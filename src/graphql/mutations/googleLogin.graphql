@@ -1,0 +1,5 @@
+mutation GoogleLogin($code: String!) {
+  googleLogin(code: $code) {
+    ...userResponse
+  }
+}

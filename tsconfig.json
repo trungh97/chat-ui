@@ -23,7 +23,8 @@
       "@redux/*": ["./redux/*"],
       "@hooks/*": ["./hooks/*"],
       "@api/*": ["./api/*"],
-      "@utils/*": ["./utils/*"]
+      "@utils/*": ["./utils/*"],
+      "@generated/*": ["./generated/*"],
     }
   },
   "exclude": ["node_modules"]

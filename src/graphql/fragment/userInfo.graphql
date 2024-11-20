@@ -1,0 +1,13 @@
+fragment userInfo on UserDTO {
+  id
+  firstName
+  lastName
+  email
+  phone
+  role
+  avatar
+  isActive
+  provider
+  providerUserId
+  status
+}

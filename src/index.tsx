@@ -1,12 +1,16 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
+import { RouterProvider } from 'react-router-dom'
 
+import { routes } from './routes/routes'
 import './index.css'
+import App from './App'
 
-const App = () => (
-  <h1 className="text-3xl font-bold text-red-600">Hello World</h1>
-)
 const container = document.getElementById('root')
 const root = createRoot(container!)
 
-root.render(<App />)
+root.render(
+  <App>
+    <RouterProvider router={routes} />
+  </App>,
+)

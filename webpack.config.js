@@ -1,37 +1,39 @@
-const path = require("path");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const webpack = require("webpack");
+const path = require('path')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const webpack = require('webpack')
 
-const dotenv = require("dotenv").config({ path: __dirname + "/.env" });
-const isDevelopment = process.env.NODE_ENV !== "production";
+const dotenv = require('dotenv').config({ path: __dirname + '/.env' })
+const isDevelopment = process.env.NODE_ENV !== 'production'
 
 module.exports = {
-  entry: path.join(__dirname, "src", "index.tsx"),
+  entry: path.join(__dirname, 'src', 'index.tsx'),
   output: {
-    filename: "bundle.js",
-    path: path.resolve(__dirname, "dist"),
+    publicPath: '/',
+    filename: 'bundle.js',
+    path: path.join(__dirname, 'dist'),
   },
   resolve: {
     alias: {
-      "@components": path.resolve(__dirname, "src/components"),
-      "@pages": path.resolve(__dirname, "src/pages"),
-      "@providers": path.resolve(__dirname, "src/providers"),
-      "@constants": path.resolve(__dirname, "src/constants"),
-      "@interfaces": path.resolve(__dirname, "src/interfaces"),
-      "@hooks": path.resolve(__dirname, "src/hooks"),
-      "@redux": path.resolve(__dirname, "src/redux"),
-      "@utils": path.resolve(__dirname, "src/utils"),
+      '@components': path.resolve(__dirname, 'src/components'),
+      '@pages': path.resolve(__dirname, 'src/pages'),
+      '@providers': path.resolve(__dirname, 'src/providers'),
+      '@constants': path.resolve(__dirname, 'src/constants'),
+      '@interfaces': path.resolve(__dirname, 'src/interfaces'),
+      '@hooks': path.resolve(__dirname, 'src/hooks'),
+      '@redux': path.resolve(__dirname, 'src/redux'),
+      '@utils': path.resolve(__dirname, 'src/utils'),
+      '@generated': path.resolve(__dirname, 'src/generated'),
     },
-    extensions: [".ts", ".js", ".tsx", ".jsx"],
+    extensions: ['.ts', '.js', '.tsx', '.jsx'],
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.join(__dirname, "public", "index.html"),
+      template: path.join(__dirname, 'public', 'index.html'),
     }),
     new webpack.DefinePlugin({
-      "process.env": JSON.stringify(dotenv.parsed),
-      "process.env.NODE_ENV": JSON.stringify(
-        isDevelopment ? "development" : "production"
+      'process.env': JSON.stringify(dotenv.parsed),
+      'process.env.NODE_ENV': JSON.stringify(
+        isDevelopment ? 'development' : 'production',
       ),
     }),
   ],
@@ -40,20 +42,20 @@ module.exports = {
       {
         test: /\.(js|jsx|ts|tsx)$/,
         exclude: /node_modules/,
-        use: ["babel-loader"],
+        use: ['babel-loader'],
       },
 
       {
         test: /\.s[ac]ss|css$/i,
         use: [
-          "style-loader",
+          'style-loader',
           {
-            loader: "css-loader",
+            loader: 'css-loader',
             options: { sourceMap: true },
           },
-          "postcss-loader",
+          'postcss-loader',
           {
-            loader: "sass-loader",
+            loader: 'sass-loader',
             options: { sourceMap: true },
           },
         ],
@@ -62,11 +64,11 @@ module.exports = {
   },
   devServer: {
     static: {
-      directory: path.join(__dirname, "public"),
+      directory: path.join(__dirname, 'public'),
     },
     port: 3000,
     hot: true,
     liveReload: true,
     historyApiFallback: true,
   },
-};
+}

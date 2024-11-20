@@ -1,0 +1,4 @@
+fragment status on IResponse {
+  statusCode
+  message
+}

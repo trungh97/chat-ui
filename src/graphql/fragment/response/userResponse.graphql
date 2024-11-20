@@ -1,0 +1,7 @@
+fragment userResponse on UserGlobalResponse {
+  ...status
+  data {
+    ...userInfo
+  }
+  error
+}
