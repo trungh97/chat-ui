@@ -25,6 +25,7 @@
       "@api/*": ["./api/*"],
       "@utils/*": ["./utils/*"],
       "@generated/*": ["./generated/*"],
+      "@routes/*": ["./routes/*"],
     }
   },
   "exclude": ["node_modules"]
