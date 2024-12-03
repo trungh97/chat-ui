@@ -15,6 +15,7 @@
     "noUnusedParameters": true,
     "paths": {
       "@components/*": ["./components/*"],
+      "@assets/*": ["./assets/*"],
       "@ui/*": ["./components/common/ui/*"],
       "@pages/*": ["./pages/*"],
       "@providers/*": ["./providers/*"],
