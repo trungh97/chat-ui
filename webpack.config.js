@@ -1,9 +1,32 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const webpack = require('webpack')
+const { ModuleFederationPlugin } = require('webpack').container
+const { FederatedTypesPlugin } = require('@module-federation/typescript')
 
 const dotenv = require('dotenv').config({ path: __dirname + '/.env' })
 const isDevelopment = process.env.NODE_ENV !== 'production'
+const deps = require('./package.json').dependencies
+
+const federationConfig = {
+  name: 'slack-ui',
+  filename: 'remoteEntry.js',
+  remotes: {
+    ui: 'ui@http://localhost:8080/remoteEntry.js',
+  },
+  shared: {
+    react: {
+      singleton: true,
+      eager: true,
+      requiredVersion: deps.react,
+    },
+    'react-dom': {
+      singleton: true,
+      eager: true,
+      requiredVersion: deps['react-dom'],
+    },
+  },
+}
 
 module.exports = {
   entry: path.join(__dirname, 'src', 'index.tsx'),
@@ -25,10 +48,15 @@ module.exports = {
       '@utils': path.resolve(__dirname, 'src/utils'),
       '@generated': path.resolve(__dirname, 'src/generated'),
       '@routes': path.resolve(__dirname, 'src/routes'),
+      ui: path.resolve(__dirname, '@mf-types/ui'),
     },
     extensions: ['.ts', '.js', '.tsx', '.jsx'],
   },
   plugins: [
+    new ModuleFederationPlugin(federationConfig),
+    new FederatedTypesPlugin({
+      federationConfig,
+    }),
     new HtmlWebpackPlugin({
       template: path.join(__dirname, 'public', 'index.html'),
     }),
@@ -73,4 +101,5 @@ module.exports = {
     liveReload: true,
     historyApiFallback: true,
   },
+  devtool: 'source-map',
 }

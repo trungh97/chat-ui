@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": "./src",
+    // "baseUrl": "./src",
     "target": "ES5",
     "lib": ["dom", "ES2016"],
     "outDir": "dist",
@@ -13,21 +13,27 @@
     "noImplicitAny": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "allowJs": true,
     "paths": {
-      "@components/*": ["./components/*"],
-      "@assets/*": ["./assets/*"],
-      "@ui/*": ["./components/common/ui/*"],
-      "@pages/*": ["./pages/*"],
-      "@providers/*": ["./providers/*"],
-      "@constants/*": ["./constants/*"],
-      "@interfaces/*": ["./interfaces/*"],
-      "@redux/*": ["./redux/*"],
-      "@hooks/*": ["./hooks/*"],
-      "@api/*": ["./api/*"],
-      "@utils/*": ["./utils/*"],
-      "@generated/*": ["./generated/*"],
-      "@routes/*": ["./routes/*"],
-    }
+      "@components/*": ["./src/components/*"],
+      "@assets/*": ["./src/assets/*"],
+      "@pages/*": ["./src/pages/*"],
+      "@providers/*": ["./src/providers/*"],
+      "@constants/*": ["./src/constants/*"],
+      "@interfaces/*": ["./src/interfaces/*"],
+      "@redux/*": ["./src/redux/*"],
+      "@hooks/*": ["./src/hooks/*"],
+      "@api/*": ["./src/api/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@generated/*": ["./src/generated/*"],
+      "@routes/*": ["./src/routes/*"],
+      "ui/*": ["./@mf-types/ui/*"]
+    },
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": false,
+    "isolatedModules": true
   },
+  "include": ["src/**/*"],
   "exclude": ["node_modules"]
 }

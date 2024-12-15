@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 
 import { CallbackPage, LoginPage } from '@pages/Auth'
 import { HomePage } from '@pages/Home'
+import About from '@pages/About/About'
 
 import { PrivateRoutes } from './PrivateRoutes'
 import { PublicRoutes } from './PublicRoutes'
@@ -12,6 +13,7 @@ const AppRoutes = () => {
     <Routes>
       <Route element={<PrivateRoutes />}>
         <Route path="/" element={<HomePage />} />
+        <Route path="/about" element={<About />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Route>
       <Route element={<PublicRoutes />}>

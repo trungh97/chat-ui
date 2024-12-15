@@ -4,8 +4,12 @@ import {
   useLogoutMutation,
   useMeQuery,
 } from '@generated/graphql'
-import React from 'react'
+import React, { lazy } from 'react'
 import { useNavigate } from 'react-router-dom'
+
+const Button = lazy(() =>
+  import('ui/Button').then((module) => ({ default: module.Button })),
+)
 
 const Home = () => {
   const { loading, data, error } = useMeQuery()
@@ -70,6 +74,12 @@ const Home = () => {
           Logout
         </button>
       )}
+
+      <Button
+        label="Go to About Page"
+        onClick={() => navigate('/about')}
+        size="sm"
+      />
     </div>
   )
 }

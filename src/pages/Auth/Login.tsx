@@ -5,6 +5,10 @@ import { useNavigate } from 'react-router-dom'
 import { MeDocument, MeQuery } from '@generated/graphql'
 import { useAuth } from '@hooks/useAuth'
 
+const Button = React.lazy(() =>
+  import('ui/Button').then((module) => ({ default: module.Button })),
+)
+
 const Login = () => {
   const navigate = useNavigate()
   const client = useApolloClient()
@@ -56,7 +60,7 @@ const Login = () => {
       {authLoading || (!authLoading && authData?.me.data?.id) ? (
         <div>Loading</div>
       ) : (
-        <button onClick={handleLogin}>Login By URL</button>
+        <Button intent="primary" label="Login By URL" onClick={handleLogin} />
       )}
     </>
   )

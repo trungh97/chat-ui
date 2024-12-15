@@ -17,7 +17,9 @@ const App = () => {
         clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID as string}
       >
         <BrowserRouter>
-          <AppRoutes />
+          <React.Suspense fallback={<div>Loading...</div>}>
+            <AppRoutes />
+          </React.Suspense>
         </BrowserRouter>
       </GoogleOAuthProvider>
     </ApolloProvider>
