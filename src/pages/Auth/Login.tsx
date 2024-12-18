@@ -5,8 +5,16 @@ import { useNavigate } from 'react-router-dom'
 import { MeDocument, MeQuery } from '@generated/graphql'
 import { useAuth } from '@hooks/useAuth'
 
+const GoogleSignInButton = React.lazy(() =>
+  import('ui/SocialButon').then((module) => ({
+    default: module.GoogleSignInButton,
+  })),
+)
+
 const Button = React.lazy(() =>
-  import('ui/Button').then((module) => ({ default: module.Button })),
+  import('ui/Button').then((module) => ({
+    default: module.Button,
+  })),
 )
 
 const Login = () => {
@@ -60,7 +68,10 @@ const Login = () => {
       {authLoading || (!authLoading && authData?.me.data?.id) ? (
         <div>Loading</div>
       ) : (
-        <Button intent="primary" label="Login By URL" onClick={handleLogin} />
+        <div className="m-3 flex justify-center items-center gap-3 flex-col w-[360px] justify-self-center">
+          <Button className='w-full' label="Sign in" />
+          <GoogleSignInButton className="w-full" onClick={handleLogin} />
+        </div>
       )}
     </>
   )
