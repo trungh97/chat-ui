@@ -1,26 +1,10 @@
 import { useApolloClient } from '@apollo/client'
-import React from 'react'
+import { MeDocument, MeQuery } from '@generated/graphql'
 import { useNavigate } from 'react-router-dom'
 
-import { MeDocument, MeQuery } from '@generated/graphql'
-import { useAuth } from '@hooks/useAuth'
-
-const GoogleSignInButton = React.lazy(() =>
-  import('ui/SocialButon').then((module) => ({
-    default: module.GoogleSignInButton,
-  })),
-)
-
-const Button = React.lazy(() =>
-  import('ui/Button').then((module) => ({
-    default: module.Button,
-  })),
-)
-
-const Login = () => {
+export const useGoogleLogin = () => {
   const navigate = useNavigate()
   const client = useApolloClient()
-  const { data: authData, loading: authLoading } = useAuth()
 
   const handleLogin = () => {
     const authorizationEndpoint = process.env.REACT_APP_AUTHORIZATION_ENDPOINT
@@ -63,18 +47,7 @@ const Login = () => {
     window.addEventListener('message', messageListener)
   }
 
-  return (
-    <>
-      {authLoading || (!authLoading && authData?.me.data?.id) ? (
-        <div>Loading</div>
-      ) : (
-        <div className="m-3 flex justify-center items-center gap-3 flex-col w-[360px] justify-self-center">
-          <Button className='w-full' label="Sign in" />
-          <GoogleSignInButton className="w-full" onClick={handleLogin} />
-        </div>
-      )}
-    </>
-  )
+  return {
+    handleLogin,
+  }
 }
-
-export default Login
