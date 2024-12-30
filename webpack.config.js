@@ -1,32 +1,33 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const webpack = require('webpack')
-const { ModuleFederationPlugin } = require('webpack').container
-const { FederatedTypesPlugin } = require('@module-federation/typescript')
+// const { ModuleFederationPlugin } = require('webpack').container
+// const { FederatedTypesPlugin } = require('@module-federation/typescript')
 
 const dotenv = require('dotenv').config({ path: __dirname + '/.env' })
 const isDevelopment = process.env.NODE_ENV !== 'production'
-const deps = require('./package.json').dependencies
+// const deps = require('./package.json').dependencies
 
-const federationConfig = {
-  name: 'slack-ui',
-  filename: 'remoteEntry.js',
-  remotes: {
-    ui: 'ui@http://localhost:8080/remoteEntry.js',
-  },
-  shared: {
-    react: {
-      singleton: true,
-      eager: true,
-      requiredVersion: deps.react,
-    },
-    'react-dom': {
-      singleton: true,
-      eager: true,
-      requiredVersion: deps['react-dom'],
-    },
-  },
-}
+// NOTE: This is the configuration for the module federation plugin.
+// const federationConfig = {
+//   name: 'slack-ui',
+//   filename: 'remoteEntry.js',
+//   remotes: {
+//     ui: 'ui@http://localhost:8080/remoteEntry.js',
+//   },
+//   shared: {
+//     react: {
+//       singleton: true,
+//       eager: true,
+//       requiredVersion: deps.react,
+//     },
+//     'react-dom': {
+//       singleton: true,
+//       eager: true,
+//       requiredVersion: deps['react-dom'],
+//     },
+//   },
+// }
 
 module.exports = {
   entry: path.join(__dirname, 'src', 'index.tsx'),
@@ -53,10 +54,10 @@ module.exports = {
     extensions: ['.ts', '.js', '.tsx', '.jsx'],
   },
   plugins: [
-    new ModuleFederationPlugin(federationConfig),
-    new FederatedTypesPlugin({
-      federationConfig,
-    }),
+    // new ModuleFederationPlugin(federationConfig),
+    // new FederatedTypesPlugin({
+    //   federationConfig,
+    // }),
     new HtmlWebpackPlugin({
       template: path.join(__dirname, 'public', 'index.html'),
     }),

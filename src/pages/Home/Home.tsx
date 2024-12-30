@@ -4,12 +4,9 @@ import {
   useLogoutMutation,
   useMeQuery,
 } from '@generated/graphql'
-import React, { lazy } from 'react'
+import React from 'react'
 import { useNavigate } from 'react-router-dom'
-
-const Button = lazy(() =>
-  import('ui/Button').then((module) => ({ default: module.Button })),
-)
+import { Button } from 'slack-shared-ui'
 
 const Home = () => {
   const { loading, data, error } = useMeQuery()

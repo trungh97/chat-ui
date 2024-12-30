@@ -1,17 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-
-const Button = React.lazy(() =>
-  import('ui/Button').then((module) => ({ default: module.Button })),
-)
-
-const SharedText = React.lazy(() =>
-  import('ui/Text').then((module) => ({ default: module.Text })),
-)
-
-const VectorIcon = React.lazy(() =>
-  import('ui/Icons').then((module) => ({ default: module.VectorIcon })),
-)
+import { Button, Text as SharedText, VectorIcon } from 'slack-shared-ui'
 
 const About = () => {
   const navigate = useNavigate()
