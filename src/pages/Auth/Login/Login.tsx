@@ -1,18 +1,13 @@
 import React from 'react'
-import { Button, Form, FormField, GoogleSignInButton } from 'slack-shared-ui'
 
-import { useAuth } from '@hooks/useAuth'
 import ChatIcon from '@assets/icons/ChatIcon'
+import { useAuth } from '@hooks/useAuth'
 
-import { useGoogleLogin } from './hooks'
+import { CredentialLogin } from './CredentialLogin'
+import { GoogleLogin } from './GoogleLogin'
 
-const Login = () => {
+export const Login = () => {
   const { data: authData, loading: authLoading } = useAuth()
-  const { handleLogin } = useGoogleLogin()
-
-  const handleLoginCredentials = () => {
-    // TODO: Implement login with email and password
-  }
 
   return (
     <>
@@ -28,33 +23,8 @@ const Login = () => {
             Welcome back! Please enter your details.
           </span>
 
-          <Form
-            autoComplete="off"
-            className="w-full mt-8"
-            onSubmit={handleLoginCredentials}
-          >
-            <FormField
-              label="Email"
-              name="email"
-              placeholder="Email"
-              rules={[
-                { type: 'required', message: 'Email is required' },
-                { type: 'email', message: 'Invalid email' },
-              ]}
-              autoComplete="off"
-              className="m-0"
-            />
-            <FormField
-              label="Password"
-              type="password"
-              name="password"
-              placeholder="Password"
-              rules={[{ type: 'required', message: 'Password is required' }]}
-              autoComplete="off"
-            />
-            <Button size="lg" label="Sign in" type="submit" />
-          </Form>
-          <GoogleSignInButton className="w-full mt-3" onClick={handleLogin} />
+          <CredentialLogin />
+          <GoogleLogin />
         </div>
       )}
     </>

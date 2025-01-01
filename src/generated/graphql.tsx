@@ -25,6 +25,7 @@ export type IResponse = {
 export type Mutation = {
   __typename?: 'Mutation';
   googleLogin: UserGlobalResponse;
+  loginCredentialBasedUser: UserGlobalResponse;
   logout: Scalars['Boolean']['output'];
   registerCredentialBasedUser: UserGlobalResponse;
 };
@@ -32,6 +33,11 @@ export type Mutation = {
 
 export type MutationGoogleLoginArgs = {
   code: Scalars['String']['input'];
+};
+
+
+export type MutationLoginCredentialBasedUserArgs = {
+  request: UserLoginInput;
 };
 
 
@@ -103,6 +109,11 @@ export type UserGlobalResponse = IResponse & {
   statusCode?: Maybe<Scalars['Float']['output']>;
 };
 
+export type UserLoginInput = {
+  email: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+};
+
 /** User provider */
 export enum UserProvider {
   Facebook = 'FACEBOOK',
@@ -131,6 +142,13 @@ type Status_UserGlobalResponse_Fragment = { __typename?: 'UserGlobalResponse', s
 export type StatusFragment = Status_PostGlobalResponse_Fragment | Status_UserGlobalResponse_Fragment;
 
 export type UserInfoFragment = { __typename?: 'UserDTO', id: string, firstName: string, lastName: string, email: string, phone?: string | null, role: UserRole, avatar: string, isActive: boolean, provider?: UserProvider | null, providerUserId?: string | null, status: UserStatus };
+
+export type CredentialBasedLoginMutationVariables = Exact<{
+  request: UserLoginInput;
+}>;
+
+
+export type CredentialBasedLoginMutation = { __typename?: 'Mutation', loginCredentialBasedUser: { __typename?: 'UserGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'UserDTO', id: string, firstName: string, lastName: string, email: string, phone?: string | null, role: UserRole, avatar: string, isActive: boolean, provider?: UserProvider | null, providerUserId?: string | null, status: UserStatus } | null } };
 
 export type GoogleLoginMutationVariables = Exact<{
   code: Scalars['String']['input'];
@@ -180,6 +198,39 @@ export const UserResponseFragmentDoc = gql`
 }
     ${StatusFragmentDoc}
 ${UserInfoFragmentDoc}`;
+export const CredentialBasedLoginDocument = gql`
+    mutation CredentialBasedLogin($request: UserLoginInput!) {
+  loginCredentialBasedUser(request: $request) {
+    ...userResponse
+  }
+}
+    ${UserResponseFragmentDoc}`;
+export type CredentialBasedLoginMutationFn = Apollo.MutationFunction<CredentialBasedLoginMutation, CredentialBasedLoginMutationVariables>;
+
+/**
+ * __useCredentialBasedLoginMutation__
+ *
+ * To run a mutation, you first call `useCredentialBasedLoginMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCredentialBasedLoginMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [credentialBasedLoginMutation, { data, loading, error }] = useCredentialBasedLoginMutation({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useCredentialBasedLoginMutation(baseOptions?: Apollo.MutationHookOptions<CredentialBasedLoginMutation, CredentialBasedLoginMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CredentialBasedLoginMutation, CredentialBasedLoginMutationVariables>(CredentialBasedLoginDocument, options);
+      }
+export type CredentialBasedLoginMutationHookResult = ReturnType<typeof useCredentialBasedLoginMutation>;
+export type CredentialBasedLoginMutationResult = Apollo.MutationResult<CredentialBasedLoginMutation>;
+export type CredentialBasedLoginMutationOptions = Apollo.BaseMutationOptions<CredentialBasedLoginMutation, CredentialBasedLoginMutationVariables>;
 export const GoogleLoginDocument = gql`
     mutation GoogleLogin($code: String!) {
   googleLogin(code: $code) {

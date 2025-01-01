@@ -1,2 +1,2 @@
-export { LoginPage } from './Login'
+export { Login } from './Login'
 export { default as CallbackPage } from './Callback'
