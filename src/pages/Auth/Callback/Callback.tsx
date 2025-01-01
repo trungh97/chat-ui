@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { useGoogleLoginMutation } from '@generated/graphql'
 
-const Callback = () => {
+export const Callback = () => {
   const [googleLogin] = useGoogleLoginMutation()
   const navigate = useNavigate()
 

@@ -2,7 +2,7 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, Text as SharedText, VectorIcon } from 'slack-shared-ui'
 
-const About = () => {
+export const AboutPage = () => {
   const navigate = useNavigate()
   return (
     <div>
@@ -21,4 +21,4 @@ const About = () => {
   )
 }
 
-export default About
+export default AboutPage

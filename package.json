@@ -9,7 +9,8 @@
     "test": "jest",
     "lint": "eslint \"src/**/*.{ts,tsx}\" --config eslint.config.mjs",
     "lint:fix": "eslint \"src/**/*.{ts,tsx}\" --fix --config eslint.config.mjs",
-    "codegen": "graphql-codegen --config codegen.yml"
+    "codegen": "graphql-codegen --config codegen.yml",
+    "rebuild": "rmdir /s /q dist && npm run build"
   },
   "keywords": [],
   "author": "",
