@@ -5,6 +5,7 @@ import {
   useCredentialBasedLoginMutation,
 } from '@generated/graphql'
 import { useNavigate } from 'react-router-dom'
+import { message } from 'slack-shared-ui'
 
 export const useCredentialLogin = () => {
   const [credentialBasedLogin] = useCredentialBasedLoginMutation()
@@ -12,7 +13,6 @@ export const useCredentialLogin = () => {
   const navigate = useNavigate()
 
   const handleLogin = async (values: Record<string, any>) => {
-    console.log(values);
     if (!values.email || !values.password) {
       return
     }
@@ -28,7 +28,7 @@ export const useCredentialLogin = () => {
       })
 
       if (response.data?.loginCredentialBasedUser.error) {
-        console.log('Error:', response.data.loginCredentialBasedUser.error)
+        message.error(response.data.loginCredentialBasedUser.error)
         return
       }
 
@@ -44,10 +44,11 @@ export const useCredentialLogin = () => {
             },
           },
         })
+        message.success('Logged in successfully')
         navigate('/')
       }
     } catch (error) {
-      console.log('Error:', error)
+      message.error('Something went wrong')
       return
     }
   }
