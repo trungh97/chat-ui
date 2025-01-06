@@ -1,6 +1,7 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const webpack = require('webpack')
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 // const { ModuleFederationPlugin } = require('webpack').container
 // const { FederatedTypesPlugin } = require('@module-federation/typescript')
 
@@ -30,6 +31,7 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 // }
 
 module.exports = {
+  mode: isDevelopment ? 'development' : 'production',
   entry: path.join(__dirname, 'src', 'index.tsx'),
   output: {
     publicPath: '/',
@@ -58,14 +60,12 @@ module.exports = {
     // new FederatedTypesPlugin({
     //   federationConfig,
     // }),
+    // new BundleAnalyzerPlugin(),
     new HtmlWebpackPlugin({
       template: path.join(__dirname, 'public', 'index.html'),
     }),
     new webpack.DefinePlugin({
       'process.env': JSON.stringify(dotenv.parsed),
-      'process.env.NODE_ENV': JSON.stringify(
-        isDevelopment ? 'development' : 'production',
-      ),
     }),
   ],
   module: {
@@ -95,7 +95,7 @@ module.exports = {
   },
   devServer: {
     static: {
-      directory: path.join(__dirname, 'public'),
+      directory: path.join(__dirname, 'dist'),
     },
     port: 3000,
     hot: true,
