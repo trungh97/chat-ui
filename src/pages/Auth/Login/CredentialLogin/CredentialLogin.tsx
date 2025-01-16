@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Form, FormField } from 'slack-shared-ui'
+import { Button, Form, FormField } from 'shared-ui'
 import { useCredentialLogin } from './hooks'
 
 export const CredentialLogin = () => {

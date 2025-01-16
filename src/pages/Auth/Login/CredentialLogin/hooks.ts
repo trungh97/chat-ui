@@ -5,7 +5,7 @@ import {
   useCredentialBasedLoginMutation,
 } from '@generated/graphql'
 import { useNavigate } from 'react-router-dom'
-import { message } from 'slack-shared-ui'
+import { message } from 'shared-ui'
 
 export const useCredentialLogin = () => {
   const [credentialBasedLogin] = useCredentialBasedLoginMutation()

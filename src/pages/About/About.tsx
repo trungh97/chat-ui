@@ -1,6 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button, Text as SharedText, VectorIcon } from 'slack-shared-ui'
+import { Button, Text as SharedText, VectorIcon } from 'shared-ui'
 
 export const AboutPage = () => {
   const navigate = useNavigate()
@@ -8,8 +8,10 @@ export const AboutPage = () => {
     <div>
       <SharedText />
       <Button
-        icon={<VectorIcon />}
-        iconPosition="trailing"
+        icon={{
+          content: <VectorIcon />,
+          position: 'trailing',
+        }}
         intent="primary"
         size="2xl"
         label="Click me"
