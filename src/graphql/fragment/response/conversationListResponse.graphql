@@ -1,0 +1,7 @@
+fragment conversationListResponse on ConversationListGlobalResponse {
+  ...status
+  data {
+    ...conversation
+  }
+  error
+}

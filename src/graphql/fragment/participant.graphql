@@ -1,0 +1,6 @@
+fragment participant on ParticipantDTO {
+  id
+  conversationId
+  userId
+  type
+}

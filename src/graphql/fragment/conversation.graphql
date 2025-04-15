@@ -1,0 +1,14 @@
+fragment conversation on ConversationDTO {
+  id
+  title
+  creatorId
+  isArchived
+  deletedAt
+  type
+  participants {
+    ...participant
+  }
+  messages {
+    ...message
+  }
+}
