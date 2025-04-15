@@ -1,0 +1,10 @@
+fragment message on MessageDTO {
+  id
+  content
+  messageType
+  senderId
+  extra
+  conversationId
+  replyToMessageId
+  createdAt
+}

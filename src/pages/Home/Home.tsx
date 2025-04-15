@@ -1,3 +1,4 @@
+import { Layout } from '@components/Layout'
 import {
   MeDocument,
   MeQuery,
@@ -6,7 +7,6 @@ import {
 } from '@generated/graphql'
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button } from 'slack-shared-ui'
 
 const Home = () => {
   const { loading, data, error } = useMeQuery()
@@ -40,8 +40,9 @@ const Home = () => {
   const hasError = Boolean(error || data?.me.error)
 
   return (
-    <div className="text-center">
-      <div className="text-3xl text-blue-700">Welcome</div>
+    <>
+      <Layout />
+      {/* <div className="text-3xl text-blue-700">Welcome</div>
       {hasError && (
         <div className="text-red-600">
           Error: {error?.message || data?.me.error}
@@ -62,22 +63,22 @@ const Home = () => {
         </button>
       )}
 
-      {data && data.me.data?.id && (
+      
+      <Button
+      label="Go to About Page"
+      onClick={() => navigate('/about')}
+      size="sm"
+      /> */}
+      {/* {data && data.me.data?.id && (
         <button
           onClick={onLogout}
           disabled={logoutLoading}
-          className="px-6 py-2 bg-slate-500 rounded border-black"
+          className="mt-[100px] px-6 py-2 bg-slate-500 rounded border-black"
         >
           Logout
         </button>
-      )}
-
-      <Button
-        label="Go to About Page"
-        onClick={() => navigate('/about')}
-        size="sm"
-      />
-    </div>
+      )} */}
+    </>
   )
 }
 
