@@ -34,30 +34,28 @@ export const ChatBox = () => {
       </div>
     )
 
-  const conversations = data.getMyConversations.data.map(
-    (conversation) => ({
-      id: conversation.id,
-      title: conversation.title!,
-      avatar:
-        conversation.groupAvatar || conversation.defaultGroupAvatar?.[0] || '',
-      lastMessage: conversation.messages[0]?.content || 'No messages yet',
-      lastMessageTime:
-        conversation.messages[0]?.createdAt || new Date().toISOString(),
-      isRead: false,
-      status: <div className="w-2 h-2 bg-green-500 rounded-full" />,
-    }),
-  )
+  const conversations = data.getMyConversations.data.map((conversation) => ({
+    id: conversation.id,
+    title: conversation.title!,
+    avatar:
+      conversation.groupAvatar || conversation.defaultGroupAvatar?.[0] || '',
+    lastMessage: conversation.messages[0]?.content || 'No messages yet',
+    lastMessageTime:
+      conversation.messages[0]?.createdAt || new Date().toISOString(),
+    isRead: false,
+    status: <div className="w-2 h-2 bg-green-500 rounded-full" />,
+  }))
 
   return (
-    <div className="flex flex-col h-full px-[1.5rem] py-[2rem]">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col h-full py-[2rem] max-w-[20rem]">
+      <div className="flex items-center justify-between px-[1.5rem]">
         <h3 className="text- [1.25rem] font-bold">Chats</h3>
         <div className="flex flex-row gap-4 gap-x-1">
           <AddNewChat />
           <FilterChat />
         </div>
       </div>
-      <div className="my-6">
+      <div className="my-6 px-[1.5rem]">
         <SearchChat />
       </div>
       <ChatList data={conversations} />
