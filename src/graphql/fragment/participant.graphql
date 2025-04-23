@@ -4,3 +4,12 @@ fragment participant on ParticipantDTO {
   userId
   type
 }
+
+fragment extendedParticipant on ExtendedParticipantDTO {
+  id
+  conversationId
+  userId
+  type
+  name
+  avatar
+}

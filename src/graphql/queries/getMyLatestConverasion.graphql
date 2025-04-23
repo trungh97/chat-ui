@@ -1,17 +1,5 @@
 query GetMyLatestConversations($options: CursorBasedPaginationParams!) {
   getMyConversations(options: $options) {
-    ...status
-    data {
-      id
-      title
-      creatorId
-      isArchived
-      deletedAt
-      type
-      messages {
-        ...message
-      }
-    }
-    error
+    ...conversationListResponse
   }
 }

@@ -2,28 +2,43 @@ import React from 'react'
 import { Avatar } from 'shared-ui'
 import { ChatSummaryProps } from '../types'
 
-export const ChatSummary = ({ data }: { data: ChatSummaryProps }) => {
+export const ChatSummary = ({
+  data: { id, avatar, title, lastMessage, lastMessageTime, isRead },
+}: {
+  data: ChatSummaryProps
+}) => {
   return (
-    // TODO: check the style carefully
-    <article className="flex flex-col justify-center items-center mt-4 w-full min-h-[60px] first:mt-0">
-      <div className="flex gap-3 items-center max-w-full min-h-[60px] w-[263px]">
-        <div className="flex overflow-hidden relative flex-col justify-end items-end self-stretch px-2.5 pt-9 my-auto w-12 aspect-square">
-          {/* TODO: replace with user avatar */}
-          <img
-            src="https://cdn.builder.io/api/v1/image/assets/TEMP/7c940198a368f49e5b6f645005a3623eb0a8df36?placeholderIfAbsent=true&apiKey=db2de4f51c3f4cc2b2e91fd659727a98"
-            className="object-cover absolute inset-0 size-full"
-            alt="User avatar"
-          />
-          <div className="flex relative z-10 shrink-0 w-full bg-emerald-500 rounded-md h-[15px] max-md:-mr-0.5" />
+    <div
+      key={id}
+      className={`px-4 py-3 hover:bg-gray-100 cursor-pointer ${!isRead ? 'bg-gray-50' : ''}`}
+    >
+      <div className="flex gap-3">
+        <div className="relative">
+          <Avatar imageUrl={avatar} size="md" />
+          <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
         </div>
-        <div className="self-stretch my-auto">
-          <h3 className="text-base font-semibold text-gray-700">Olivia Rhye</h3>
-          <p className="text-sm leading-6 text-gray-600">
-            This is the sample message...
+        <div className="flex-1 min-w-0">
+          <div className="flex justify-between items-center">
+            <h3
+              className={`font-medium text-gray-900 truncate ${!isRead ? 'font-semibold' : ''}`}
+            >
+              {title}
+            </h3>
+            <span className="text-sm text-gray-500">
+              {new Date(lastMessageTime).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </span>
+          </div>
+          <p
+            className={`text-sm text-gray-500 truncate ${!isRead ? 'font-medium text-gray-900' : ''}`}
+          >
+            {lastMessage}
           </p>
         </div>
       </div>
-    </article>
+    </div>
   )
 }
 

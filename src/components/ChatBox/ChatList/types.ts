@@ -8,4 +8,5 @@ export type ChatSummaryProps = {
   lastMessageTime: string
   isRead: boolean
   avatar: string
+  isSelected?: boolean
 }
