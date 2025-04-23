@@ -5,8 +5,20 @@ fragment conversation on ConversationDTO {
   isArchived
   deletedAt
   type
+  groupAvatar
+}
+
+fragment extendedConversation on ExtendConversationDTO {
+  id
+  title
+  creatorId
+  isArchived
+  deletedAt
+  type
+  groupAvatar
+  defaultGroupAvatar
   participants {
-    ...participant
+    ...extendedParticipant
   }
   messages {
     ...message

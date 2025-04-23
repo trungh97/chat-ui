@@ -1,7 +1,7 @@
-fragment conversationListResponse on ConversationListGlobalResponse {
+fragment conversationListResponse on ExtendConversationListGlobalResponse {
   ...status
   data {
-    ...conversation
+    ...extendedConversation
   }
   error
 }
