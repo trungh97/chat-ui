@@ -10,7 +10,7 @@ export const ChatSummary = ({
   return (
     <div
       key={id}
-      className={`px-4 py-3 hover:bg-gray-100 cursor-pointer ${!isRead ? 'bg-gray-50' : ''}`}
+      className={`py-1 px-6 hover:bg-brand-100 cursor-pointer w-full`}
     >
       <div className="flex gap-3">
         <div className="relative">
@@ -31,11 +31,7 @@ export const ChatSummary = ({
               })}
             </span>
           </div>
-          <p
-            className={`text-sm text-gray-500 truncate ${!isRead ? 'font-medium text-gray-900' : ''}`}
-          >
-            {lastMessage}
-          </p>
+          <p className={`text-sm text-gray-500 truncate`}>{lastMessage}</p>
         </div>
       </div>
     </div>
