@@ -12,12 +12,9 @@ export const ChatList = ({ data }: ChatListProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-4 overflow-y-auto h-full flex-1">
+    <div className="flex flex-col overflow-y-auto h-full flex-1">
       {data.map((chat) => (
-        <div
-          key={chat.id}
-          className="flex items-center gap-4 py-2 hover:bg-brand-100 cursor-pointer"
-        >
+        <div key={chat.id}>
           <ChatSummary data={chat} />
         </div>
       ))}
