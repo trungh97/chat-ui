@@ -10,7 +10,7 @@ export const ChatSummary = ({
   return (
     <div
       key={id}
-      className={`py-3 px-6 hover:bg-brand-100 cursor-pointer w-full`}
+      className={`py-3 px-6 hover:bg-brand-200 cursor-pointer w-full rounded-xl`}
     >
       <div className="flex gap-3">
         <div className="relative">
