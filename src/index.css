@@ -4,6 +4,22 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .chatlist-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+  .chatlist-scrollbar::-webkit-scrollbar-track {
+    background: #f9f5ff;
+  }
+  .chatlist-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 8px;
+  }
+  .chatlist-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+}
+
 /* NOTE: BELOW IS THE WAY TO LOAD OFFLINE THE CUSTOM GOOGLE FONT TO AVOID SCREEN FLICKERING 
 WHEN THE FONT IS LOADED VIA THE LINK AT THE TOP OF THE FILE. BUT THIS WAY MAKE THE CSS FILE BIGGER, 
 SO I DECIDED TO USE THE AVAILABLE FONT ON SYSTEM */
