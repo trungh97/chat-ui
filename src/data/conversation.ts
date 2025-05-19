@@ -4,7 +4,7 @@ import { Conversation } from '../types'
 export const formatConversationList = (
   data: GetMyLatestConversationsQuery | undefined,
 ): Conversation[] => {
-  return (data?.getMyConversations.data || []).map((conversation) => ({
+  return (data?.getMyConversations.data?.items || []).map((conversation) => ({
     id: conversation.id,
     title: conversation.title!,
     avatar:

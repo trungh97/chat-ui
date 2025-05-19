@@ -1,7 +1,10 @@
 fragment conversationListResponse on ExtendConversationListGlobalResponse {
   ...status
   data {
-    ...extendedConversation
+    items {
+      ...extendedConversation
+    }
+    nextCursor
   }
   error
 }

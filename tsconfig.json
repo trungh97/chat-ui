@@ -27,6 +27,8 @@
       "@utils/*": ["./src/utils/*"],
       "@generated/*": ["./src/generated/*"],
       "@routes/*": ["./src/routes/*"],
+      "@store/*": ["./src/store/*"],
+      "@data/*": ["./src/data/*"],
       "ui/*": ["./@mf-types/ui/*"]
     },
     "declaration": true,
