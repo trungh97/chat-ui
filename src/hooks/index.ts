@@ -1,2 +1,2 @@
 export * from './useAuth'
-export * from './useMyLatestConversations'
+export * from './conversations/useMyLatestConversations'
