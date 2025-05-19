@@ -50,8 +50,16 @@ export const ChatList = memo(() => {
     }
   }, [handleIntersect])
 
-  if (!conversations || conversations.length === 0) {
+  if ((!conversations || conversations.length === 0) && !loading) {
     return <div>No chats available</div>
+  }
+
+  if (loading && conversations.length === 0) {
+    return (
+      <div className="text-center py-2 text-sm text-gray-500">
+        Loading chats...
+      </div>
+    )
   }
 
   return (
