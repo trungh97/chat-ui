@@ -1,12 +1,12 @@
+import { DEFAULT_DEBOUNCE_TIME } from '@constants/common'
 import { DEFAULT_LIMIT } from '@constants/pagination'
 import { useGetMyLatestConversationsQuery } from '@generated/graphql'
-import { useCallback, useEffect, useRef } from 'react'
 import _debounce from 'lodash/debounce'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { formatConversationList } from '../../data'
 import { useConversationListStore } from '../../store'
 import { CursorBasedPagination } from '../../types'
-import { DEFAULT_DEBOUNCE_TIME } from '@constants/common'
 
 export const useMyLatestConversations = (options: CursorBasedPagination) => {
   const setConversations = useConversationListStore.use.setConversations()
@@ -15,6 +15,8 @@ export const useMyLatestConversations = (options: CursorBasedPagination) => {
   const conversations = useConversationListStore.use.conversations()
 
   const initializedRef = useRef(false)
+
+  const [isFetchingMore, setIsFetchingMore] = useState(false)
 
   const { data, error, loading, fetchMore } = useGetMyLatestConversationsQuery({
     variables: {
@@ -41,7 +43,9 @@ export const useMyLatestConversations = (options: CursorBasedPagination) => {
 
   const loadMore = useCallback(
     _debounce(async () => {
-      if (!cursor || loading) return
+      if (!cursor || isFetchingMore || loading) return
+
+      setIsFetchingMore(true)
 
       const { data: moreData } = await fetchMore({
         variables: {
@@ -50,6 +54,8 @@ export const useMyLatestConversations = (options: CursorBasedPagination) => {
             limit: options.limit || DEFAULT_LIMIT,
           },
         },
+      }).finally(() => {
+        setIsFetchingMore(false)
       })
 
       const moreItems = formatConversationList(moreData)
@@ -62,12 +68,13 @@ export const useMyLatestConversations = (options: CursorBasedPagination) => {
       setConversations(uniqueList)
       setNextCursor(moreData?.getMyConversations.data?.nextCursor ?? null)
     }, DEFAULT_DEBOUNCE_TIME),
-    [cursor, loading],
+    [cursor, loading, isFetchingMore],
   )
 
   return {
     conversations: formatConversationList(data),
     loading,
+    isFetchingMore,
     error,
     loadMore,
     hasNextPage: !!data?.getMyConversations.data?.nextCursor,
