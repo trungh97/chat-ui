@@ -1,7 +1,11 @@
 import { useMyLatestConversations } from '@hooks/conversations'
 import useConversationListStore from '@store/conversations'
 import React, { memo, useCallback, useEffect, useRef } from 'react'
-import ChatSummary from './ChatSummary/ChatSummary'
+import { Skeleton } from 'shared-ui'
+
+import { ChatListLoading } from './ChatListLoading'
+import { ChatListWrapper } from './ChatListWrapper'
+import { ChatSummary, ChatSummaryWrapper } from './ChatSummary'
 import { ChatSummaryProps } from './types'
 
 export type ChatListProps = {
@@ -11,10 +15,11 @@ export type ChatListProps = {
 export const ChatList = memo(() => {
   const conversations = useConversationListStore.use.conversations()
 
-  const { loadMore, hasNextPage, loading } = useMyLatestConversations({
-    cursor: null,
-    limit: 15,
-  })
+  const { loadMore, hasNextPage, loading, isFetchingMore } =
+    useMyLatestConversations({
+      cursor: null,
+      limit: 15,
+    })
 
   const observerRef = useRef<IntersectionObserver | null>(null)
   const sentinelRef = useRef<HTMLDivElement | null>(null)
@@ -56,26 +61,26 @@ export const ChatList = memo(() => {
 
   if (loading && conversations.length === 0) {
     return (
-      <div className="text-center py-2 text-sm text-gray-500">
-        Loading chats...
-      </div>
+      <ChatListWrapper>
+        <ChatListLoading />
+      </ChatListWrapper>
     )
   }
 
   return (
-    <div className="flex flex-col pr-2 overflow-y-auto h-full flex-1 ml-2 chatlist-scrollbar">
+    <ChatListWrapper>
       {conversations.map((chat) => (
-        <ChatSummary key={chat.id} data={chat} />
+        <ChatSummaryWrapper key={chat.id}>
+          <Skeleton title={false} avatar loading={loading} key={chat.id}>
+            <ChatSummary key={chat.id} data={chat} />
+          </Skeleton>
+        </ChatSummaryWrapper>
       ))}
 
       <div ref={sentinelRef} className="h-1" />
 
-      {loading && (
-        <div className="text-center py-2 text-sm text-gray-500">
-          Loading more...
-        </div>
-      )}
-    </div>
+      {isFetchingMore && <ChatListLoading />}
+    </ChatListWrapper>
   )
 })
 
