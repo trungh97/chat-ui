@@ -1,16 +1,8 @@
-import { ChatBox } from '@components/ChatBox'
 import React from 'react'
-import { Divider } from 'shared-ui'
-import { QuickLaunch } from './QuickLaunch'
 
-export const Layout = () => {
+export const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="flex h-screen w-full flex-row bg-brand-50">
-      <QuickLaunch />
-      <Divider orientation="vertical" color="#e9eaeb" />
-      <ChatBox />
-      <Divider orientation="vertical" color="#e9eaeb" />
-    </div>
+    <div className="w-full h-screen bg-brand-50 flex flex-row min-w-[500px]">{children}</div>
   )
 }
 
