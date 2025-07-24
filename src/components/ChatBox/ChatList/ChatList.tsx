@@ -1,8 +1,8 @@
+import { useInfiniteScroll } from '@hooks/common'
 import { useMyLatestConversations } from '@hooks/conversations'
 import useConversationListStore from '@store/conversations'
-import React, { memo, useCallback, useEffect, useRef } from 'react'
+import React, { memo } from 'react'
 import { Skeleton } from 'shared-ui'
-
 import { ChatListLoading } from './ChatListLoading'
 import { ChatListWrapper } from './ChatListWrapper'
 import { ChatSummary, ChatSummaryWrapper } from './ChatSummary'
@@ -21,39 +21,11 @@ export const ChatList = memo(() => {
       limit: 15,
     })
 
-  const observerRef = useRef<IntersectionObserver | null>(null)
-  const sentinelRef = useRef<HTMLDivElement | null>(null)
-
-  const handleIntersect = useCallback(
-    (entries: IntersectionObserverEntry[]) => {
-      const entry = entries[0]
-      if (entry.isIntersecting && hasNextPage && !loading) {
-        loadMore()
-      }
-    },
-    [hasNextPage, loadMore, loading],
-  )
-
-  useEffect(() => {
-    if (observerRef.current) {
-      observerRef.current.disconnect()
-    }
-
-    observerRef.current = new IntersectionObserver(handleIntersect, {
-      root: null, // viewport
-      rootMargin: '0px',
-      threshold: 1.0,
-    })
-
-    const node = sentinelRef.current
-    if (node) observerRef.current.observe(node)
-
-    return () => {
-      if (observerRef.current && node) {
-        observerRef.current.unobserve(node)
-      }
-    }
-  }, [handleIntersect])
+  const { sentinelRef } = useInfiniteScroll({
+    onLoadMore: loadMore,
+    hasNextPage,
+    loading,
+  })
 
   if ((!conversations || conversations.length === 0) && !loading) {
     return <div>No chats available</div>
@@ -72,7 +44,7 @@ export const ChatList = memo(() => {
       {conversations.map((chat) => (
         <ChatSummaryWrapper key={chat.id}>
           <Skeleton title={false} avatar loading={loading} key={chat.id}>
-            <ChatSummary key={chat.id} data={chat} />
+            <ChatSummary key={chat.id} data={{ ...chat, isActive: false }} />
           </Skeleton>
         </ChatSummaryWrapper>
       ))}
