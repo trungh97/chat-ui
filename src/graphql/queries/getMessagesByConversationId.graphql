@@ -1,0 +1,11 @@
+query GetMessagesByConversationId(
+  $conversationId: String!
+  $options: CursorBasedPaginationParams!
+) {
+  getMessagesByConversationId(
+    conversationId: $conversationId
+    options: $options
+  ) {
+    ...messageListResponse
+  }
+}

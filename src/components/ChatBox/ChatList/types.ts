@@ -6,4 +6,5 @@ export type ChatSummaryProps = {
   isRead: boolean
   avatar: string
   isSelected?: boolean
+  isActive: boolean
 }
