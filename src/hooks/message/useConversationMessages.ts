@@ -42,7 +42,7 @@ export function useConversationMessages({
     fetchPolicy: 'network-only',
   })
 
-  const fetchMore = useCallback(async () => {
+  const loadMore = useCallback(async () => {
     if (!hasNextPage || !nextCursor) return
 
     const response = await refetch({
@@ -66,6 +66,6 @@ export function useConversationMessages({
     loading,
     hasNextPage,
     nextCursor,
-    fetchMore,
+    loadMore,
   }
 }

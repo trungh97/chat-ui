@@ -1,16 +1,24 @@
 import React from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { Avatar } from 'shared-ui'
 import { ChatSummaryProps } from '../types'
 
-export const ChatSummary = ({
-  data: { id, avatar, title, lastMessage, lastMessageTime },
-}: {
-  data: ChatSummaryProps
-}) => {
+export const ChatSummary = ({ data }: { data: ChatSummaryProps }) => {
+  const { id, avatar, title, lastMessage, lastMessageTime } = data
+  const navigate = useNavigate()
+  const { conversationId } = useParams()
+
+  const handleClick = () => {
+    if (conversationId !== id) {
+      navigate(`/chat/${id}`)
+    }
+  }
+
   return (
     <div
       key={id}
-      className={`w-full cursor-pointer rounded-xl px-6 py-3 hover:bg-brand-200`}
+      className={`py-3 px-6 hover:bg-brand-200 cursor-pointer w-full rounded-xl`}
+      onClick={handleClick}
     >
       <div className="flex gap-3">
         <div className="relative">
