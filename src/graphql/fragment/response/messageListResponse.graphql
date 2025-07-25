@@ -2,9 +2,7 @@ fragment messageListResponse on MessageListGlobalResponse {
   ...status
   data {
     items {
-      ...message
-      senderName
-      senderAvatar
+      ...messageWithSender
     }
     nextCursor
   }

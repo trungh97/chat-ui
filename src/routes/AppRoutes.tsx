@@ -22,6 +22,7 @@ const AppRoutes = () => {
     <Routes>
       <Route element={<PrivateRoutes />}>
         <Route path="/" element={<HomePage />} />
+        <Route path="/chat/:conversationId" element={<HomePage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Route>

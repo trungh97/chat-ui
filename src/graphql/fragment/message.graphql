@@ -8,3 +8,16 @@ fragment message on MessageDTO {
   replyToMessageId
   createdAt
 }
+
+fragment messageWithSender on MessageWithSenderDTO {
+  id
+  content
+  messageType
+  senderId
+  extra
+  conversationId
+  replyToMessageId
+  createdAt
+  senderName
+  senderAvatar
+}

@@ -189,9 +189,7 @@ export type MessageDto = {
   id: Scalars['ID']['output'];
   messageType: MessageType;
   replyToMessageId?: Maybe<Scalars['String']['output']>;
-  senderAvatar?: Maybe<Scalars['String']['output']>;
   senderId: Scalars['String']['output'];
-  senderName?: Maybe<Scalars['String']['output']>;
 };
 
 export type MessageListGlobalResponse = IResponse & {
@@ -218,6 +216,20 @@ export enum MessageType {
   Text = 'TEXT',
   Video = 'VIDEO'
 }
+
+export type MessageWithSenderDto = {
+  __typename?: 'MessageWithSenderDTO';
+  content: Scalars['String']['output'];
+  conversationId: Scalars['String']['output'];
+  createdAt: Scalars['DateTimeISO']['output'];
+  extra?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  messageType: MessageType;
+  replyToMessageId?: Maybe<Scalars['String']['output']>;
+  senderAvatar?: Maybe<Scalars['String']['output']>;
+  senderId: Scalars['String']['output'];
+  senderName?: Maybe<Scalars['String']['output']>;
+};
 
 export type Mutation = {
   __typename?: 'Mutation';
@@ -299,7 +311,7 @@ export type PaginatedConversationListResponse = {
 
 export type PaginatedMessageListResponse = {
   __typename?: 'PaginatedMessageListResponse';
-  items: Array<MessageDto>;
+  items: Array<MessageWithSenderDto>;
   nextCursor?: Maybe<Scalars['String']['output']>;
 };
 
@@ -443,13 +455,15 @@ export type ExtendedConversationFragment = { __typename?: 'ExtendConversationDTO
 
 export type MessageFragment = { __typename?: 'MessageDTO', id: string, content: string, messageType: MessageType, senderId: string, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any };
 
+export type MessageWithSenderFragment = { __typename?: 'MessageWithSenderDTO', id: string, content: string, messageType: MessageType, senderId: string, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, senderName?: string | null, senderAvatar?: string | null };
+
 export type ParticipantFragment = { __typename?: 'ParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType };
 
 export type ExtendedParticipantFragment = { __typename?: 'ExtendedParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType, name: string, avatar: string };
 
 export type ConversationListResponseFragment = { __typename?: 'ExtendConversationListGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'PaginatedConversationListResponse', nextCursor?: string | null, items: Array<{ __typename?: 'ExtendConversationDTO', id: string, title?: string | null, creatorId: string, isArchived: boolean, deletedAt?: any | null, type: ConversationType, groupAvatar?: string | null, defaultGroupAvatar?: Array<string> | null, participants: Array<{ __typename?: 'ExtendedParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType, name: string, avatar: string }>, messages: Array<{ __typename?: 'MessageDTO', id: string, content: string, messageType: MessageType, senderId: string, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any }> }> } | null };
 
-export type MessageListResponseFragment = { __typename?: 'MessageListGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'PaginatedMessageListResponse', nextCursor?: string | null, items: Array<{ __typename?: 'MessageDTO', senderName?: string | null, senderAvatar?: string | null, id: string, content: string, messageType: MessageType, senderId: string, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any }> } | null };
+export type MessageListResponseFragment = { __typename?: 'MessageListGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'PaginatedMessageListResponse', nextCursor?: string | null, items: Array<{ __typename?: 'MessageWithSenderDTO', id: string, content: string, messageType: MessageType, senderId: string, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, senderName?: string | null, senderAvatar?: string | null }> } | null };
 
 export type UserResponseFragment = { __typename?: 'UserGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'UserDTO', id: string, firstName: string, lastName: string, email: string, phone?: string | null, role: UserRole, avatar: string, isActive: boolean, provider?: UserProvider | null, providerUserId?: string | null, status: UserStatus } | null };
 
@@ -506,7 +520,7 @@ export type GetMessagesByConversationIdQueryVariables = Exact<{
 }>;
 
 
-export type GetMessagesByConversationIdQuery = { __typename?: 'Query', getMessagesByConversationId: { __typename?: 'MessageListGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'PaginatedMessageListResponse', nextCursor?: string | null, items: Array<{ __typename?: 'MessageDTO', senderName?: string | null, senderAvatar?: string | null, id: string, content: string, messageType: MessageType, senderId: string, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any }> } | null } };
+export type GetMessagesByConversationIdQuery = { __typename?: 'Query', getMessagesByConversationId: { __typename?: 'MessageListGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'PaginatedMessageListResponse', nextCursor?: string | null, items: Array<{ __typename?: 'MessageWithSenderDTO', id: string, content: string, messageType: MessageType, senderId: string, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, senderName?: string | null, senderAvatar?: string | null }> } | null } };
 
 export type GetMyLatestConversationsQueryVariables = Exact<{
   options: CursorBasedPaginationParams;
@@ -604,21 +618,33 @@ export const ConversationListResponseFragmentDoc = gql`
 }
     ${StatusFragmentDoc}
 ${ExtendedConversationFragmentDoc}`;
+export const MessageWithSenderFragmentDoc = gql`
+    fragment messageWithSender on MessageWithSenderDTO {
+  id
+  content
+  messageType
+  senderId
+  extra
+  conversationId
+  replyToMessageId
+  createdAt
+  senderName
+  senderAvatar
+}
+    `;
 export const MessageListResponseFragmentDoc = gql`
     fragment messageListResponse on MessageListGlobalResponse {
   ...status
   data {
     items {
-      ...message
-      senderName
-      senderAvatar
+      ...messageWithSender
     }
     nextCursor
   }
   error
 }
     ${StatusFragmentDoc}
-${MessageFragmentDoc}`;
+${MessageWithSenderFragmentDoc}`;
 export const UserInfoFragmentDoc = gql`
     fragment userInfo on UserDTO {
   id

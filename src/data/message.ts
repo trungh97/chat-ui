@@ -1,9 +1,9 @@
-import { MessageDto } from '@generated/graphql'
+import { MessageWithSenderDto } from '@generated/graphql'
 import { Message } from '../types'
 
 export class MessageData {
   // Converts a GraphQL message DTO (e.g., from Apollo codegen) to the local Message type
-  static toMessage(dto: MessageDto): Message {
+  static toMessage(dto: MessageWithSenderDto): Message {
     return {
       id: dto.id,
       content: dto.content,
