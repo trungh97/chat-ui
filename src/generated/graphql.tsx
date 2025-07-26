@@ -390,7 +390,7 @@ export type QueryGetUserByIdArgs = {
 
 export type Subscription = {
   __typename?: 'Subscription';
-  newMessageAdded: MessageDto;
+  newMessageAdded: MessageWithSenderDto;
 };
 
 export type UserCreateMutationRequest = {
@@ -537,7 +537,7 @@ export type MeQuery = { __typename?: 'Query', me: { __typename?: 'UserGlobalResp
 export type NewMessageAddedSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
-export type NewMessageAddedSubscription = { __typename?: 'Subscription', newMessageAdded: { __typename?: 'MessageDTO', id: string, content: string, messageType: MessageType, senderId: string, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any } };
+export type NewMessageAddedSubscription = { __typename?: 'Subscription', newMessageAdded: { __typename?: 'MessageWithSenderDTO', id: string, content: string, messageType: MessageType, senderId: string, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, senderName?: string | null, senderAvatar?: string | null } };
 
 export const ConversationFragmentDoc = gql`
     fragment conversation on ConversationDTO {
@@ -894,10 +894,10 @@ export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
 export const NewMessageAddedDocument = gql`
     subscription NewMessageAdded {
   newMessageAdded {
-    ...message
+    ...messageWithSender
   }
 }
-    ${MessageFragmentDoc}`;
+    ${MessageWithSenderFragmentDoc}`;
 
 /**
  * __useNewMessageAddedSubscription__

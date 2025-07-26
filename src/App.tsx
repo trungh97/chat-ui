@@ -1,14 +1,9 @@
-import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client'
+import { ApolloProvider } from '@apollo/client'
 import { GoogleOAuthProvider } from '@react-oauth/google'
+import AppRoutes from '@routes/AppRoutes'
 import React from 'react'
 import { BrowserRouter } from 'react-router-dom'
-import AppRoutes from '@routes/AppRoutes'
-
-const apolloClient = new ApolloClient({
-  uri: process.env.REACT_APP_SERVER_ENDPOINT,
-  cache: new InMemoryCache(),
-  credentials: 'include',
-})
+import apolloClient from './apollo'
 
 const App = () => {
   return (
