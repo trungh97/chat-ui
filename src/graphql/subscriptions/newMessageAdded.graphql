@@ -1,5 +1,5 @@
 subscription NewMessageAdded {
   newMessageAdded {
-    ...message
+    ...messageWithSender
   }
 }
