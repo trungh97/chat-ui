@@ -5,17 +5,20 @@
 @tailwind utilities;
 
 @layer utilities {
-  .chatlist-scrollbar::-webkit-scrollbar {
+  .chat-window-scrollbar::-webkit-scrollbar, .chatlist-scrollbar::-webkit-scrollbar {
     width: 8px;
   }
   .chatlist-scrollbar::-webkit-scrollbar-track {
     background: #f9f5ff;
   }
-  .chatlist-scrollbar::-webkit-scrollbar-thumb {
+  .chat-window-scrollbar::-webkit-scrollbar-track {
+    background: #f4ebff;
+  }
+  .chat-window-scrollbar::-webkit-scrollbar-thumb, .chatlist-scrollbar::-webkit-scrollbar-thumb {
     background-color: #888;
     border-radius: 8px;
   }
-  .chatlist-scrollbar::-webkit-scrollbar-thumb:hover {
+  .chat-window-scrollbar::-webkit-scrollbar-thumb:hover, .chatlist-scrollbar::-webkit-scrollbar-thumb:hover {
     background: #555;
   }
 }
