@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { Message } from '../types'
 import { createSelectors } from './utils'
 
-interface IMessageListState {
+export interface IMessageListState {
   messagesByConversation: Record<string, Message[]>
   nextCursorByConversation: Record<string, string | null>
   loadingByConversation: Record<string, boolean>
@@ -87,15 +87,19 @@ const useMessageListStoreBase = create<IMessageListState>()((set) => ({
    * @param {Message[]} messages - An array of Message objects to be added to the conversation's message list.
    */
   addMessages: (conversationId, messages) =>
-    set((state) => ({
-      messagesByConversation: {
-        ...state.messagesByConversation,
-        [conversationId]: [
-          ...(state.messagesByConversation[conversationId] || []),
-          ...messages,
-        ],
-      },
-    })),
+    set((state) => {
+      const merged = [
+        ...(state.messagesByConversation[conversationId] || []),
+        ...messages,
+      ]
+      merged.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      return {
+        messagesByConversation: {
+          ...state.messagesByConversation,
+          [conversationId]: merged,
+        },
+      }
+    }),
 
   /**
    * Clears all messages, errors, and pagination state for a specific conversation.
