@@ -5,7 +5,7 @@ import { useMeQuery } from '@generated/graphql'
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Divider } from 'shared-ui'
-import { ChatMessageSection } from './ChatMessageSection'
+import ChatWindow from './ChatMessageSection/ChatWindow'
 
 const Home = () => {
   const { loading, data } = useMeQuery()
@@ -21,7 +21,7 @@ const Home = () => {
         <QuickLaunch />
         <Divider orientation="vertical" color="#e9eaeb" />
         <ChatBox />
-        <ChatMessageSection />
+        <ChatWindow />
       </Layout>
     </>
   )
