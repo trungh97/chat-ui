@@ -35,7 +35,7 @@ export const ChatMessageSection = () => {
   }
 
   return (
-    <div className="flex-1 overflow-y-auto">
+    <div className="overflow-y-auto max-h-[calc(100vh-157px)] chat-window-scrollbar">
       {conversationMessages.map(
         ({ senderAvatar, id, senderName, content, createdAt, senderId }) => (
           <ChatMessage
