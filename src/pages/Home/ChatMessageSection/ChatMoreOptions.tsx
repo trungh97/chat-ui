@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { MoreIcon, Popover } from 'shared-ui'
 
-export const ChatMoreOptions = () => {
+export const ChatMoreOptions = memo(() => {
   return (
     <div>
       <Popover
@@ -15,6 +15,6 @@ export const ChatMoreOptions = () => {
       </Popover>
     </div>
   )
-}
+})
 
 export default ChatMoreOptions

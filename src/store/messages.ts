@@ -88,15 +88,13 @@ const useMessageListStoreBase = create<IMessageListState>()((set) => ({
    */
   addMessages: (conversationId, messages) =>
     set((state) => {
-      const merged = [
-        ...(state.messagesByConversation[conversationId] || []),
-        ...messages,
-      ]
-      merged.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       return {
         messagesByConversation: {
           ...state.messagesByConversation,
-          [conversationId]: merged,
+          [conversationId]: [
+            ...(state.messagesByConversation[conversationId] || []),
+            ...messages,
+          ],
         },
       }
     }),

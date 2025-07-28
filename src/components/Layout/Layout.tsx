@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { memo } from 'react'
 
-export const Layout = ({ children }: { children: React.ReactNode }) => {
+export const Layout = memo(({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="w-full h-screen bg-brand-50 flex flex-row min-w-[500px]">{children}</div>
+    <div className="w-full h-screen bg-brand-50 flex flex-row min-w-[500px]">
+      {children}
+    </div>
   )
-}
+})
 
 export default Layout

@@ -10,14 +10,14 @@ export const ChatSummary = ({ data }: { data: ChatSummaryProps }) => {
 
   const handleClick = () => {
     if (conversationId !== id) {
-      navigate(`/chat/${id}`)
+      navigate(`/${id}`)
     }
   }
 
   return (
     <div
       key={id}
-      className={`py-3 px-6 hover:bg-brand-200 cursor-pointer w-full rounded-xl`}
+      className={`py-3 px-6 hover:bg-brand-200 cursor-pointer w-full rounded-xl ${conversationId === id ? 'bg-brand-300' : ''}`}
       onClick={handleClick}
     >
       <div className="flex gap-3">

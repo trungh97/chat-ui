@@ -6,11 +6,13 @@ import {
 } from '@generated/graphql'
 import { useNavigate } from 'react-router-dom'
 import { message } from 'shared-ui'
+import { useUserStore } from '@store/user'
 
 export const useCredentialLogin = () => {
   const [credentialBasedLogin] = useCredentialBasedLoginMutation()
   const client = useApolloClient()
   const navigate = useNavigate()
+  const setCurrentUser = useUserStore.use.setCurrentUser()
 
   const handleLogin = async (values: Record<string, any>) => {
     if (!values.email || !values.password) {
@@ -44,6 +46,7 @@ export const useCredentialLogin = () => {
             },
           },
         })
+        setCurrentUser(data)
         message.success('Logged in successfully')
         navigate('/')
       }
