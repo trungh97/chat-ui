@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { Divider, MessageIcon, StarIcon, UserIcon } from 'shared-ui'
 
-export const ChatTitle = () => {
+export const ChatTitle = memo(() => {
   return (
     <div>
       <div className="block text-lg font-semibold text-ellipsis">
@@ -27,6 +27,6 @@ export const ChatTitle = () => {
       </div>
     </div>
   )
-}
+})
 
 export default ChatTitle
