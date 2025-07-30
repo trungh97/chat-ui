@@ -27,7 +27,6 @@ export default [
       },
     },
     rules: {
-      'prettier/prettier': 'error', // Enforces Prettier formatting rules
       ...eslintConfigPrettier.rules,
       '@typescript-eslint/no-unused-vars': ['error'], // TypeScript-specific linting rules
       'react/prop-types': 'off', // Turn off PropTypes checking (irrelevant for TypeScript)

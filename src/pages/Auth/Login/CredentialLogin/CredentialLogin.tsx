@@ -6,7 +6,7 @@ export const CredentialLogin = () => {
   const { handleLogin } = useCredentialLogin()
 
   return (
-    <Form autoComplete="off" className="w-full mt-8" onSubmit={handleLogin}>
+    <Form autoComplete="off" className="mt-8 w-full" onSubmit={handleLogin}>
       <FormField
         label="Email"
         name="email"

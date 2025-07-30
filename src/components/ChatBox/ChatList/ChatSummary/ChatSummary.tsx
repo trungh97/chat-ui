@@ -10,17 +10,17 @@ export const ChatSummary = ({
   return (
     <div
       key={id}
-      className={`py-3 px-6 hover:bg-brand-200 cursor-pointer w-full rounded-xl`}
+      className={`w-full cursor-pointer rounded-xl px-6 py-3 hover:bg-brand-200`}
     >
       <div className="flex gap-3">
         <div className="relative">
           <Avatar imageUrl={avatar} size="md" />
-          <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+          <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white bg-green-500"></div>
         </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex justify-between items-center">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center justify-between">
             <h3
-              className={`font-medium text-gray-900 truncate ${!isRead ? 'font-semibold' : ''}`}
+              className={`truncate font-medium text-gray-900 ${!isRead ? 'font-semibold' : ''}`}
             >
               {title}
             </h3>
@@ -31,7 +31,7 @@ export const ChatSummary = ({
               })}
             </span>
           </div>
-          <p className={`text-sm text-gray-500 truncate`}>{lastMessage}</p>
+          <p className={`truncate text-sm text-gray-500`}>{lastMessage}</p>
         </div>
       </div>
     </div>
