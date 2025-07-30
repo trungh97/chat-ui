@@ -5,4 +5,6 @@ export interface Conversation {
   lastMessage: string
   lastMessageTime: string
   isRead: boolean
+  numberOfPaticipants: number
+  isGroup: boolean
 }
