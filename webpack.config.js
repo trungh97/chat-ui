@@ -53,7 +53,7 @@ module.exports = {
       '@routes': path.resolve(__dirname, 'src/routes'),
       '@store': path.resolve(__dirname, 'src/store'),
       '@data': path.resolve(__dirname, 'src/data'),
-      '@types': path.resolve(__dirname, 'src/types'),
+      '@helpers': path.resolve(__dirname, 'src/helpers'),
       ui: path.resolve(__dirname, '@mf-types/ui'),
     },
     extensions: ['.ts', '.js', '.tsx', '.jsx'],
