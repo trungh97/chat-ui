@@ -1,5 +1,5 @@
+import { Conversation } from '@interfaces/dtos'
 import { create } from 'zustand'
-import { Conversation } from '../types'
 import { createSelectors } from './utils'
 
 // Define the shape of the store
@@ -54,3 +54,4 @@ const useConversationListStore = createSelectors(useConversationListStoreBase)
 export default useConversationListStore
 
 export { useConversationListStore }
+

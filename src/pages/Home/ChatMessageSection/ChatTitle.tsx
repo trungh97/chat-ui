@@ -1,29 +1,51 @@
+import useConversationListStore from '@store/conversations'
 import React, { memo } from 'react'
-import { Divider, MessageIcon, StarIcon, UserIcon } from 'shared-ui'
+import { useParams } from 'react-router-dom'
+import { Divider, StarIcon, UserIcon } from 'shared-ui'
 
 export const ChatTitle = memo(() => {
+  const { conversationId } = useParams()
+  if (!conversationId) {
+    return null
+  }
+
+  const conversationsFromStore = useConversationListStore.use.conversations()
+  const currentConversation = conversationsFromStore.find(
+    (c) => c.id === conversationId,
+  )
+
+  if (!currentConversation) {
+    return null
+  }
+
+  const { title, numberOfPaticipants, isGroup } = currentConversation
+
   return (
     <div>
-      <div className="block text-lg font-semibold text-ellipsis">
-        Phoenix Baker
-      </div>
+      <div className="block text-lg font-semibold text-ellipsis">{title}</div>
       <div className="flex items-center text-xs font-medium">
         <StarIcon width={12} height={12} />
-        <Divider orientation="vertical" color="#D5D7DA" className="mx-1" />
+        {isGroup && (
+          <Divider orientation="vertical" color="#D5D7DA" className="mx-1" />
+        )}
 
-        <div className="flex items-center hover:cursor-pointer">
-          <UserIcon width={12} height={12} />
-          <span className="ml-1">10</span>
-        </div>
+        {isGroup && (
+          <div className="flex items-center hover:cursor-pointer">
+            <UserIcon width={12} height={12} />
+            <span className="ml-1">{numberOfPaticipants}</span>
+          </div>
+        )}
 
-        <Divider orientation="vertical" color="#D5D7DA" className="mx-1" />
+        {isGroup && (
+          <Divider orientation="vertical" color="#D5D7DA" className="mx-1" />
+        )}
 
-        <div className="flex items-center hover:cursor-pointer">
+        {/* <div className="flex items-center hover:cursor-pointer">
           <MessageIcon style={{ transform: 'scale(0.5)' }} />
           <span className="ml-1">100</span>
-        </div>
+        </div> */}
 
-        <Divider orientation="vertical" color="#D5D7DA" className="mx-1" />
+        {/* <Divider orientation="vertical" color="#D5D7DA" className="mx-1" /> */}
       </div>
     </div>
   )

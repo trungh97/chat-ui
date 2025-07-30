@@ -1,5 +1,8 @@
-import { GetMyLatestConversationsQuery } from '@generated/graphql'
-import { Conversation } from '../types'
+import {
+  ConversationType,
+  GetMyLatestConversationsQuery,
+} from '@generated/graphql'
+import { Conversation } from '@interfaces/dtos'
 
 export const formatConversationList = (
   data: GetMyLatestConversationsQuery | undefined,
@@ -13,5 +16,7 @@ export const formatConversationList = (
     lastMessageTime:
       conversation.messages[0]?.createdAt || new Date().toISOString(),
     isRead: false,
+    numberOfPaticipants: conversation.participants.length,
+    isGroup: conversation.type === ConversationType.Group,
   }))
 }
