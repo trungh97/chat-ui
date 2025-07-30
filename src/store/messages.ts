@@ -1,5 +1,5 @@
+import { Message } from '@interfaces/dtos'
 import { create } from 'zustand'
-import { Message } from '../types'
 import { createSelectors } from './utils'
 
 export interface IMessageListState {
@@ -130,3 +130,4 @@ const useMessageListStore = createSelectors(useMessageListStoreBase)
 
 export default useMessageListStore
 export { useMessageListStore }
+

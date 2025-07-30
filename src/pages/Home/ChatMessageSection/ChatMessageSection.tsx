@@ -32,18 +32,24 @@ export const ChatMessageSection = memo(() => {
   return (
     <div className="overflow-y-auto max-h-[calc(100vh-157px)] chat-window-scrollbar">
       {conversationMessages.map(
-        ({ senderAvatar, id, senderName, content, createdAt, senderId }) => (
+        ({
+          senderAvatar,
+          id,
+          senderName,
+          content,
+          createdAt,
+          senderId,
+          groupPosition,
+        }) => (
           <ChatMessage
             key={id}
             avatarUrl={senderAvatar!}
             senderName={senderName!}
             message={content}
-            timestamp={new Date(createdAt).toLocaleTimeString([], {
-              hour: '2-digit',
-              minute: '2-digit',
-            })}
+            timestamp={createdAt}
             isOnline
             type={senderId === currentUserId ? 'sent' : 'received'}
+            groupPosition={groupPosition}
           />
         ),
       )}

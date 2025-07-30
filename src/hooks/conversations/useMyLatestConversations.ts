@@ -1,12 +1,11 @@
 import { DEFAULT_DEBOUNCE_TIME } from '@constants/common'
 import { DEFAULT_LIMIT } from '@constants/pagination'
+import { formatConversationList } from '@data/conversation'
 import { useGetMyLatestConversationsQuery } from '@generated/graphql'
+import { CursorBasedPagination } from '@interfaces/pagination'
+import useConversationListStore from '@store/conversations'
 import _debounce from 'lodash/debounce'
 import { useCallback, useEffect, useRef, useState } from 'react'
-
-import { formatConversationList } from '../../data'
-import { useConversationListStore } from '../../store'
-import { CursorBasedPagination } from '../../types'
 
 export const useMyLatestConversations = (options: CursorBasedPagination) => {
   const setConversations = useConversationListStore.use.setConversations()

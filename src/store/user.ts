@@ -1,4 +1,4 @@
-import { User } from '../types/dtos'
+import { User } from '@interfaces/dtos'
 import { create } from 'zustand'
 import { createSelectors } from './utils'
 
@@ -18,3 +18,4 @@ const useUserStore = createSelectors(useUserStoreBase)
 
 export default useUserStore
 export { useUserStore }
+
