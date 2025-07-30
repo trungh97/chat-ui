@@ -5,7 +5,7 @@ import { QuickLaunch } from './QuickLaunch'
 
 export const Layout = () => {
   return (
-    <div className="w-full h-screen bg-brand-50 flex flex-row">
+    <div className="flex h-screen w-full flex-row bg-brand-50">
       <QuickLaunch />
       <Divider orientation="vertical" color="#e9eaeb" />
       <ChatBox />

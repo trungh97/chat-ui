@@ -5,7 +5,7 @@ import { GoogleSignInButton } from 'shared-ui'
 export const GoogleLogin = () => {
   const { handleLogin } = useGoogleLogin()
 
-  return <GoogleSignInButton className="w-full mt-3" onClick={handleLogin} />
+  return <GoogleSignInButton className="mt-3 w-full" onClick={handleLogin} />
 }
 
 export default GoogleLogin

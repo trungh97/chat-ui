@@ -3,7 +3,7 @@ import React, { memo } from 'react'
 export const ChatListWrapper = memo(
   ({ children }: { children: React.ReactNode }) => {
     return (
-      <div className="flex flex-col pr-2 overflow-y-auto h-full flex-1 ml-2 chatlist-scrollbar">
+      <div className="chatlist-scrollbar ml-2 flex h-full flex-1 flex-col overflow-y-auto pr-2">
         {children}
       </div>
     )
