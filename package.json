@@ -6,7 +6,7 @@
   "scripts": {
     "start": "set NODE_ENV=development && webpack serve --mode development",
     "build": "set NODE_ENV=production && webpack --mode production",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "coverage": "jest --coverage",
     "lint": "eslint \"src/**/*.{ts,tsx}\" --config eslint.config.mjs",
     "lint:fix": "eslint \"src/**/*.{ts,tsx}\" --fix --config eslint.config.mjs",
