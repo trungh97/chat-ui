@@ -12,6 +12,7 @@ export interface IMessageListState {
   setNextCursor: (conversationId: string, nextCursor?: string | null) => void
   setMessages: (conversationId: string, messages: Message[]) => void
   addMessages: (conversationId: string, messages: Message[]) => void
+  updateMessage: (conversationId: string, message: Message) => void
   clearMessages: (conversationId: string) => void
 }
 
@@ -100,6 +101,22 @@ const useMessageListStoreBase = create<IMessageListState>()((set) => ({
     }),
 
   /**
+   * Updates a specific message in the message list for a specific conversation.
+   *
+   * @param {string} conversationId - The ID of the conversation.
+   * @param {Message} message - The updated message object.
+   */
+  updateMessage: (conversationId, message) =>
+    set((state) => ({
+      messagesByConversation: {
+        ...state.messagesByConversation,
+        [conversationId]: state.messagesByConversation[conversationId].map(
+          (m) => (m.id === message.id ? message : m),
+        ),
+      },
+    })),
+
+  /**
    * Clears all messages, errors, and pagination state for a specific conversation.
    * This method is useful when a conversation is deleted or its messages are purged.
    *
@@ -130,4 +147,3 @@ const useMessageListStore = createSelectors(useMessageListStoreBase)
 
 export default useMessageListStore
 export { useMessageListStore }
-

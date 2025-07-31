@@ -31,3 +31,37 @@ export function formatRelativeToNow(
   const date = parseISO(isoString)
   return formatDistanceToNow(date, options)
 }
+
+/**
+ * Calculates the difference between two ISO 8601 date strings in the specified unit.
+ * @param isoString1 First ISO 8601 date string
+ * @param isoString2 Second ISO 8601 date string
+ * @param unit The unit for the difference: 'milliseconds' | 'seconds' | 'minutes' | 'hours' | 'days'
+ * @returns The difference as a positive integer in the specified unit
+ */
+export function getTimeDifference(
+  isoString1: string,
+  isoString2: string,
+  unit:
+    | 'milliseconds'
+    | 'seconds'
+    | 'minutes'
+    | 'hours'
+    | 'days' = 'milliseconds',
+): number {
+  const date1 = parseISO(isoString1)
+  const date2 = parseISO(isoString2)
+  const diffMs = Math.abs(date1.getTime() - date2.getTime())
+  switch (unit) {
+    case 'seconds':
+      return Math.floor(diffMs / 1000)
+    case 'minutes':
+      return Math.floor(diffMs / (1000 * 60))
+    case 'hours':
+      return Math.floor(diffMs / (1000 * 60 * 60))
+    case 'days':
+      return Math.floor(diffMs / (1000 * 60 * 60 * 24))
+    default:
+      return diffMs
+  }
+}
