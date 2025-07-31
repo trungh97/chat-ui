@@ -20,7 +20,7 @@ export const ChatSummary = ({ data }: { data: ChatSummaryProps }) => {
   return (
     <div
       key={id}
-      className={`py-3 px-6 hover:bg-brand-200 cursor-pointer w-full rounded-xl ${isCurrentConversation ? 'bg-brand-300' : ''}`}
+      className={`py-3 px-6 ${isCurrentConversation ? 'hover:bg-brand-300' : 'hover:bg-brand-200'} cursor-pointer w-full rounded-xl ${isCurrentConversation ? 'bg-brand-300' : ''}`}
       onClick={handleClick}
     >
       <div className="flex gap-3">
