@@ -1,6 +1,9 @@
+// Standard time (in minutes) for grouping messages
 import { Message } from '@interfaces/dtos'
 import { MessageGroupPosition } from '@interfaces/types'
 import { getTimeDifference } from './date'
+
+const GROUP_TIME_MINUTES = 5
 
 /**
  * Determines the groupPosition for each message in a conversation.
@@ -16,59 +19,70 @@ export function getGroupPositions(messages: Message[]): MessageGroupPosition[] {
   })
 }
 
+/**
+ * Given a message and its previous and next messages, determine the groupPosition for the message.
+ * @param prev Previous message in the conversation, or undefined if none.
+ * @param curr The current message.
+ * @param next Next message in the conversation, or undefined if none.
+ * @returns The group position for the message, one of 'start', 'middle', or 'end', or undefined if none.
+ * The group position is determined as follows:
+ * 1. If the message is the first in a group (no previous message, or different sender than previous message),
+ *    or if the message is the last in a group (no next message, or different sender than next message),
+ *    or if the time difference between the message and the previous or next message is > 5 minutes,
+ *    then the group position is 'start' or 'end' respectively.
+ * 2. If the message is in the middle of a group (same sender as previous and next messages, and time difference
+ *    between the message and the previous or next message is <= 5 minutes), then the group position is 'middle'.
+ * 3. If none of the above, then the group position is undefined.
+ */
 export function getGroupPosition(
   prev: Message | undefined,
   curr: Message,
   next: Message | undefined,
 ): MessageGroupPosition | undefined {
-  const currId = curr.senderId
-  const prevId = prev?.senderId
-  const nextId = next?.senderId
+  const currSender = curr.senderId
+  const prevSender = prev?.senderId
+  const nextSender = next?.senderId
 
-  // Special case: only prev and curr (new message appended)
+  // Helper to get time difference in minutes, safely
+  const diffWithPrev = prev
+    ? getTimeDifference(prev.createdAt, curr.createdAt, 'minutes')
+    : undefined
+  const diffWithNext = next
+    ? getTimeDifference(curr.createdAt, next.createdAt, 'minutes')
+    : undefined
+
+  // Case 1: New message appended (no next)
   if (prev && !next) {
-    if (prevId === currId) {
-      const diff = getTimeDifference(prev.createdAt, curr.createdAt, 'minutes')
-      if (diff < 5) {
+    if (prevSender === currSender) {
+      if (diffWithPrev !== undefined && diffWithPrev < GROUP_TIME_MINUTES)
         return 'end'
-      } else {
-        return 'start'
-      }
-    } else {
       return 'start'
     }
-  }
-
-  // If previous is not same sender, or time diff > 5 min, and next is same sender: start
-  if (
-    (prevId !== currId ||
-      (prev &&
-        getTimeDifference(prev.createdAt, curr.createdAt, 'minutes') > 5)) &&
-    nextId === currId
-  ) {
     return 'start'
   }
 
-  // If previous is same sender, next is same sender, and time diff with prev/next <= 5 min: middle
-  if (
-    prevId === currId &&
-    nextId === currId &&
-    (!prev ||
-      getTimeDifference(prev.createdAt, curr.createdAt, 'minutes') <= 5) &&
-    (!next || getTimeDifference(curr.createdAt, next.createdAt, 'minutes') <= 5)
-  ) {
-    return 'middle'
-  }
+  // Case 2: Start of a group
+  const isStart =
+    (prevSender !== currSender ||
+      (diffWithPrev !== undefined && diffWithPrev >= GROUP_TIME_MINUTES)) &&
+    nextSender === currSender
+  if (isStart) return 'start'
 
-  // If previous is same sender, and (next is not same sender or time diff > 5 min): end
-  if (
-    prevId === currId &&
-    (nextId !== currId ||
-      (next &&
-        getTimeDifference(curr.createdAt, next.createdAt, 'minutes') > 5))
-  ) {
-    return 'end'
-  }
+  // Case 3: Middle of a group
+  const isMiddle =
+    prevSender === currSender &&
+    nextSender === currSender &&
+    (diffWithPrev === undefined || diffWithPrev < GROUP_TIME_MINUTES) &&
+    (diffWithNext === undefined || diffWithNext < GROUP_TIME_MINUTES)
+  if (isMiddle) return 'middle'
 
-  return undefined
+  // Case 4: End of a group
+  const isEnd =
+    prevSender === currSender &&
+    (nextSender !== currSender ||
+      (diffWithNext !== undefined && diffWithNext >= GROUP_TIME_MINUTES))
+  if (isEnd) return 'end'
+
+  // Default: no group position
+  return 'start'
 }
