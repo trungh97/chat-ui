@@ -10,7 +10,6 @@ export function useAutoScrollToBottom(deps: any[] = []) {
 
   useEffect(() => {
     const el = containerRef.current
-    console.log(el);
     if (el) {
       el.scrollTop = el.scrollHeight
     }
