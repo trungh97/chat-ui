@@ -5,16 +5,12 @@ import { Divider, StarIcon, UserIcon } from 'shared-ui'
 
 export const ChatTitle = memo(() => {
   const { conversationId } = useParams()
-  if (!conversationId) {
-    return null
-  }
-
   const conversationsFromStore = useConversationListStore.use.conversations()
   const currentConversation = conversationsFromStore.find(
     (c) => c.id === conversationId,
   )
 
-  if (!currentConversation) {
+  if (!conversationId || !currentConversation) {
     return null
   }
 

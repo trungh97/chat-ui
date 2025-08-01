@@ -2,7 +2,7 @@ import { DEFAULT_LIMIT } from '@constants/pagination'
 import { MessageData } from '@data/message'
 import { useGetMessagesByConversationIdQuery } from '@generated/graphql'
 import { useMessageListStore } from '@store/messages'
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 
 interface UseMessageListOptions {
   conversationId: string
@@ -16,10 +16,6 @@ export function useConversationMessages({
   limit = DEFAULT_LIMIT,
 }: UseMessageListOptions) {
   const store = useMessageListStore()
-  const [hasNextPage, setHasNextPage] = useState(false)
-  const [nextCursor, setNextCursor] = useState<string | null>(
-    initialCursor ?? null,
-  )
 
   const { loading, refetch } = useGetMessagesByConversationIdQuery({
     variables: {
@@ -33,14 +29,16 @@ export function useConversationMessages({
 
       store.setMessages(conversationId, MessageData.toMessageList(items))
       store.setNextCursor(conversationId, cursor)
-      setNextCursor(cursor)
-      setHasNextPage(!!cursor)
+      store.setHasNextPage(conversationId, !!cursor)
     },
     onError: (err) => {
       store.setError(conversationId, err)
     },
     fetchPolicy: 'network-only',
   })
+
+  const hasNextPage = store.hasNextPageByConversation[conversationId] || false
+  const nextCursor = store.nextCursorByConversation[conversationId] || null
 
   const loadMore = useCallback(async () => {
     if (!hasNextPage || !nextCursor) return
@@ -56,8 +54,7 @@ export function useConversationMessages({
 
     store.addMessages(conversationId, MessageData.toMessageList(items))
     store.setNextCursor(conversationId, cursor)
-    setNextCursor(cursor)
-    setHasNextPage(!!cursor)
+    store.setHasNextPage(conversationId, !!cursor)
   }, [conversationId, nextCursor, hasNextPage, limit, refetch, store])
 
   return {
