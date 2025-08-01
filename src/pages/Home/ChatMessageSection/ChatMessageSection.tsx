@@ -1,4 +1,5 @@
 import { useAuth } from '@hooks/auth'
+import { useAutoScrollToBottom } from '@hooks/common'
 import { useConversationMessages, useSubscribeNewMessage } from '@hooks/message'
 import React, { memo } from 'react'
 import { useParams } from 'react-router-dom'
@@ -13,6 +14,11 @@ export const ChatMessageSection = memo(() => {
   const { loading, data: conversationMessages } = useConversationMessages({
     conversationId: conversationId!,
   })
+
+  const containerRef = useAutoScrollToBottom([
+    conversationId,
+    conversationMessages,
+  ])
 
   if (!conversationId) {
     return <span>Please select a conversation to view messages.</span>
@@ -30,7 +36,10 @@ export const ChatMessageSection = memo(() => {
   }
 
   return (
-    <div className="overflow-y-auto max-h-[calc(100vh-157px)] chat-window-scrollbar">
+    <div
+      ref={containerRef}
+      className="overflow-y-auto max-h-[calc(100vh-157px)] chat-window-scrollbar"
+    >
       {conversationMessages.map(
         ({
           senderAvatar,

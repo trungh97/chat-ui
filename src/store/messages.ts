@@ -5,11 +5,13 @@ import { createSelectors } from './utils'
 export interface IMessageListState {
   messagesByConversation: Record<string, Message[]>
   nextCursorByConversation: Record<string, string | null>
+  hasNextPageByConversation: Record<string, boolean>
   loadingByConversation: Record<string, boolean>
   errorByConversation: Record<string, Error | undefined>
   setLoading: (conversationId: string, loading: boolean) => void
   setError: (conversationId: string, error?: Error) => void
   setNextCursor: (conversationId: string, nextCursor?: string | null) => void
+  setHasNextPage: (conversationId: string, hasNextPage: boolean) => void
   setMessages: (conversationId: string, messages: Message[]) => void
   addMessages: (conversationId: string, messages: Message[]) => void
   updateMessage: (conversationId: string, message: Message) => void
@@ -19,6 +21,14 @@ export interface IMessageListState {
 const useMessageListStoreBase = create<IMessageListState>()((set) => ({
   messagesByConversation: {},
   nextCursorByConversation: {},
+  hasNextPageByConversation: {},
+  setHasNextPage: (conversationId, hasNextPage) =>
+    set((state) => ({
+      hasNextPageByConversation: {
+        ...state.hasNextPageByConversation,
+        [conversationId]: hasNextPage,
+      },
+    })),
   loadingByConversation: {},
   errorByConversation: {},
 
