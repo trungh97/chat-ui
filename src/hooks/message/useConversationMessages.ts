@@ -17,7 +17,7 @@ export function useConversationMessages({
 }: UseMessageListOptions) {
   const store = useMessageListStore()
 
-  const { loading, refetch } = useGetMessagesByConversationIdQuery({
+  const { loading, fetchMore } = useGetMessagesByConversationIdQuery({
     variables: {
       conversationId,
       options: { cursor: initialCursor, limit },
@@ -43,19 +43,37 @@ export function useConversationMessages({
   const loadMore = useCallback(async () => {
     if (!hasNextPage || !nextCursor) return
 
-    const response = await refetch({
-      conversationId,
-      options: { cursor: nextCursor, limit },
+    await fetchMore({
+      variables: {
+        conversationId,
+        options: { cursor: nextCursor, limit },
+      },
+      updateQuery: (prev, { fetchMoreResult }) => {
+        if (!fetchMoreResult) return prev
+        const result = fetchMoreResult.getMessagesByConversationId?.data
+        const prevData = prev.getMessagesByConversationId.data
+        const prevItems = prevData?.items || []
+        const newItems = result?.items || []
+        const newCursor = result?.nextCursor || null
+
+        store.addMessages(conversationId, MessageData.toMessageList(newItems))
+        store.setNextCursor(conversationId, newCursor)
+        store.setHasNextPage(conversationId, !!newCursor)
+
+        return {
+          ...prev,
+          getMessagesByConversationId: {
+            ...prev.getMessagesByConversationId,
+            data: {
+              ...prev.getMessagesByConversationId.data,
+              items: [...newItems, ...prevItems],
+              nextCursor: newCursor,
+            },
+          },
+        }
+      },
     })
-
-    const items = response?.data?.getMessagesByConversationId?.data?.items || []
-    const cursor =
-      response?.data?.getMessagesByConversationId?.data?.nextCursor || null
-
-    store.addMessages(conversationId, MessageData.toMessageList(items))
-    store.setNextCursor(conversationId, cursor)
-    store.setHasNextPage(conversationId, !!cursor)
-  }, [conversationId, nextCursor, hasNextPage, limit, refetch, store])
+  }, [conversationId, nextCursor, hasNextPage, limit, fetchMore, store])
 
   return {
     data: store.messagesByConversation[conversationId] || [],
