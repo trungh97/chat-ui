@@ -103,8 +103,8 @@ const useMessageListStoreBase = create<IMessageListState>()((set) => ({
         messagesByConversation: {
           ...state.messagesByConversation,
           [conversationId]: [
-            ...(state.messagesByConversation[conversationId] || []),
             ...messages,
+            ...(state.messagesByConversation[conversationId] || []),
           ],
         },
       }
