@@ -20,7 +20,7 @@ export const ChatSummary = ({ data }: { data: ChatSummaryProps }) => {
   return (
     <div
       key={id}
-      className={`py-3 px-6 ${isCurrentConversation ? 'hover:bg-brand-300' : 'hover:bg-brand-200'} cursor-pointer w-full rounded-xl ${isCurrentConversation ? 'bg-brand-300' : ''}`}
+      className={`px-6 py-3 ${isCurrentConversation ? 'hover:bg-brand-300' : 'hover:bg-brand-200'} w-full cursor-pointer rounded-xl ${isCurrentConversation ? 'bg-brand-300' : ''}`}
       onClick={handleClick}
     >
       <div className="flex gap-3">
@@ -28,13 +28,13 @@ export const ChatSummary = ({ data }: { data: ChatSummaryProps }) => {
           <Avatar imageUrl={avatar} size="md" />
           <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white bg-green-500"></div>
         </div>
-        <div className="flex-1 min-w-0">
-          <h3 className={`font-medium text-gray-900 truncate`}>{title}</h3>
-          <div className="flex justify-between items-center">
-            <p className={`text-sm text-gray-500 truncate max-w-[65%]`}>
+        <div className="min-w-0 flex-1">
+          <h3 className={`truncate font-medium text-gray-900`}>{title}</h3>
+          <div className="flex items-center justify-between">
+            <p className={`max-w-[65%] truncate text-sm text-gray-500`}>
               {lastMessage}
             </p>
-            <span className="text-xs text-gray-500 whitespace-nowrap">
+            <span className="whitespace-nowrap text-xs text-gray-500">
               {'\u2022 '}
               {lastMessageDateTime}
             </span>
