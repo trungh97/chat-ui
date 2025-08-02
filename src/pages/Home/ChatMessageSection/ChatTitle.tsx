@@ -18,7 +18,7 @@ export const ChatTitle = memo(() => {
 
   return (
     <div>
-      <div className="block text-lg font-semibold text-ellipsis">{title}</div>
+      <div className="block text-ellipsis text-lg font-semibold">{title}</div>
       <div className="flex items-center text-xs font-medium">
         <StarIcon width={12} height={12} />
         {isGroup && (
