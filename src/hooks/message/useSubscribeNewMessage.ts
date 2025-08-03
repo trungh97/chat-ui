@@ -2,8 +2,58 @@ import { MessageData } from '@data/message'
 import { useNewMessageAddedSubscription } from '@generated/graphql'
 import { getGroupPosition } from '@helpers/conversation'
 import { getTimeDifference } from '@helpers/date'
-import useConversationListStore from '@store/conversations'
+import { Message } from '@interfaces/dtos'
+import useConversationListStore, {
+  ConversationGlobalState,
+} from '@store/conversations'
 import { useMessageListStore } from '@store/messages'
+
+// Helper: update the last message's group position if needed
+function updateLastMessageGroupPosition({
+  conversationId,
+  lastMessage,
+  newMessage,
+  updateMessage,
+}: {
+  conversationId: string
+  lastMessage: Message
+  newMessage: Message
+  updateMessage: ReturnType<typeof useMessageListStore.use.updateMessage>
+}) {
+  let lastMessageWithNewPosition = lastMessage
+  if (
+    lastMessage &&
+    lastMessage.senderId === newMessage.senderId &&
+    lastMessage.groupPosition === 'end' &&
+    getTimeDifference(lastMessage.createdAt, newMessage.createdAt, 'minutes') <
+      5
+  ) {
+    lastMessageWithNewPosition.groupPosition = 'middle'
+    updateMessage(conversationId, lastMessageWithNewPosition)
+  }
+}
+
+// Helper: update the conversation with the latest message
+function updateConversationLatestMessageQuickView({
+  conversationId,
+  latestMessage,
+  conversationStore,
+}: {
+  conversationId: string
+  latestMessage: Message
+  conversationStore: ConversationGlobalState
+}) {
+  const currentConversation = conversationStore.conversations.find(
+    (c) => c.id === conversationId,
+  )
+  if (currentConversation) {
+    conversationStore.updateConversation({
+      ...currentConversation,
+      lastMessage: latestMessage.content,
+      lastMessageTime: latestMessage.createdAt,
+    })
+  }
+}
 
 /**
  * Subscribe to new messages and update the store based on the message's conversationId.
@@ -20,65 +70,35 @@ export function useSubscribeNewMessage(options?: {
     skip: options?.skip,
     onData: ({ data: { data, error, loading } }) => {
       if (data && data.newMessageAdded && !loading && !error) {
-        if (typeof data.newMessageAdded.conversationId === 'string') {
-          const conversationId = data.newMessageAdded.conversationId
-          const existingMessages =
-            messageStore.messagesByConversation[conversationId] || []
-          const lastMessage = existingMessages[existingMessages.length - 1]
-          const newMessage = MessageData.toMessage(data.newMessageAdded)
+        if (typeof data.newMessageAdded.conversationId !== 'string') return
 
-          // Determine the group position for the new message
-          const newMessageGroupPosition = getGroupPosition(
-            lastMessage,
-            newMessage,
-            undefined,
-          )
+        const conversationId = data.newMessageAdded.conversationId
+        const latestMessageFromStore =
+          messageStore.messagesByConversation[conversationId]?.slice(-1)[0]
+          
+        const newMessage = MessageData.toMessage(data.newMessageAdded)
 
-          // If the last message is from the same sender and within 5 minutes, update its group position
-          // to 'middle' if it was previously 'end'
-          let lastMessageWithNewPosition = lastMessage
-          if (
-            lastMessage &&
-            lastMessage.senderId === newMessage.senderId &&
-            lastMessage.groupPosition === 'end' &&
-            getTimeDifference(
-              lastMessage.createdAt,
-              newMessage.createdAt,
-              'minutes',
-            ) < 5
-          ) {
-            lastMessageWithNewPosition = {
-              ...lastMessage,
-              groupPosition: 'middle',
-            }
-            messageStore.updateMessage(
-              conversationId,
-              lastMessageWithNewPosition,
-            )
-          }
+        const newMessageWithPosition = MessageData.toMessage(
+          data.newMessageAdded,
+          getGroupPosition(latestMessageFromStore, newMessage, undefined),
+        )
 
-          // Convert the new message to the local Message type with group position
-          const newMessageWithPosition = MessageData.toMessage(
-            data.newMessageAdded,
-            newMessageGroupPosition,
-          )
+        updateLastMessageGroupPosition({
+          conversationId,
+          lastMessage: latestMessageFromStore,
+          newMessage,
+          updateMessage: messageStore.updateMessage,
+        })
 
-          // Add the new message to the store
-          messageStore.addMessages(conversationId, [newMessageWithPosition])
+        messageStore.addMessagesToTheEnd(conversationId, [
+          newMessageWithPosition,
+        ])
 
-          // If the conversation exists in the store, update it with the latest message
-          const currentConversation = conversationStore.conversations.find(
-            (c) => c.id === conversationId,
-          )
-
-          if (currentConversation) {
-            conversationStore.updateConversation({
-              ...currentConversation,
-              lastMessage: newMessageWithPosition.content,
-              lastMessageTime: newMessageWithPosition.createdAt,
-            })
-          }
-        }
+        updateConversationLatestMessageQuickView({
+          conversationId,
+          latestMessage: newMessage,
+          conversationStore,
+        })
       }
     },
   })

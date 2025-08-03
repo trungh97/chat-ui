@@ -3,7 +3,7 @@ import { create } from 'zustand'
 import { createSelectors } from './utils'
 
 // Define the shape of the store
-interface ConversationGlobalState {
+export interface ConversationGlobalState {
   conversations: Conversation[]
   nextCursor?: string | null
   loading: boolean

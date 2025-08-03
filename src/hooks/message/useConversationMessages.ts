@@ -56,7 +56,7 @@ export function useConversationMessages({
         const newItems = result?.items || []
         const newCursor = result?.nextCursor || null
 
-        store.addMessages(conversationId, MessageData.toMessageList(newItems))
+        store.addMessagesToTheBeginning(conversationId, MessageData.toMessageList(newItems))
         store.setNextCursor(conversationId, newCursor)
         store.setHasNextPage(conversationId, !!newCursor)
 

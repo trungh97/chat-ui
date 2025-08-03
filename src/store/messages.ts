@@ -13,7 +13,11 @@ export interface IMessageListState {
   setNextCursor: (conversationId: string, nextCursor?: string | null) => void
   setHasNextPage: (conversationId: string, hasNextPage: boolean) => void
   setMessages: (conversationId: string, messages: Message[]) => void
-  addMessages: (conversationId: string, messages: Message[]) => void
+  addMessagesToTheEnd: (conversationId: string, messages: Message[]) => void
+  addMessagesToTheBeginning: (
+    conversationId: string,
+    messages: Message[],
+  ) => void
   updateMessage: (conversationId: string, message: Message) => void
   clearMessages: (conversationId: string) => void
 }
@@ -92,23 +96,41 @@ const useMessageListStoreBase = create<IMessageListState>()((set) => ({
     })),
 
   /**
-   * Adds new messages to the existing list of messages for a specific conversation.
+   * Adds new messages to the end of the existing list of messages for a specific conversation.
    *
    * @param {string} conversationId - The ID of the conversation to which the messages belong.
-   * @param {Message[]} messages - An array of Message objects to be added to the conversation's message list.
+   * @param {Message[]} messages - An array of Message objects to be added to the end of the conversation's message list.
+   * @param {boolean} [addToBottom=false] - Whether to add the messages to the bottom (true) or top (false) of the message list.
    */
-  addMessages: (conversationId, messages) =>
+  addMessagesToTheEnd: (conversationId, messages) =>
     set((state) => {
       return {
         messagesByConversation: {
           ...state.messagesByConversation,
           [conversationId]: [
-            ...messages,
             ...(state.messagesByConversation[conversationId] || []),
+            ...messages,
           ],
         },
       }
     }),
+
+  /**
+   * Adds new messages to the beginning of the existing list of messages for a specific conversation.
+   *
+   * @param {string} conversationId - The ID of the conversation to which the messages belong.
+   * @param {Message[]} messages - An array of Message objects to be added to the beginning of the conversation's message list.
+   */
+  addMessagesToTheBeginning: (conversationId, messages) =>
+    set((state) => ({
+      messagesByConversation: {
+        ...state.messagesByConversation,
+        [conversationId]: [
+          ...messages,
+          ...(state.messagesByConversation[conversationId] || []),
+        ],
+      },
+    })),
 
   /**
    * Updates a specific message in the message list for a specific conversation.

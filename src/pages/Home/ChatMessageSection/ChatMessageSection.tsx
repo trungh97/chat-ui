@@ -18,6 +18,7 @@ export const ChatMessageSection = memo(() => {
     loadMore,
   } = useConversationMessages({
     conversationId: conversationId!,
+    limit: 20,
   })
 
   const { containerRef, sentinelRef } = useChatScrollManagement({
