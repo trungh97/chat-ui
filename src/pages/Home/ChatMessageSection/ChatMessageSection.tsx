@@ -47,7 +47,7 @@ export const ChatMessageSection = memo(() => {
   return (
     <div
       ref={containerRef}
-      className="chat-window-scrollbar max-h-[calc(100vh-157px)] overflow-y-auto"
+      className="chat-window-scrollbar max-h-[calc(100vh-205px)] overflow-y-auto"
     >
       <div ref={sentinelRef} className="h-1" />
       {conversationMessages.map(
