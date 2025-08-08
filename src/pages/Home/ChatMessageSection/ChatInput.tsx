@@ -1,19 +1,9 @@
-import React, { memo, useState } from 'react'
+import { useSendMessage } from '@hooks/message'
+import React, { memo } from 'react'
 import { Input, SendIcon } from 'shared-ui'
 
 export const ChatInput = memo(() => {
-  const [value, setValue] = useState('')
-
-  const handleChange: React.ChangeEventHandler<HTMLInputElement> | undefined = (
-    event,
-  ) => {
-    setValue(event.target.value)
-  }
-
-  const handleSubmit = (value: string) => {
-    setValue('')
-    console.log(value)
-  }
+  const { value, handleChange, handleSubmit } = useSendMessage()
 
   return (
     <div className="absolute p-3 bottom-0 left-0 right-0 bg-brand-300 flex rounded-b-2xl items-center gap-x-2">
@@ -27,6 +17,7 @@ export const ChatInput = memo(() => {
             handleSubmit(value)
           }
         }}
+        autoFocus
       />
       <div
         onClick={() => handleSubmit(value)}

@@ -189,7 +189,7 @@ export type MessageDto = {
   id: Scalars['ID']['output'];
   messageType: MessageType;
   replyToMessageId?: Maybe<Scalars['String']['output']>;
-  senderId: Scalars['String']['output'];
+  senderId?: Maybe<Scalars['String']['output']>;
 };
 
 export type MessageListGlobalResponse = IResponse & {
@@ -217,6 +217,15 @@ export enum MessageType {
   Video = 'VIDEO'
 }
 
+export type MessageUpdateBody = {
+  content?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type MessageUpdateMutationRequest = {
+  id: Scalars['String']['input'];
+  updates: MessageUpdateBody;
+};
+
 export type MessageWithSenderDto = {
   __typename?: 'MessageWithSenderDTO';
   content: Scalars['String']['output'];
@@ -227,7 +236,7 @@ export type MessageWithSenderDto = {
   messageType: MessageType;
   replyToMessageId?: Maybe<Scalars['String']['output']>;
   senderAvatar?: Maybe<Scalars['String']['output']>;
-  senderId: Scalars['String']['output'];
+  senderId?: Maybe<Scalars['String']['output']>;
   senderName?: Maybe<Scalars['String']['output']>;
 };
 
@@ -241,10 +250,12 @@ export type Mutation = {
   createParticipant: ParticipantResponse;
   deleteConversation: ConversationDeleteGlobalResponse;
   deleteFriendRequest: Scalars['Boolean']['output'];
+  deleteMessage: MessageResponse;
   googleLogin: UserGlobalResponse;
   loginCredentialBasedUser: UserGlobalResponse;
   logout: Scalars['Boolean']['output'];
   registerCredentialBasedUser: UserGlobalResponse;
+  updateMessage: MessageResponse;
 };
 
 
@@ -289,6 +300,11 @@ export type MutationDeleteFriendRequestArgs = {
 };
 
 
+export type MutationDeleteMessageArgs = {
+  id: Scalars['String']['input'];
+};
+
+
 export type MutationGoogleLoginArgs = {
   code: Scalars['String']['input'];
 };
@@ -301,6 +317,11 @@ export type MutationLoginCredentialBasedUserArgs = {
 
 export type MutationRegisterCredentialBasedUserArgs = {
   request: UserCreateMutationRequest;
+};
+
+
+export type MutationUpdateMessageArgs = {
+  request: MessageUpdateMutationRequest;
 };
 
 export type PaginatedConversationListResponse = {
@@ -349,6 +370,7 @@ export type Query = {
   getConversationById: ExtendConversationGlobalResponse;
   getFriendRequestById: FriendRequestResponse;
   getFriendRequestByUsers: FriendRequestResponse;
+  getMessageById: MessageResponse;
   getMessagesByConversationId: MessageListGlobalResponse;
   getMyConversations: ExtendConversationListGlobalResponse;
   getMyFriendRequests: FriendRequestListResponse;
@@ -370,6 +392,11 @@ export type QueryGetFriendRequestByIdArgs = {
 export type QueryGetFriendRequestByUsersArgs = {
   receiverId: Scalars['String']['input'];
   senderId: Scalars['String']['input'];
+};
+
+
+export type QueryGetMessageByIdArgs = {
+  id: Scalars['String']['input'];
 };
 
 
@@ -451,19 +478,19 @@ export enum UserStatus {
 
 export type ConversationFragment = { __typename?: 'ConversationDTO', id: string, title?: string | null, creatorId: string, isArchived: boolean, deletedAt?: any | null, type: ConversationType, groupAvatar?: string | null };
 
-export type ExtendedConversationFragment = { __typename?: 'ExtendConversationDTO', id: string, title?: string | null, creatorId: string, isArchived: boolean, deletedAt?: any | null, type: ConversationType, groupAvatar?: string | null, defaultGroupAvatar?: Array<string> | null, participants: Array<{ __typename?: 'ExtendedParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType, name: string, avatar: string }>, messages: Array<{ __typename?: 'MessageDTO', id: string, content: string, messageType: MessageType, senderId: string, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any }> };
+export type ExtendedConversationFragment = { __typename?: 'ExtendConversationDTO', id: string, title?: string | null, creatorId: string, isArchived: boolean, deletedAt?: any | null, type: ConversationType, groupAvatar?: string | null, defaultGroupAvatar?: Array<string> | null, participants: Array<{ __typename?: 'ExtendedParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType, name: string, avatar: string }>, messages: Array<{ __typename?: 'MessageDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any }> };
 
-export type MessageFragment = { __typename?: 'MessageDTO', id: string, content: string, messageType: MessageType, senderId: string, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any };
+export type MessageFragment = { __typename?: 'MessageDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any };
 
-export type MessageWithSenderFragment = { __typename?: 'MessageWithSenderDTO', id: string, content: string, messageType: MessageType, senderId: string, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, senderName?: string | null, senderAvatar?: string | null };
+export type MessageWithSenderFragment = { __typename?: 'MessageWithSenderDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, senderName?: string | null, senderAvatar?: string | null };
 
 export type ParticipantFragment = { __typename?: 'ParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType };
 
 export type ExtendedParticipantFragment = { __typename?: 'ExtendedParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType, name: string, avatar: string };
 
-export type ConversationListResponseFragment = { __typename?: 'ExtendConversationListGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'PaginatedConversationListResponse', nextCursor?: string | null, items: Array<{ __typename?: 'ExtendConversationDTO', id: string, title?: string | null, creatorId: string, isArchived: boolean, deletedAt?: any | null, type: ConversationType, groupAvatar?: string | null, defaultGroupAvatar?: Array<string> | null, participants: Array<{ __typename?: 'ExtendedParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType, name: string, avatar: string }>, messages: Array<{ __typename?: 'MessageDTO', id: string, content: string, messageType: MessageType, senderId: string, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any }> }> } | null };
+export type ConversationListResponseFragment = { __typename?: 'ExtendConversationListGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'PaginatedConversationListResponse', nextCursor?: string | null, items: Array<{ __typename?: 'ExtendConversationDTO', id: string, title?: string | null, creatorId: string, isArchived: boolean, deletedAt?: any | null, type: ConversationType, groupAvatar?: string | null, defaultGroupAvatar?: Array<string> | null, participants: Array<{ __typename?: 'ExtendedParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType, name: string, avatar: string }>, messages: Array<{ __typename?: 'MessageDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any }> }> } | null };
 
-export type MessageListResponseFragment = { __typename?: 'MessageListGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'PaginatedMessageListResponse', nextCursor?: string | null, items: Array<{ __typename?: 'MessageWithSenderDTO', id: string, content: string, messageType: MessageType, senderId: string, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, senderName?: string | null, senderAvatar?: string | null }> } | null };
+export type MessageListResponseFragment = { __typename?: 'MessageListGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'PaginatedMessageListResponse', nextCursor?: string | null, items: Array<{ __typename?: 'MessageWithSenderDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, senderName?: string | null, senderAvatar?: string | null }> } | null };
 
 export type UserResponseFragment = { __typename?: 'UserGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'UserDTO', id: string, firstName: string, lastName: string, email: string, phone?: string | null, role: UserRole, avatar: string, isActive: boolean, provider?: UserProvider | null, providerUserId?: string | null, status: UserStatus } | null };
 
@@ -495,6 +522,13 @@ export type StatusFragment = Status_ContactListResponse_Fragment | Status_Contac
 
 export type UserInfoFragment = { __typename?: 'UserDTO', id: string, firstName: string, lastName: string, email: string, phone?: string | null, role: UserRole, avatar: string, isActive: boolean, provider?: UserProvider | null, providerUserId?: string | null, status: UserStatus };
 
+export type CreateMessageMutationVariables = Exact<{
+  request: MessageCreateMutationRequest;
+}>;
+
+
+export type CreateMessageMutation = { __typename?: 'Mutation', createMessage: { __typename?: 'MessageResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'MessageDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any } | null } };
+
 export type CredentialBasedLoginMutationVariables = Exact<{
   request: UserLoginInput;
 }>;
@@ -520,14 +554,14 @@ export type GetMessagesByConversationIdQueryVariables = Exact<{
 }>;
 
 
-export type GetMessagesByConversationIdQuery = { __typename?: 'Query', getMessagesByConversationId: { __typename?: 'MessageListGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'PaginatedMessageListResponse', nextCursor?: string | null, items: Array<{ __typename?: 'MessageWithSenderDTO', id: string, content: string, messageType: MessageType, senderId: string, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, senderName?: string | null, senderAvatar?: string | null }> } | null } };
+export type GetMessagesByConversationIdQuery = { __typename?: 'Query', getMessagesByConversationId: { __typename?: 'MessageListGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'PaginatedMessageListResponse', nextCursor?: string | null, items: Array<{ __typename?: 'MessageWithSenderDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, senderName?: string | null, senderAvatar?: string | null }> } | null } };
 
 export type GetMyLatestConversationsQueryVariables = Exact<{
   options: CursorBasedPaginationParams;
 }>;
 
 
-export type GetMyLatestConversationsQuery = { __typename?: 'Query', getMyConversations: { __typename?: 'ExtendConversationListGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'PaginatedConversationListResponse', nextCursor?: string | null, items: Array<{ __typename?: 'ExtendConversationDTO', id: string, title?: string | null, creatorId: string, isArchived: boolean, deletedAt?: any | null, type: ConversationType, groupAvatar?: string | null, defaultGroupAvatar?: Array<string> | null, participants: Array<{ __typename?: 'ExtendedParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType, name: string, avatar: string }>, messages: Array<{ __typename?: 'MessageDTO', id: string, content: string, messageType: MessageType, senderId: string, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any }> }> } | null } };
+export type GetMyLatestConversationsQuery = { __typename?: 'Query', getMyConversations: { __typename?: 'ExtendConversationListGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'PaginatedConversationListResponse', nextCursor?: string | null, items: Array<{ __typename?: 'ExtendConversationDTO', id: string, title?: string | null, creatorId: string, isArchived: boolean, deletedAt?: any | null, type: ConversationType, groupAvatar?: string | null, defaultGroupAvatar?: Array<string> | null, participants: Array<{ __typename?: 'ExtendedParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType, name: string, avatar: string }>, messages: Array<{ __typename?: 'MessageDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any }> }> } | null } };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -537,7 +571,7 @@ export type MeQuery = { __typename?: 'Query', me: { __typename?: 'UserGlobalResp
 export type NewMessageAddedSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
-export type NewMessageAddedSubscription = { __typename?: 'Subscription', newMessageAdded: { __typename?: 'MessageWithSenderDTO', id: string, content: string, messageType: MessageType, senderId: string, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, senderName?: string | null, senderAvatar?: string | null } };
+export type NewMessageAddedSubscription = { __typename?: 'Subscription', newMessageAdded: { __typename?: 'MessageWithSenderDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, senderName?: string | null, senderAvatar?: string | null } };
 
 export const ConversationFragmentDoc = gql`
     fragment conversation on ConversationDTO {
@@ -670,6 +704,44 @@ export const UserResponseFragmentDoc = gql`
 }
     ${StatusFragmentDoc}
 ${UserInfoFragmentDoc}`;
+export const CreateMessageDocument = gql`
+    mutation CreateMessage($request: MessageCreateMutationRequest!) {
+  createMessage(request: $request) {
+    ...status
+    data {
+      ...message
+    }
+    error
+  }
+}
+    ${StatusFragmentDoc}
+${MessageFragmentDoc}`;
+export type CreateMessageMutationFn = Apollo.MutationFunction<CreateMessageMutation, CreateMessageMutationVariables>;
+
+/**
+ * __useCreateMessageMutation__
+ *
+ * To run a mutation, you first call `useCreateMessageMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateMessageMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createMessageMutation, { data, loading, error }] = useCreateMessageMutation({
+ *   variables: {
+ *      request: // value for 'request'
+ *   },
+ * });
+ */
+export function useCreateMessageMutation(baseOptions?: Apollo.MutationHookOptions<CreateMessageMutation, CreateMessageMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateMessageMutation, CreateMessageMutationVariables>(CreateMessageDocument, options);
+      }
+export type CreateMessageMutationHookResult = ReturnType<typeof useCreateMessageMutation>;
+export type CreateMessageMutationResult = Apollo.MutationResult<CreateMessageMutation>;
+export type CreateMessageMutationOptions = Apollo.BaseMutationOptions<CreateMessageMutation, CreateMessageMutationVariables>;
 export const CredentialBasedLoginDocument = gql`
     mutation CredentialBasedLogin($request: UserLoginInput!) {
   loginCredentialBasedUser(request: $request) {

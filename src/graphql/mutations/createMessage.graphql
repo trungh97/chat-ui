@@ -1,0 +1,9 @@
+mutation CreateMessage($request: MessageCreateMutationRequest!) {
+  createMessage(request: $request) {
+    ...status
+    data {
+      ...message
+    }
+    error
+  }
+}
