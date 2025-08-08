@@ -6,7 +6,7 @@ export const ChatInput = memo(() => {
   const { value, handleChange, handleSubmit } = useSendMessage()
 
   return (
-    <div className="absolute p-3 bottom-0 left-0 right-0 bg-brand-300 flex rounded-b-2xl items-center gap-x-2">
+    <div className="absolute bottom-0 left-0 right-0 flex items-center gap-x-2 rounded-b-2xl bg-brand-300 p-3">
       <Input
         wrapperClassName="flex-1"
         onChange={handleChange}
