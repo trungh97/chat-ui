@@ -14,6 +14,7 @@ function useInitialAutoScroll(conversationId: string, messages: any[]) {
     conversationId,
     messages,
   ])
+  const lastMessageId = messages[messages.length - 1]?.id
 
   useEffect(() => {
     // Reset scroll on conversation change, only auto-scroll on first load
@@ -24,6 +25,15 @@ function useInitialAutoScroll(conversationId: string, messages: any[]) {
       isFirstLoadRef.current = false
     }
   }, [conversationId, messages])
+
+  useEffect(() => {
+    if (lastMessageId) {
+      const el = containerRef.current
+      if (el) {
+        el.scrollTop = el.scrollHeight
+      }
+    }
+  }, [lastMessageId])
 
   return containerRef
 }

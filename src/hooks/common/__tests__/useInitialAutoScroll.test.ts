@@ -60,4 +60,44 @@ describe('useInitialAutoScroll', () => {
     // Should not scroll again (remains at 0)
     expect(div.scrollTop).toBe(0)
   })
+
+  it('should auto-scroll if the new message comes', () => {
+    let conversationId = '1'
+    let messages = [{ id: '1', content: 'msg1' }]
+    const { result, rerender } = renderHook(
+      ({ conversationId, messages }) =>
+        useInitialAutoScroll(conversationId, messages),
+      { initialProps: { conversationId, messages } },
+    )
+    const div = createScrollableDiv()
+    result.current.current = div
+    act(() => {
+      messages = [
+        { id: '1', content: 'msg1' },
+        { id: '2', content: 'msg2' },
+      ]
+      rerender({ conversationId, messages })
+    })
+    expect(div.scrollTop).toBe(div.scrollHeight)
+  })
+
+  it('should not auto-scroll if the new message id is invalid', () => {
+    let conversationId = '1'
+    let messages = [{ id: '1', content: 'msg1' }]
+    const { result, rerender } = renderHook(
+      ({ conversationId, messages }) =>
+        useInitialAutoScroll(conversationId, messages),
+      { initialProps: { conversationId, messages } },
+    )
+    const div = createScrollableDiv()
+    result.current.current = div
+    act(() => {
+      messages = [
+        { id: '1', content: 'msg1' },
+        { id: '', content: 'msg2' },
+      ]
+      rerender({ conversationId, messages })
+    })
+    expect(div.scrollTop).toBe(0)
+  })
 })
