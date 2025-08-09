@@ -6,12 +6,12 @@ export const ChatInput = memo(() => {
   const { value, handleChange, handleSubmit } = useSendMessage()
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 flex items-center gap-x-2 rounded-b-2xl bg-brand-300 p-3">
+    <div className="absolute bottom-0 left-0 right-0 flex items-center gap-x-2 rounded-b-2xl bg-brand-200 p-3">
       <Input
         wrapperClassName="flex-1"
         onChange={handleChange}
         value={value}
-        className="bg-brand-200"
+        className="bg-brand-100 focus-within:shadow-none"
         onKeyDown={(e) => {
           if (e.key === 'Enter') {
             handleSubmit(value)
