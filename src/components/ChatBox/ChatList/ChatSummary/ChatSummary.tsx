@@ -1,26 +1,35 @@
 import { formatRelativeToNow } from '@helpers/date'
-import React from 'react'
+import useConversationListStore from '@store/conversations'
+import React, { memo, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Avatar } from 'shared-ui'
 import { ChatSummaryProps } from '../types'
 
-export const ChatSummary = ({ data }: { data: ChatSummaryProps }) => {
+export const ChatSummary = memo(({ data }: { data: ChatSummaryProps }) => {
   const { id, avatar, title, lastMessage, lastMessageTime } = data
+  const setActiveConversation =
+    useConversationListStore.use.setActiveConversation()
   const navigate = useNavigate()
   const { conversationId } = useParams()
-  const lastMessageDateTime = formatRelativeToNow(lastMessageTime)
-  const isCurrentConversation = conversationId === id
+  const isActive = conversationId === id
 
   const handleClick = () => {
-    if (!isCurrentConversation) {
+    if (!isActive) {
+      setActiveConversation(id)
       navigate(`/${id}`)
     }
   }
 
+  useEffect(() => {
+    if (conversationId) {
+      setActiveConversation(conversationId)
+    }
+  }, [])
+
   return (
     <div
       key={id}
-      className={`px-6 py-3 ${isCurrentConversation ? 'hover:bg-brand-300' : 'hover:bg-brand-200'} w-full cursor-pointer rounded-xl ${isCurrentConversation ? 'bg-brand-300' : ''}`}
+      className={`px-6 py-3 ${isActive ? 'hover:bg-brand-300' : 'hover:bg-brand-200'} w-full cursor-pointer rounded-xl ${isActive ? 'bg-brand-300' : ''}`}
       onClick={handleClick}
     >
       <div className="flex gap-3">
@@ -36,13 +45,13 @@ export const ChatSummary = ({ data }: { data: ChatSummaryProps }) => {
             </p>
             <span className="whitespace-nowrap text-xs text-gray-500">
               {'\u2022 '}
-              {lastMessageDateTime}
+              {formatRelativeToNow(lastMessageTime)}
             </span>
           </div>
         </div>
       </div>
     </div>
   )
-}
+})
 
 export default ChatSummary

@@ -8,6 +8,8 @@ export interface ConversationGlobalState {
   nextCursor?: string | null
   loading: boolean
   error?: Error
+  activeConversation: string | null
+  setActiveConversation: (conversationId: string) => void
   setLoading: (loading: boolean) => void
   setError: (error: Error | undefined) => void
   setNextCursor: (nextCursor?: string | null) => void
@@ -23,6 +25,9 @@ const useConversationListStoreBase = create<ConversationGlobalState>()(
     loading: false,
     error: undefined,
     nextCursor: undefined,
+    activeConversation: null,
+    setActiveConversation: (conversationId: string) =>
+      set({ activeConversation: conversationId }),
     setLoading: (loading: boolean) => set({ loading }),
     setError: (error: Error | undefined) => set({ error }),
     setNextCursor: (nextCursor?: string | null) => set({ nextCursor }),
@@ -48,10 +53,21 @@ const useConversationListStoreBase = create<ConversationGlobalState>()(
   }),
 )
 
+useConversationListStoreBase.subscribe((state) => {
+  const activeConversation = state.activeConversation
+  if (activeConversation) {
+    const conversation = state.conversations.find(
+      (conversation) => conversation.id === activeConversation,
+    )
+    if (conversation && conversation.id) {
+      document.title = conversation.title
+    }
+  }
+})
+
 // This is a custom hook that allows you to access the store's state and actions
 const useConversationListStore = createSelectors(useConversationListStoreBase)
 
 export default useConversationListStore
 
 export { useConversationListStore }
-

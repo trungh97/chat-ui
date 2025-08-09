@@ -1,43 +1,47 @@
+import { MessageGroupPosition } from '@constants/enums'
 import { MessageWithSenderDto } from '@generated/graphql'
 import { getGroupPosition } from '@helpers/conversation'
 import { Message } from '@interfaces/dtos'
-import { MessageGroupPosition } from '@interfaces/types'
+import { MessagePosition } from '@interfaces/types'
 
 export class MessageData {
   // Converts a GraphQL message DTO (e.g., from Apollo codegen) to the local Message type
-  static toMessage(
-    dto: MessageWithSenderDto,
-    groupPosition: MessageGroupPosition = undefined,
-  ): Message {
+  static toMessage({
+    data,
+    position = MessageGroupPosition.START,
+  }: {
+    data: MessageWithSenderDto
+    position?: MessagePosition
+  }): Message {
     return {
-      id: dto.id,
-      content: dto.content,
-      messageType: dto.messageType,
-      senderId: dto.senderId ?? null,
-      senderName: dto.senderName ?? null,
-      senderAvatar: dto.senderAvatar ?? null,
-      extra: dto.extra ?? undefined,
-      conversationId: dto.conversationId ?? null,
-      replyToMessageId: dto.replyToMessageId ?? undefined,
+      id: data.id,
+      content: data.content,
+      messageType: data.messageType,
+      senderId: data.senderId ?? null,
+      senderName: data.senderName ?? null,
+      senderAvatar: data.senderAvatar ?? null,
+      extra: data.extra ?? undefined,
+      conversationId: data.conversationId ?? null,
+      replyToMessageId: data.replyToMessageId ?? undefined,
       createdAt:
-        typeof dto.createdAt === 'string'
-          ? dto.createdAt
-          : String(dto.createdAt),
-      groupPosition,
+        typeof data.createdAt === 'string'
+          ? data.createdAt
+          : String(data.createdAt),
+      groupPosition: position,
     }
   }
 
   // Converts an array of GraphQL message DTOs to the local Message type with groupPosition
-  static toMessageList(dtos: MessageWithSenderDto[]): Message[] {
-    const reversedDtos = [...dtos].reverse()
+  static toMessageList({ data }: { data: MessageWithSenderDto[] }): Message[] {
+    const reversedDtos = [...data].reverse()
     return reversedDtos.map((message, i, arr) => {
-      const prev = arr[i - 1] && this.toMessage(arr[i - 1])
-      const next = arr[i + 1] && this.toMessage(arr[i + 1])
-      const current = this.toMessage(message)
+      const prev = arr[i - 1] && this.toMessage({ data: arr[i - 1] })
+      const next = arr[i + 1] && this.toMessage({ data: arr[i + 1] })
+      const current = this.toMessage({ data: message })
 
       const groupPosition = getGroupPosition(prev, current, next)
 
-      return MessageData.toMessage(message, groupPosition)
+      return MessageData.toMessage({ data: message, position: groupPosition })
     })
   }
 }

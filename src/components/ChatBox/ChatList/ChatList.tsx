@@ -44,7 +44,7 @@ export const ChatList = memo(() => {
       {conversations.map((chat) => (
         <ChatSummaryWrapper key={chat.id}>
           <Skeleton title={false} avatar loading={loading} key={chat.id}>
-            <ChatSummary key={chat.id} data={{ ...chat, isActive: false }} />
+            <ChatSummary key={chat.id} data={chat} />
           </Skeleton>
         </ChatSummaryWrapper>
       ))}
