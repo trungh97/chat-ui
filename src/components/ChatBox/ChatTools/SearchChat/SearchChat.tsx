@@ -7,6 +7,7 @@ export const SearchChat = React.memo(() => {
       <Input
         variant="leading-icon"
         placeholder="Search chat"
+        className='bg-brand-100'
         icon={<SearchIcon color="#717680" transform="scale(0.8)" />}
       />
     </div>

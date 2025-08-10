@@ -13,3 +13,9 @@ export enum UserProvider {
   GOOGLE = 'GOOGLE',
   FACEBOOK = 'FACEBOOK',
 }
+
+export enum MessageGroupPosition {
+  START = 'START',
+  MIDDLE = 'MIDDLE',
+  END = 'END',
+}

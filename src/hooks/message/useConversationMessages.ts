@@ -27,7 +27,10 @@ export function useConversationMessages({
       const cursor =
         response?.getMessagesByConversationId?.data?.nextCursor || null
 
-      store.setMessages(conversationId, MessageData.toMessageList(items))
+      store.setMessages(
+        conversationId,
+        MessageData.toMessageList({ data: items }),
+      )
       store.setNextCursor(conversationId, cursor)
       store.setHasNextPage(conversationId, !!cursor)
     },
@@ -56,7 +59,10 @@ export function useConversationMessages({
         const newItems = result?.items || []
         const newCursor = result?.nextCursor || null
 
-        store.addMessagesToTheBeginning(conversationId, MessageData.toMessageList(newItems))
+        store.addMessagesToTheBeginning(
+          conversationId,
+          MessageData.toMessageList({ data: newItems }),
+        )
         store.setNextCursor(conversationId, newCursor)
         store.setHasNextPage(conversationId, !!newCursor)
 

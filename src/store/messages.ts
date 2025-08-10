@@ -8,6 +8,7 @@ export interface IMessageListState {
   hasNextPageByConversation: Record<string, boolean>
   loadingByConversation: Record<string, boolean>
   errorByConversation: Record<string, Error | undefined>
+  lastMessageByConversation: (conversationId: string) => Message | null
   setLoading: (conversationId: string, loading: boolean) => void
   setError: (conversationId: string, error?: Error) => void
   setNextCursor: (conversationId: string, nextCursor?: string | null) => void
@@ -22,7 +23,7 @@ export interface IMessageListState {
   clearMessages: (conversationId: string) => void
 }
 
-const useMessageListStoreBase = create<IMessageListState>()((set) => ({
+const useMessageListStoreBase = create<IMessageListState>()((set, get) => ({
   messagesByConversation: {},
   nextCursorByConversation: {},
   hasNextPageByConversation: {},
@@ -173,6 +174,15 @@ const useMessageListStoreBase = create<IMessageListState>()((set) => ({
         [conversationId]: false,
       },
     })),
+
+  /**
+   * Returns the last message in the message list for a specific conversation.
+   *
+   * @param {string} conversationId - The ID of the conversation.
+   * @returns {Message | null} The last message in the message list, or null if the message list is empty.
+   */
+  lastMessageByConversation: (conversationId) =>
+    get().messagesByConversation[conversationId].slice(-1)[0] ?? null,
 }))
 
 const useMessageListStore = createSelectors(useMessageListStoreBase)

@@ -1,3 +1,4 @@
+import { MessageGroupPosition } from '@constants/enums'
 import { MessageData } from '@data/message'
 import { useNewMessageAddedSubscription } from '@generated/graphql'
 import { getGroupPosition } from '@helpers/conversation'
@@ -24,11 +25,11 @@ function updateLastMessageGroupPosition({
   if (
     lastMessage &&
     lastMessage.senderId === newMessage.senderId &&
-    lastMessage.groupPosition === 'end' &&
+    lastMessage.groupPosition === MessageGroupPosition.END &&
     getTimeDifference(lastMessage.createdAt, newMessage.createdAt, 'minutes') <
       5
   ) {
-    lastMessageWithNewPosition.groupPosition = 'middle'
+    lastMessageWithNewPosition.groupPosition = MessageGroupPosition.MIDDLE
     updateMessage(conversationId, lastMessageWithNewPosition)
   }
 }
@@ -71,17 +72,22 @@ export function useSubscribeNewMessage(options?: {
     onData: ({ data: { data, error, loading } }) => {
       if (data && data.newMessageAdded && !loading && !error) {
         if (typeof data.newMessageAdded.conversationId !== 'string') return
+        const { newMessageAdded } = data
 
-        const conversationId = data.newMessageAdded.conversationId
+        const conversationId = newMessageAdded.conversationId
         const latestMessageFromStore =
-          messageStore.messagesByConversation[conversationId]?.slice(-1)[0]
-          
-        const newMessage = MessageData.toMessage(data.newMessageAdded)
+          messageStore.lastMessageByConversation(conversationId)!
 
-        const newMessageWithPosition = MessageData.toMessage(
-          data.newMessageAdded,
-          getGroupPosition(latestMessageFromStore, newMessage, undefined),
-        )
+        const newMessage = MessageData.toMessage({ data: newMessageAdded })
+
+        const newMessageWithPosition = MessageData.toMessage({
+          data: newMessageAdded,
+          position: getGroupPosition(
+            latestMessageFromStore,
+            newMessage,
+            undefined,
+          ),
+        })
 
         updateLastMessageGroupPosition({
           conversationId,
