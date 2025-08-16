@@ -21,3 +21,17 @@ fragment messageWithSender on MessageWithSenderDTO {
   senderName
   senderAvatar
 }
+
+fragment messageWithConversation on MessageWithConversationDTO {
+  id
+  content
+  messageType
+  senderId
+  extra
+  conversationId
+  replyToMessageId
+  createdAt
+  conversation {
+    ...conversation
+  }
+}

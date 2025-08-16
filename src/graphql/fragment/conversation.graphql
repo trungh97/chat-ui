@@ -6,6 +6,7 @@ fragment conversation on ConversationDTO {
   deletedAt
   type
   groupAvatar
+  lastMessageAt
 }
 
 fragment extendedConversation on ExtendConversationDTO {
@@ -15,10 +16,11 @@ fragment extendedConversation on ExtendConversationDTO {
   isArchived
   deletedAt
   type
+  lastMessageAt
   groupAvatar
-  defaultGroupAvatar
+  defaultGroupAvatars
   participants {
-    ...extendedParticipant
+    ...detailedParticipant
   }
   messages {
     ...message
