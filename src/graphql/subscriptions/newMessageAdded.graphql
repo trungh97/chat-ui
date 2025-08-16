@@ -1,5 +1,17 @@
 subscription NewMessageAdded {
   newMessageAdded {
-    ...messageWithSender
+    id
+    content
+    messageType
+    senderId
+    extra
+    conversationId
+    replyToMessageId
+    createdAt
+    senderName
+    senderAvatar
+    conversation {
+      ...conversation
+    }
   }
 }

@@ -1,4 +1,5 @@
-import { MessageGroupPosition } from '@interfaces/types'
+import { MessagePosition } from '@interfaces/types'
+import { Conversation } from './conversation'
 
 export interface Message {
   id: string
@@ -11,5 +12,9 @@ export interface Message {
   conversationId: string | null
   replyToMessageId?: string
   createdAt: string
-  groupPosition: MessageGroupPosition
+  groupPosition: MessagePosition
+}
+
+export interface MessageWithConversation extends Message {
+  conversation: Conversation
 }

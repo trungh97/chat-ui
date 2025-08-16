@@ -5,7 +5,7 @@ fragment participant on ParticipantDTO {
   type
 }
 
-fragment extendedParticipant on ExtendedParticipantDTO {
+fragment detailedParticipant on DetailedParticipantDTO {
   id
   conversationId
   userId
