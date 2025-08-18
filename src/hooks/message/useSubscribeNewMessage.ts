@@ -25,11 +25,11 @@ function updateLastMessageGroupPosition({
   if (
     lastMessage &&
     lastMessage.senderId === newMessage.senderId &&
-    lastMessage.groupPosition === MessageGroupPosition.END &&
+    lastMessage.groupPosition === MessageGroupPosition.end &&
     getTimeDifference(lastMessage.createdAt, newMessage.createdAt, 'minutes') <
       5
   ) {
-    lastMessageWithNewPosition.groupPosition = MessageGroupPosition.MIDDLE
+    lastMessageWithNewPosition.groupPosition = MessageGroupPosition.middle
     updateMessage(conversationId, lastMessageWithNewPosition)
   }
 }
@@ -78,9 +78,11 @@ export function useSubscribeNewMessage(options?: {
         const latestMessageFromStore =
           messageStore.lastMessageByConversation(conversationId)!
 
-        const newMessage = MessageData.toMessage({ data: newMessageAdded })
+        const newMessage = MessageData.toMessageWithConversation({
+          data: newMessageAdded,
+        })
 
-        const newMessageWithPosition = MessageData.toMessage({
+        const newMessageWithPosition = MessageData.toMessageWithConversation({
           data: newMessageAdded,
           position: getGroupPosition(
             latestMessageFromStore,

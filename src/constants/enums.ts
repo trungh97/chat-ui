@@ -15,7 +15,7 @@ export enum UserProvider {
 }
 
 export enum MessageGroupPosition {
-  START = 'START',
-  MIDDLE = 'MIDDLE',
-  END = 'END',
+  start = 'start',
+  middle = 'middle',
+  end = 'end',
 }

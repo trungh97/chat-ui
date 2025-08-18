@@ -17,28 +17,29 @@ export function useConversationMessages({
 }: UseMessageListOptions) {
   const store = useMessageListStore()
 
-  const { loading, fetchMore } = useGetMessagesByConversationIdQuery({
-    variables: {
-      conversationId,
-      options: { cursor: initialCursor, limit },
-    },
-    onCompleted: (response) => {
-      const items = response?.getMessagesByConversationId?.data?.items || []
-      const cursor =
-        response?.getMessagesByConversationId?.data?.nextCursor || null
-
-      store.setMessages(
+  const { loading, fetchMore, data, error } =
+    useGetMessagesByConversationIdQuery({
+      variables: {
         conversationId,
-        MessageData.toMessageList({ data: items }),
-      )
-      store.setNextCursor(conversationId, cursor)
-      store.setHasNextPage(conversationId, !!cursor)
-    },
-    onError: (err) => {
-      store.setError(conversationId, err)
-    },
-    fetchPolicy: 'network-only',
-  })
+        options: { cursor: initialCursor, limit },
+      },
+      onCompleted: (response) => {
+        const items = response?.getMessagesByConversationId?.data?.items || []
+        const cursor =
+          response?.getMessagesByConversationId?.data?.nextCursor || null
+
+        store.setMessages(
+          conversationId,
+          MessageData.toMessageListWithSender({ data: items }),
+        )
+        store.setNextCursor(conversationId, cursor)
+        store.setHasNextPage(conversationId, !!cursor)
+      },
+      onError: (err) => {
+        store.setError(conversationId, err)
+      },
+      fetchPolicy: 'network-only',
+    })
 
   const hasNextPage = store.hasNextPageByConversation[conversationId] || false
   const nextCursor = store.nextCursorByConversation[conversationId] || null
@@ -53,15 +54,15 @@ export function useConversationMessages({
       },
       updateQuery: (prev, { fetchMoreResult }) => {
         if (!fetchMoreResult) return prev
-        const result = fetchMoreResult.getMessagesByConversationId?.data
-        const prevData = prev.getMessagesByConversationId.data
-        const prevItems = prevData?.items || []
-        const newItems = result?.items || []
-        const newCursor = result?.nextCursor || null
+        const prevItems = prev.getMessagesByConversationId.data?.items || []
+        const newItems =
+          fetchMoreResult.getMessagesByConversationId?.data?.items || []
+        const newCursor =
+          fetchMoreResult.getMessagesByConversationId?.data?.nextCursor || null
 
         store.addMessagesToTheBeginning(
           conversationId,
-          MessageData.toMessageList({ data: newItems }),
+          MessageData.toMessageListWithSender({ data: newItems }),
         )
         store.setNextCursor(conversationId, newCursor)
         store.setHasNextPage(conversationId, !!newCursor)
@@ -72,7 +73,7 @@ export function useConversationMessages({
             ...prev.getMessagesByConversationId,
             data: {
               ...prev.getMessagesByConversationId.data,
-              items: [...newItems, ...prevItems],
+              items: [...prevItems, ...newItems],
               nextCursor: newCursor,
             },
           },
@@ -82,8 +83,10 @@ export function useConversationMessages({
   }, [conversationId, nextCursor, hasNextPage, limit, fetchMore, store])
 
   return {
-    data: store.messagesByConversation[conversationId] || [],
-    error: store.errorByConversation[conversationId],
+    data: MessageData.toMessageListWithSender({
+      data: data?.getMessagesByConversationId?.data?.items || [],
+    }),
+    error,
     loading,
     hasNextPage,
     nextCursor,

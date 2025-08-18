@@ -1,6 +1,6 @@
 import { DEFAULT_DEBOUNCE_TIME } from '@constants/common'
 import { DEFAULT_LIMIT } from '@constants/pagination'
-import { formatConversationList } from '@data/conversation'
+import { ConversationData } from '@data/conversation'
 import { useGetMyLatestConversationsQuery } from '@generated/graphql'
 import { CursorBasedPagination } from '@interfaces/pagination'
 import useConversationListStore from '@store/conversations'
@@ -33,7 +33,7 @@ export const useMyLatestConversations = (options: CursorBasedPagination) => {
       !initializedRef.current &&
       data?.getMyConversations.data?.items.length! > 0
     ) {
-      const items = formatConversationList(data)
+      const items = ConversationData.toConversationListDTO(data)
       setConversations(items)
       setNextCursor(data?.getMyConversations.data?.nextCursor ?? null)
       initializedRef.current = true
@@ -53,11 +53,35 @@ export const useMyLatestConversations = (options: CursorBasedPagination) => {
             limit: options.limit || DEFAULT_LIMIT,
           },
         },
+        updateQuery: (
+          prev,
+          {
+            fetchMoreResult: {
+              getMyConversations: { data, error },
+            },
+          },
+        ) => {
+          if (error || !data) return prev
+
+          const prevItems = prev?.getMyConversations?.data?.items || []
+
+          return {
+            ...prev,
+            getMyConversations: {
+              ...prev.getMyConversations,
+              data: {
+                ...prev.getMyConversations.data,
+                items: [...prevItems, ...data.items],
+                nextCursor: data.nextCursor,
+              },
+            },
+          }
+        },
       }).finally(() => {
         setIsFetchingMore(false)
       })
 
-      const moreItems = formatConversationList(moreData)
+      const moreItems = ConversationData.toConversationListDTO(moreData)
       const allItems = [...conversations, ...moreItems]
 
       const uniqueMap = new Map()
@@ -71,7 +95,7 @@ export const useMyLatestConversations = (options: CursorBasedPagination) => {
   )
 
   return {
-    conversations: formatConversationList(data),
+    conversations: ConversationData.toConversationListDTO(data),
     loading,
     isFetchingMore,
     error,

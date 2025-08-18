@@ -12,7 +12,7 @@ export class MessageData {
   // Converts a GraphQL message DTO (e.g., from Apollo codegen) to the local Message type
   static toMessageWithSender({
     data,
-    position = MessageGroupPosition.START,
+    position = MessageGroupPosition.start,
   }: {
     data: MessageWithSenderDto
     position?: MessagePosition
@@ -41,8 +41,8 @@ export class MessageData {
   }: {
     data: MessageWithSenderDto[]
   }): Message[] {
-    const reversedDtos = [...data].reverse()
-    return reversedDtos.map((message, i, arr) => {
+    const reversedData = [...data].reverse()
+    return reversedData.map((message, i, arr) => {
       const prev = arr[i - 1] && this.toMessageWithSender({ data: arr[i - 1] })
       const next = arr[i + 1] && this.toMessageWithSender({ data: arr[i + 1] })
       const current = this.toMessageWithSender({ data: message })
@@ -58,7 +58,7 @@ export class MessageData {
 
   static toMessageWithConversation({
     data,
-    position = MessageGroupPosition.START,
+    position = MessageGroupPosition.start,
   }: {
     data: MessageWithConversationDto
     position?: MessagePosition

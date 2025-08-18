@@ -48,7 +48,7 @@ function usePreserveScrollOnLoadMore(
   useEffect(() => {
     // Restore scroll position after loading more messages
     restoreScrollPosition()
-  }, [messages])
+  }, [messages.length])
 
   return preserveScrollPositionAndLoadingMore
 }
