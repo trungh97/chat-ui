@@ -13,7 +13,7 @@ export const ChatMessageSection = memo(() => {
   useSubscribeNewMessage()
   const {
     loading,
-    data: conversationMessages,
+    data: messages,
     hasNextPage,
     loadMore,
   } = useConversationMessages({
@@ -23,7 +23,7 @@ export const ChatMessageSection = memo(() => {
 
   const { containerRef, sentinelRef } = useChatScrollManagement({
     conversationId: conversationId!,
-    messages: conversationMessages,
+    messages,
     hasNextPage,
     loading,
     loadMore,
@@ -33,8 +33,7 @@ export const ChatMessageSection = memo(() => {
     return <span>Please select a conversation to view messages.</span>
   }
 
-  const isEmptyConversation =
-    !conversationMessages || conversationMessages.length === 0
+  const isEmptyConversation = !messages || messages.length === 0
 
   if (isEmptyConversation) {
     return loading ? (
@@ -50,7 +49,7 @@ export const ChatMessageSection = memo(() => {
       className="chat-window-scrollbar max-h-[calc(100vh-205px)] overflow-y-auto"
     >
       <div ref={sentinelRef} className="h-1" />
-      {conversationMessages.map(
+      {messages.map(
         ({
           senderAvatar,
           id,

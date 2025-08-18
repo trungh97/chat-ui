@@ -1,6 +1,5 @@
 import { useInfiniteScroll } from '@hooks/common'
 import { useMyLatestConversations } from '@hooks/conversations'
-import useConversationListStore from '@store/conversations'
 import React, { memo } from 'react'
 import { Skeleton } from 'shared-ui'
 import { ChatListLoading } from './ChatListLoading'
@@ -13,9 +12,7 @@ export type ChatListProps = {
 }
 
 export const ChatList = memo(() => {
-  const conversations = useConversationListStore.use.conversations()
-
-  const { loadMore, hasNextPage, loading, isFetchingMore } =
+  const { conversations, loadMore, hasNextPage, loading, isFetchingMore } =
     useMyLatestConversations({
       cursor: null,
       limit: 15,
