@@ -76,8 +76,8 @@ export class MessageData {
           ? data.createdAt
           : String(data.createdAt),
       groupPosition: position,
-      senderAvatar: data.senderAvatar,
-      senderName: data.senderName,
+      senderAvatar: data.senderAvatar!,
+      senderName: data.senderName!,
       conversation: {
         id: data.conversation.id,
         title: data.conversation.title!,
@@ -91,6 +91,36 @@ export class MessageData {
         numberOfPaticipants: 0,
         isGroup: data.conversation.type === ConversationType.Group,
       },
+    }
+  }
+
+  static fromMessageWithConversationToMessageWithSender({
+    data,
+  }: {
+    data: MessageWithConversation
+  }): MessageWithSenderDto {
+    return {
+      id: data.id,
+      content: data.content,
+      messageType: data.messageType,
+      senderId: data.senderId ?? null,
+      extra: typeof data.extra === 'string' ? JSON.parse(data.extra) : null,
+      conversationId: data.conversationId!,
+      replyToMessageId: data.replyToMessageId ?? null,
+      createdAt: data.createdAt,
+      senderAvatar: data.senderAvatar,
+      senderName: data.senderName,
+    }
+  }
+
+  static fromNewMessageSubscriptionToMessageWithSenderDTO({
+    data,
+  }: {
+    data: MessageWithConversationDto
+  }): MessageWithSenderDto {
+    return {
+      ...(data as MessageWithSenderDto),
+      __typename: 'MessageWithSenderDTO',
     }
   }
 }
