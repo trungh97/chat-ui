@@ -1,30 +1,20 @@
 import { formatRelativeToNow } from '@helpers/date'
-import useConversationListStore from '@store/conversations'
-import React, { memo, useEffect } from 'react'
+import React, { memo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Avatar } from 'shared-ui'
 import { ChatSummaryProps } from '../types'
 
 export const ChatSummary = memo(({ data }: { data: ChatSummaryProps }) => {
   const { id, avatar, title, lastMessage, lastMessageTime } = data
-  const setActiveConversation =
-    useConversationListStore.use.setActiveConversation()
   const navigate = useNavigate()
   const { conversationId } = useParams()
   const isActive = conversationId === id
 
   const handleClick = () => {
     if (!isActive) {
-      setActiveConversation(id)
       navigate(`/${id}`)
     }
   }
-
-  useEffect(() => {
-    if (conversationId) {
-      setActiveConversation(conversationId)
-    }
-  }, [])
 
   return (
     <div

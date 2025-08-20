@@ -1,6 +1,6 @@
 // Standard time (in minutes) for grouping messages
 import { Message } from '@interfaces/dtos'
-import { MessageGroupPosition } from '@interfaces/types'
+import { MessagePosition } from '@interfaces/types'
 import { getTimeDifference } from './date'
 
 const GROUP_TIME_MINUTES = 5
@@ -10,7 +10,7 @@ const GROUP_TIME_MINUTES = 5
  * @param messages Array of messages with senderId
  * @returns Array of groupPosition values: 'start' | 'middle' | 'end' | undefined
  */
-export function getGroupPositions(messages: Message[]): MessageGroupPosition[] {
+export function getGroupPositions(messages: Message[]): MessagePosition[] {
   return messages.map((msg, i) => {
     const prev = messages[i - 1]
     const next = messages[i + 1]
@@ -38,7 +38,7 @@ export function getGroupPosition(
   prev: Message | undefined,
   curr: Message,
   next: Message | undefined,
-): MessageGroupPosition | undefined {
+): MessagePosition {
   const currSender = curr.senderId
   const prevSender = prev?.senderId
   const nextSender = next?.senderId

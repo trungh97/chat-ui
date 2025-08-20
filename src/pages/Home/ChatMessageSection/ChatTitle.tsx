@@ -1,20 +1,38 @@
-import useConversationListStore from '@store/conversations'
+import { gql } from '@apollo/client'
+import {
+  ConversationType,
+  DetailedParticipantFragmentDoc,
+} from '@generated/graphql'
+import { useConversationInCache } from '@hooks/conversations'
 import React, { memo } from 'react'
 import { useParams } from 'react-router-dom'
 import { Divider, StarIcon, UserIcon } from 'shared-ui'
 
 export const ChatTitle = memo(() => {
   const { conversationId } = useParams()
-  const conversationsFromStore = useConversationListStore.use.conversations()
-  const currentConversation = conversationsFromStore.find(
-    (c) => c.id === conversationId,
-  )
+  const fragment = gql`
+    fragment ConversationTitle on ExtendConversationDTO {
+      id
+      title
+      type
+      participants {
+        ...detailedParticipant
+      }
+    }
+    ${DetailedParticipantFragmentDoc}
+  `
+  const { data } = useConversationInCache({
+    conversationId: conversationId!,
+    fragment,
+    fragmentName: 'ConversationTitle',
+  })
 
-  if (!conversationId || !currentConversation) {
+  if (!conversationId || !data) {
     return null
   }
 
-  const { title, numberOfPaticipants, isGroup } = currentConversation
+  const { title, type, participants = [] } = data
+  const isGroup = type === ConversationType.Group
 
   return (
     <div>
@@ -28,7 +46,7 @@ export const ChatTitle = memo(() => {
         {isGroup && (
           <div className="flex items-center hover:cursor-pointer">
             <UserIcon width={12} height={12} />
-            <span className="ml-1">{numberOfPaticipants}</span>
+            <span className="ml-1">{participants.length}</span>
           </div>
         )}
 
