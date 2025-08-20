@@ -1,8 +1,11 @@
 import { DEFAULT_LIMIT } from '@constants/pagination'
 import { MessageData } from '@data/message'
-import { useGetMessagesByConversationIdQuery } from '@generated/graphql'
-import { useMessageListStore } from '@store/messages'
-import { useCallback } from 'react'
+import {
+  NewMessageAddedDocument,
+  NewMessageAddedSubscription,
+  useGetMessagesByConversationIdQuery,
+} from '@generated/graphql'
+import { useCallback, useEffect } from 'react'
 
 interface UseMessageListOptions {
   conversationId: string
@@ -15,34 +18,18 @@ export function useConversationMessages({
   initialCursor,
   limit = DEFAULT_LIMIT,
 }: UseMessageListOptions) {
-  const store = useMessageListStore()
-
-  const { loading, fetchMore, data, error } =
+  const { loading, fetchMore, data, error, subscribeToMore } =
     useGetMessagesByConversationIdQuery({
       variables: {
         conversationId,
         options: { cursor: initialCursor, limit },
       },
-      onCompleted: (response) => {
-        const items = response?.getMessagesByConversationId?.data?.items || []
-        const cursor =
-          response?.getMessagesByConversationId?.data?.nextCursor || null
-
-        store.setMessages(
-          conversationId,
-          MessageData.toMessageListWithSender({ data: items }),
-        )
-        store.setNextCursor(conversationId, cursor)
-        store.setHasNextPage(conversationId, !!cursor)
-      },
-      onError: (err) => {
-        store.setError(conversationId, err)
-      },
       fetchPolicy: 'network-only',
     })
 
-  const hasNextPage = store.hasNextPageByConversation[conversationId] || false
-  const nextCursor = store.nextCursorByConversation[conversationId] || null
+  const nextCursor = data?.getMessagesByConversationId?.data?.nextCursor
+  const items = data?.getMessagesByConversationId?.data?.items || []
+  const hasNextPage = !!nextCursor
 
   const loadMore = useCallback(async () => {
     if (!hasNextPage || !nextCursor) return
@@ -55,17 +42,8 @@ export function useConversationMessages({
       updateQuery: (prev, { fetchMoreResult }) => {
         if (!fetchMoreResult) return prev
         const prevItems = prev.getMessagesByConversationId.data?.items || []
-        const newItems =
-          fetchMoreResult.getMessagesByConversationId?.data?.items || []
-        const newCursor =
-          fetchMoreResult.getMessagesByConversationId?.data?.nextCursor || null
-
-        store.addMessagesToTheBeginning(
-          conversationId,
-          MessageData.toMessageListWithSender({ data: newItems }),
-        )
-        store.setNextCursor(conversationId, newCursor)
-        store.setHasNextPage(conversationId, !!newCursor)
+        const { items: newItems = [], nextCursor: newNextCursor = null } =
+          fetchMoreResult.getMessagesByConversationId?.data || {}
 
         return {
           ...prev,
@@ -74,18 +52,63 @@ export function useConversationMessages({
             data: {
               ...prev.getMessagesByConversationId.data,
               items: [...prevItems, ...newItems],
-              nextCursor: newCursor,
+              nextCursor: newNextCursor,
             },
           },
         }
       },
     })
-  }, [conversationId, nextCursor, hasNextPage, limit, fetchMore, store])
+  }, [conversationId, nextCursor, hasNextPage, limit, fetchMore])
+
+  useEffect(() => {
+    // This assumes you want to wait to start the subscription
+    // after the query has loaded.
+    if (data) {
+      const unsubscribe = subscribeToMore<NewMessageAddedSubscription>({
+        document: NewMessageAddedDocument,
+        updateQuery: (
+          prev,
+          {
+            subscriptionData: {
+              data: { newMessageAdded },
+            },
+          },
+        ) => {
+          if (!newMessageAdded) return prev
+
+          // Append only if this is the same conversation
+          if (newMessageAdded.conversationId !== conversationId) {
+            return prev
+          }
+
+          const prevMessages =
+            prev.getMessagesByConversationId.data?.items || []
+          const normalizedNewMessage =
+            MessageData.fromNewMessageSubscriptionToMessageWithSenderDTO({
+              data: newMessageAdded,
+            })
+
+          return {
+            ...prev,
+            getMessagesByConversationId: {
+              ...prev.getMessagesByConversationId,
+              data: {
+                ...prev.getMessagesByConversationId.data,
+                items: [normalizedNewMessage, ...prevMessages],
+              },
+            },
+          }
+        },
+      })
+
+      return () => {
+        unsubscribe()
+      }
+    }
+  }, [data, conversationId, subscribeToMore])
 
   return {
-    data: MessageData.toMessageListWithSender({
-      data: data?.getMessagesByConversationId?.data?.items || [],
-    }),
+    data: MessageData.toMessageListWithSender({ data: items }),
     error,
     loading,
     hasNextPage,

@@ -3,17 +3,13 @@ import { DEFAULT_LIMIT } from '@constants/pagination'
 import { ConversationData } from '@data/conversation'
 import { useGetMyLatestConversationsQuery } from '@generated/graphql'
 import { CursorBasedPagination } from '@interfaces/pagination'
-import useConversationListStore from '@store/conversations'
 import _debounce from 'lodash/debounce'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 
 export const useMyLatestConversations = (options: CursorBasedPagination) => {
-  const setConversations = useConversationListStore.use.setConversations()
-  const setNextCursor = useConversationListStore.use.setNextCursor()
-  const cursor = useConversationListStore.use.nextCursor!()
-  const conversations = useConversationListStore.use.conversations()
-
-  const initializedRef = useRef(false)
+  const navigate = useNavigate()
+  const { conversationId } = useParams()
 
   const [isFetchingMore, setIsFetchingMore] = useState(false)
 
@@ -26,30 +22,27 @@ export const useMyLatestConversations = (options: CursorBasedPagination) => {
     },
   })
 
+  const items = data?.getMyConversations.data?.items || []
+  const nextCursor = data?.getMyConversations.data?.nextCursor
+
+  // Auto redirect to the first conversation
   useEffect(() => {
-    if (
-      !loading &&
-      !error &&
-      !initializedRef.current &&
-      data?.getMyConversations.data?.items.length! > 0
-    ) {
-      const items = ConversationData.toConversationListDTO(data)
-      setConversations(items)
-      setNextCursor(data?.getMyConversations.data?.nextCursor ?? null)
-      initializedRef.current = true
+    if (items.length > 0 && !conversationId) {
+      const firstConversationId = data?.getMyConversations?.data?.items[0].id
+      navigate(`/${firstConversationId}`)
     }
-  }, [data, loading, error, setConversations, setNextCursor])
+  }, [data])
 
   const loadMore = useCallback(
     _debounce(async () => {
-      if (!cursor || isFetchingMore || loading) return
+      if (!nextCursor || isFetchingMore || loading) return
 
       setIsFetchingMore(true)
 
-      const { data: moreData } = await fetchMore({
+      await fetchMore({
         variables: {
           options: {
-            cursor,
+            cursor: nextCursor,
             limit: options.limit || DEFAULT_LIMIT,
           },
         },
@@ -80,27 +73,17 @@ export const useMyLatestConversations = (options: CursorBasedPagination) => {
       }).finally(() => {
         setIsFetchingMore(false)
       })
-
-      const moreItems = ConversationData.toConversationListDTO(moreData)
-      const allItems = [...conversations, ...moreItems]
-
-      const uniqueMap = new Map()
-      allItems.forEach((item) => uniqueMap.set(item.id, item))
-      const uniqueList = Array.from(uniqueMap.values())
-
-      setConversations(uniqueList)
-      setNextCursor(moreData?.getMyConversations.data?.nextCursor ?? null)
     }, DEFAULT_DEBOUNCE_TIME),
-    [cursor, loading, isFetchingMore],
+    [nextCursor, loading, isFetchingMore],
   )
 
   return {
-    conversations: ConversationData.toConversationListDTO(data),
+    conversations: ConversationData.toBaseConversationList(items),
     loading,
     isFetchingMore,
     error,
     loadMore,
-    hasNextPage: !!data?.getMyConversations.data?.nextCursor,
-    nextCursor: data?.getMyConversations.data?.nextCursor,
+    hasNextPage: !!nextCursor,
+    nextCursor,
   }
 }
