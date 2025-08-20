@@ -1,7 +1,7 @@
 import { MeDocument, MeQuery, useLogoutMutation } from '@generated/graphql'
 
 export const useLogout = () => {
-  const [logout, { loading }] = useLogoutMutation()
+  const [logout, { loading, client }] = useLogoutMutation()
 
   const onLogout = async () => {
     await logout({
@@ -21,6 +21,7 @@ export const useLogout = () => {
         }
       },
     })
+    await client.clearStore()
   }
 
   return {
