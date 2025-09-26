@@ -95,9 +95,20 @@ export type DetailedParticipantDto = {
   avatar: Scalars['String']['output'];
   conversationId: Scalars['String']['output'];
   id: Scalars['ID']['output'];
+  lastReceivedMessageId?: Maybe<Scalars['String']['output']>;
+  lastSeenAt?: Maybe<Scalars['DateTimeISO']['output']>;
+  lastSeenMessageId?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
   type: ParticipantType;
   userId: Scalars['String']['output'];
+};
+
+export type DetailedParticipantResponse = IResponse & {
+  __typename?: 'DetailedParticipantResponse';
+  data?: Maybe<DetailedParticipantDto>;
+  error?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  statusCode?: Maybe<Scalars['Float']['output']>;
 };
 
 export type ExtendConversationDto = {
@@ -171,6 +182,21 @@ export type IResponse = {
   statusCode?: Maybe<Scalars['Float']['output']>;
 };
 
+export type LastReceivedMessageUpdateBodyDto = {
+  __typename?: 'LastReceivedMessageUpdateBodyDTO';
+  conversationId: Scalars['String']['output'];
+  messageId: Scalars['String']['output'];
+  participantId: Scalars['String']['output'];
+};
+
+export type LastSeenMessageUpdateBodyDto = {
+  __typename?: 'LastSeenMessageUpdateBodyDTO';
+  conversationId: Scalars['String']['output'];
+  lastSeenAt: Scalars['DateTimeISO']['output'];
+  messageId: Scalars['String']['output'];
+  participantId: Scalars['String']['output'];
+};
+
 export type MessageCreateMutationRequest = {
   content: Scalars['String']['input'];
   conversationId?: InputMaybe<Scalars['String']['input']>;
@@ -178,6 +204,14 @@ export type MessageCreateMutationRequest = {
   messageType: MessageType;
   receivers?: InputMaybe<Array<Scalars['String']['input']>>;
   replyToMessageId?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type MessageCreationResponse = IResponse & {
+  __typename?: 'MessageCreationResponse';
+  data?: Maybe<Scalars['Boolean']['output']>;
+  error?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  statusCode?: Maybe<Scalars['Float']['output']>;
 };
 
 export type MessageDto = {
@@ -261,8 +295,8 @@ export type Mutation = {
   createContact: ContactResponse;
   createConversation: ConversationGlobalResponse;
   createFriendRequest: FriendRequestResponse;
-  createMessage: MessageResponse;
-  createParticipant: ParticipantResponse;
+  createMessage: MessageCreationResponse;
+  createParticipant: DetailedParticipantResponse;
   deleteConversation: ConversationDeleteGlobalResponse;
   deleteFriendRequest: Scalars['Boolean']['output'];
   deleteMessage: MessageResponse;
@@ -270,6 +304,8 @@ export type Mutation = {
   loginCredentialBasedUser: UserGlobalResponse;
   logout: Scalars['Boolean']['output'];
   registerCredentialBasedUser: UserGlobalResponse;
+  updateLastReceivedMessage: DetailedParticipantResponse;
+  updateLastSeenMessage: DetailedParticipantResponse;
   updateMessage: MessageResponse;
 };
 
@@ -335,6 +371,18 @@ export type MutationRegisterCredentialBasedUserArgs = {
 };
 
 
+export type MutationUpdateLastReceivedMessageArgs = {
+  messageId: Scalars['String']['input'];
+  participantId: Scalars['String']['input'];
+};
+
+
+export type MutationUpdateLastSeenMessageArgs = {
+  messageId: Scalars['String']['input'];
+  participantId: Scalars['String']['input'];
+};
+
+
 export type MutationUpdateMessageArgs = {
   request: MessageUpdateMutationRequest;
 };
@@ -355,22 +403,6 @@ export type ParticipantCreateMutationRequest = {
   conversationId: Scalars['String']['input'];
   type?: ParticipantType;
   userId: Scalars['String']['input'];
-};
-
-export type ParticipantDto = {
-  __typename?: 'ParticipantDTO';
-  conversationId: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
-  type: ParticipantType;
-  userId: Scalars['String']['output'];
-};
-
-export type ParticipantResponse = IResponse & {
-  __typename?: 'ParticipantResponse';
-  data?: Maybe<ParticipantDto>;
-  error?: Maybe<Scalars['String']['output']>;
-  message?: Maybe<Scalars['String']['output']>;
-  statusCode?: Maybe<Scalars['Float']['output']>;
 };
 
 /** Participant type */
@@ -433,6 +465,8 @@ export type QueryGetUserByIdArgs = {
 export type Subscription = {
   __typename?: 'Subscription';
   newMessageAdded: MessageWithConversationDto;
+  updateLastReceivedMessageSubscription: LastReceivedMessageUpdateBodyDto;
+  updateLastSeenMessageSubscription: LastSeenMessageUpdateBodyDto;
 };
 
 export type UserCreateMutationRequest = {
@@ -501,11 +535,11 @@ export type MessageWithSenderFragment = { __typename?: 'MessageWithSenderDTO', i
 
 export type MessageWithConversationFragment = { __typename?: 'MessageWithConversationDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, conversation: { __typename?: 'ConversationDTO', id: string, title?: string | null, creatorId: string, isArchived: boolean, deletedAt?: any | null, type: ConversationType, groupAvatar?: string | null, lastMessageAt?: any | null } };
 
-export type ParticipantFragment = { __typename?: 'ParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType };
-
 export type DetailedParticipantFragment = { __typename?: 'DetailedParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType, name: string, avatar: string };
 
 export type ConversationListResponseFragment = { __typename?: 'ExtendConversationListGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'PaginatedConversationListResponse', nextCursor?: string | null, items: Array<{ __typename?: 'ExtendConversationDTO', id: string, title?: string | null, creatorId: string, isArchived: boolean, deletedAt?: any | null, type: ConversationType, lastMessageAt?: any | null, groupAvatar?: string | null, defaultGroupAvatars?: Array<string> | null, participants: Array<{ __typename?: 'DetailedParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType, name: string, avatar: string }>, messages: Array<{ __typename?: 'MessageDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any }> }> } | null };
+
+export type DetailedParticipantResponseFragment = { __typename?: 'DetailedParticipantResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'DetailedParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType, name: string, avatar: string } | null };
 
 export type MessageListResponseFragment = { __typename?: 'MessageListGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'PaginatedMessageListResponse', nextCursor?: string | null, items: Array<{ __typename?: 'MessageWithSenderDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, senderName?: string | null, senderAvatar?: string | null }> } | null };
 
@@ -519,6 +553,8 @@ type Status_ConversationDeleteGlobalResponse_Fragment = { __typename?: 'Conversa
 
 type Status_ConversationGlobalResponse_Fragment = { __typename?: 'ConversationGlobalResponse', statusCode?: number | null, message?: string | null };
 
+type Status_DetailedParticipantResponse_Fragment = { __typename?: 'DetailedParticipantResponse', statusCode?: number | null, message?: string | null };
+
 type Status_ExtendConversationGlobalResponse_Fragment = { __typename?: 'ExtendConversationGlobalResponse', statusCode?: number | null, message?: string | null };
 
 type Status_ExtendConversationListGlobalResponse_Fragment = { __typename?: 'ExtendConversationListGlobalResponse', statusCode?: number | null, message?: string | null };
@@ -527,15 +563,15 @@ type Status_FriendRequestListResponse_Fragment = { __typename?: 'FriendRequestLi
 
 type Status_FriendRequestResponse_Fragment = { __typename?: 'FriendRequestResponse', statusCode?: number | null, message?: string | null };
 
+type Status_MessageCreationResponse_Fragment = { __typename?: 'MessageCreationResponse', statusCode?: number | null, message?: string | null };
+
 type Status_MessageListGlobalResponse_Fragment = { __typename?: 'MessageListGlobalResponse', statusCode?: number | null, message?: string | null };
 
 type Status_MessageResponse_Fragment = { __typename?: 'MessageResponse', statusCode?: number | null, message?: string | null };
 
-type Status_ParticipantResponse_Fragment = { __typename?: 'ParticipantResponse', statusCode?: number | null, message?: string | null };
-
 type Status_UserGlobalResponse_Fragment = { __typename?: 'UserGlobalResponse', statusCode?: number | null, message?: string | null };
 
-export type StatusFragment = Status_ContactListResponse_Fragment | Status_ContactResponse_Fragment | Status_ConversationDeleteGlobalResponse_Fragment | Status_ConversationGlobalResponse_Fragment | Status_ExtendConversationGlobalResponse_Fragment | Status_ExtendConversationListGlobalResponse_Fragment | Status_FriendRequestListResponse_Fragment | Status_FriendRequestResponse_Fragment | Status_MessageListGlobalResponse_Fragment | Status_MessageResponse_Fragment | Status_ParticipantResponse_Fragment | Status_UserGlobalResponse_Fragment;
+export type StatusFragment = Status_ContactListResponse_Fragment | Status_ContactResponse_Fragment | Status_ConversationDeleteGlobalResponse_Fragment | Status_ConversationGlobalResponse_Fragment | Status_DetailedParticipantResponse_Fragment | Status_ExtendConversationGlobalResponse_Fragment | Status_ExtendConversationListGlobalResponse_Fragment | Status_FriendRequestListResponse_Fragment | Status_FriendRequestResponse_Fragment | Status_MessageCreationResponse_Fragment | Status_MessageListGlobalResponse_Fragment | Status_MessageResponse_Fragment | Status_UserGlobalResponse_Fragment;
 
 export type UserInfoFragment = { __typename?: 'UserDTO', id: string, firstName: string, lastName: string, email: string, phone?: string | null, role: UserRole, avatar: string, isActive: boolean, provider?: UserProvider | null, providerUserId?: string | null, status: UserStatus };
 
@@ -544,7 +580,7 @@ export type CreateMessageMutationVariables = Exact<{
 }>;
 
 
-export type CreateMessageMutation = { __typename?: 'Mutation', createMessage: { __typename?: 'MessageResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'MessageDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any } | null } };
+export type CreateMessageMutation = { __typename?: 'Mutation', createMessage: { __typename?: 'MessageCreationResponse', data?: boolean | null, error?: string | null, statusCode?: number | null, message?: string | null } };
 
 export type CredentialBasedLoginMutationVariables = Exact<{
   request: UserLoginInput;
@@ -559,6 +595,22 @@ export type GoogleLoginMutationVariables = Exact<{
 
 
 export type GoogleLoginMutation = { __typename?: 'Mutation', googleLogin: { __typename?: 'UserGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'UserDTO', id: string, firstName: string, lastName: string, email: string, phone?: string | null, role: UserRole, avatar: string, isActive: boolean, provider?: UserProvider | null, providerUserId?: string | null, status: UserStatus } | null } };
+
+export type UpdateLastReceivedMessageMutationVariables = Exact<{
+  participantId: Scalars['String']['input'];
+  messageId: Scalars['String']['input'];
+}>;
+
+
+export type UpdateLastReceivedMessageMutation = { __typename?: 'Mutation', updateLastReceivedMessage: { __typename?: 'DetailedParticipantResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'DetailedParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType, name: string, avatar: string } | null } };
+
+export type UpdateLastSeenMessageMutationVariables = Exact<{
+  participantId: Scalars['String']['input'];
+  messageId: Scalars['String']['input'];
+}>;
+
+
+export type UpdateLastSeenMessageMutation = { __typename?: 'Mutation', updateLastSeenMessage: { __typename?: 'DetailedParticipantResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'DetailedParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType, name: string, avatar: string } | null } };
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -590,6 +642,16 @@ export type NewMessageAddedSubscriptionVariables = Exact<{ [key: string]: never;
 
 export type NewMessageAddedSubscription = { __typename?: 'Subscription', newMessageAdded: { __typename?: 'MessageWithConversationDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, senderName?: string | null, senderAvatar?: string | null, conversation: { __typename?: 'ConversationDTO', id: string, title?: string | null, creatorId: string, isArchived: boolean, deletedAt?: any | null, type: ConversationType, groupAvatar?: string | null, lastMessageAt?: any | null } } };
 
+export type UpdateLastReceivedMessageSubscriptionSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type UpdateLastReceivedMessageSubscriptionSubscription = { __typename?: 'Subscription', updateLastReceivedMessageSubscription: { __typename?: 'LastReceivedMessageUpdateBodyDTO', participantId: string, messageId: string, conversationId: string } };
+
+export type UpdateLastSeenMessageSubscriptionSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type UpdateLastSeenMessageSubscriptionSubscription = { __typename?: 'Subscription', updateLastSeenMessageSubscription: { __typename?: 'LastSeenMessageUpdateBodyDTO', participantId: string, messageId: string, conversationId: string, lastSeenAt: any } };
+
 export const ConversationFragmentDoc = gql`
     fragment conversation on ConversationDTO {
   id
@@ -617,14 +679,6 @@ export const MessageWithConversationFragmentDoc = gql`
   }
 }
     ${ConversationFragmentDoc}`;
-export const ParticipantFragmentDoc = gql`
-    fragment participant on ParticipantDTO {
-  id
-  conversationId
-  userId
-  type
-}
-    `;
 export const StatusFragmentDoc = gql`
     fragment status on IResponse {
   statusCode
@@ -686,6 +740,16 @@ export const ConversationListResponseFragmentDoc = gql`
 }
     ${StatusFragmentDoc}
 ${ExtendedConversationFragmentDoc}`;
+export const DetailedParticipantResponseFragmentDoc = gql`
+    fragment detailedParticipantResponse on DetailedParticipantResponse {
+  ...status
+  data {
+    ...detailedParticipant
+  }
+  error
+}
+    ${StatusFragmentDoc}
+${DetailedParticipantFragmentDoc}`;
 export const MessageWithSenderFragmentDoc = gql`
     fragment messageWithSender on MessageWithSenderDTO {
   id
@@ -742,14 +806,11 @@ export const CreateMessageDocument = gql`
     mutation CreateMessage($request: MessageCreateMutationRequest!) {
   createMessage(request: $request) {
     ...status
-    data {
-      ...message
-    }
+    data
     error
   }
 }
-    ${StatusFragmentDoc}
-${MessageFragmentDoc}`;
+    ${StatusFragmentDoc}`;
 export type CreateMessageMutationFn = Apollo.MutationFunction<CreateMessageMutation, CreateMessageMutationVariables>;
 
 /**
@@ -842,6 +903,74 @@ export function useGoogleLoginMutation(baseOptions?: Apollo.MutationHookOptions<
 export type GoogleLoginMutationHookResult = ReturnType<typeof useGoogleLoginMutation>;
 export type GoogleLoginMutationResult = Apollo.MutationResult<GoogleLoginMutation>;
 export type GoogleLoginMutationOptions = Apollo.BaseMutationOptions<GoogleLoginMutation, GoogleLoginMutationVariables>;
+export const UpdateLastReceivedMessageDocument = gql`
+    mutation UpdateLastReceivedMessage($participantId: String!, $messageId: String!) {
+  updateLastReceivedMessage(participantId: $participantId, messageId: $messageId) {
+    ...detailedParticipantResponse
+  }
+}
+    ${DetailedParticipantResponseFragmentDoc}`;
+export type UpdateLastReceivedMessageMutationFn = Apollo.MutationFunction<UpdateLastReceivedMessageMutation, UpdateLastReceivedMessageMutationVariables>;
+
+/**
+ * __useUpdateLastReceivedMessageMutation__
+ *
+ * To run a mutation, you first call `useUpdateLastReceivedMessageMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateLastReceivedMessageMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateLastReceivedMessageMutation, { data, loading, error }] = useUpdateLastReceivedMessageMutation({
+ *   variables: {
+ *      participantId: // value for 'participantId'
+ *      messageId: // value for 'messageId'
+ *   },
+ * });
+ */
+export function useUpdateLastReceivedMessageMutation(baseOptions?: Apollo.MutationHookOptions<UpdateLastReceivedMessageMutation, UpdateLastReceivedMessageMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateLastReceivedMessageMutation, UpdateLastReceivedMessageMutationVariables>(UpdateLastReceivedMessageDocument, options);
+      }
+export type UpdateLastReceivedMessageMutationHookResult = ReturnType<typeof useUpdateLastReceivedMessageMutation>;
+export type UpdateLastReceivedMessageMutationResult = Apollo.MutationResult<UpdateLastReceivedMessageMutation>;
+export type UpdateLastReceivedMessageMutationOptions = Apollo.BaseMutationOptions<UpdateLastReceivedMessageMutation, UpdateLastReceivedMessageMutationVariables>;
+export const UpdateLastSeenMessageDocument = gql`
+    mutation UpdateLastSeenMessage($participantId: String!, $messageId: String!) {
+  updateLastSeenMessage(participantId: $participantId, messageId: $messageId) {
+    ...detailedParticipantResponse
+  }
+}
+    ${DetailedParticipantResponseFragmentDoc}`;
+export type UpdateLastSeenMessageMutationFn = Apollo.MutationFunction<UpdateLastSeenMessageMutation, UpdateLastSeenMessageMutationVariables>;
+
+/**
+ * __useUpdateLastSeenMessageMutation__
+ *
+ * To run a mutation, you first call `useUpdateLastSeenMessageMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateLastSeenMessageMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateLastSeenMessageMutation, { data, loading, error }] = useUpdateLastSeenMessageMutation({
+ *   variables: {
+ *      participantId: // value for 'participantId'
+ *      messageId: // value for 'messageId'
+ *   },
+ * });
+ */
+export function useUpdateLastSeenMessageMutation(baseOptions?: Apollo.MutationHookOptions<UpdateLastSeenMessageMutation, UpdateLastSeenMessageMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateLastSeenMessageMutation, UpdateLastSeenMessageMutationVariables>(UpdateLastSeenMessageDocument, options);
+      }
+export type UpdateLastSeenMessageMutationHookResult = ReturnType<typeof useUpdateLastSeenMessageMutation>;
+export type UpdateLastSeenMessageMutationResult = Apollo.MutationResult<UpdateLastSeenMessageMutation>;
+export type UpdateLastSeenMessageMutationOptions = Apollo.BaseMutationOptions<UpdateLastSeenMessageMutation, UpdateLastSeenMessageMutationVariables>;
 export const LogoutDocument = gql`
     mutation Logout {
   logout
@@ -1038,3 +1167,66 @@ export function useNewMessageAddedSubscription(baseOptions?: Apollo.Subscription
       }
 export type NewMessageAddedSubscriptionHookResult = ReturnType<typeof useNewMessageAddedSubscription>;
 export type NewMessageAddedSubscriptionResult = Apollo.SubscriptionResult<NewMessageAddedSubscription>;
+export const UpdateLastReceivedMessageSubscriptionDocument = gql`
+    subscription UpdateLastReceivedMessageSubscription {
+  updateLastReceivedMessageSubscription {
+    participantId
+    messageId
+    conversationId
+  }
+}
+    `;
+
+/**
+ * __useUpdateLastReceivedMessageSubscriptionSubscription__
+ *
+ * To run a query within a React component, call `useUpdateLastReceivedMessageSubscriptionSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useUpdateLastReceivedMessageSubscriptionSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUpdateLastReceivedMessageSubscriptionSubscription({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useUpdateLastReceivedMessageSubscriptionSubscription(baseOptions?: Apollo.SubscriptionHookOptions<UpdateLastReceivedMessageSubscriptionSubscription, UpdateLastReceivedMessageSubscriptionSubscriptionVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useSubscription<UpdateLastReceivedMessageSubscriptionSubscription, UpdateLastReceivedMessageSubscriptionSubscriptionVariables>(UpdateLastReceivedMessageSubscriptionDocument, options);
+      }
+export type UpdateLastReceivedMessageSubscriptionSubscriptionHookResult = ReturnType<typeof useUpdateLastReceivedMessageSubscriptionSubscription>;
+export type UpdateLastReceivedMessageSubscriptionSubscriptionResult = Apollo.SubscriptionResult<UpdateLastReceivedMessageSubscriptionSubscription>;
+export const UpdateLastSeenMessageSubscriptionDocument = gql`
+    subscription UpdateLastSeenMessageSubscription {
+  updateLastSeenMessageSubscription {
+    participantId
+    messageId
+    conversationId
+    lastSeenAt
+  }
+}
+    `;
+
+/**
+ * __useUpdateLastSeenMessageSubscriptionSubscription__
+ *
+ * To run a query within a React component, call `useUpdateLastSeenMessageSubscriptionSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useUpdateLastSeenMessageSubscriptionSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUpdateLastSeenMessageSubscriptionSubscription({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useUpdateLastSeenMessageSubscriptionSubscription(baseOptions?: Apollo.SubscriptionHookOptions<UpdateLastSeenMessageSubscriptionSubscription, UpdateLastSeenMessageSubscriptionSubscriptionVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useSubscription<UpdateLastSeenMessageSubscriptionSubscription, UpdateLastSeenMessageSubscriptionSubscriptionVariables>(UpdateLastSeenMessageSubscriptionDocument, options);
+      }
+export type UpdateLastSeenMessageSubscriptionSubscriptionHookResult = ReturnType<typeof useUpdateLastSeenMessageSubscriptionSubscription>;
+export type UpdateLastSeenMessageSubscriptionSubscriptionResult = Apollo.SubscriptionResult<UpdateLastSeenMessageSubscriptionSubscription>;

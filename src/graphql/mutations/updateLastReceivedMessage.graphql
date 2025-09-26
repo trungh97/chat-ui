@@ -1,0 +1,11 @@
+mutation UpdateLastReceivedMessage(
+  $participantId: String!
+  $messageId: String!
+) {
+  updateLastReceivedMessage(
+    participantId: $participantId
+    messageId: $messageId
+  ) {
+    ...detailedParticipantResponse
+  }
+}

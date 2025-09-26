@@ -1,0 +1,7 @@
+fragment detailedParticipantResponse on DetailedParticipantResponse {
+  ...status
+  data {
+    ...detailedParticipant
+  }
+  error
+}
