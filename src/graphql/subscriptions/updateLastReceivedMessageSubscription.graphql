@@ -1,0 +1,7 @@
+subscription UpdateLastReceivedMessageSubscription {
+  updateLastReceivedMessageSubscription {
+    participantId
+    messageId
+    conversationId
+  }
+}
