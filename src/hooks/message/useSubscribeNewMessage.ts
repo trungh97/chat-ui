@@ -1,6 +1,10 @@
 import { gql } from '@apollo/client'
 import { ConversationData } from '@data/conversation'
-import { useNewMessageAddedSubscription } from '@generated/graphql'
+import {
+  useNewMessageAddedSubscription,
+  useUpdateLastReceivedMessageMutation,
+} from '@generated/graphql'
+import { useAuth } from '@hooks/auth'
 
 /**
  * Subscribe to new messages and update the store based on the message's conversationId.
@@ -10,6 +14,8 @@ export function useSubscribeNewMessage(options?: {
   skip?: boolean
   onData?: (data: any) => void
 }) {
+  const { data: meData } = useAuth()
+  const [updateLastReceivedMessage] = useUpdateLastReceivedMessageMutation()
   const { error } = useNewMessageAddedSubscription({
     skip: options?.skip,
     onData: ({ data: { data, error, loading }, client }) => {
@@ -80,6 +86,44 @@ export function useSubscribeNewMessage(options?: {
             ],
           },
         })
+
+        const userId = meData?.me?.data?.id
+        if (userId === newMessageAdded.senderId) return
+
+        // Find participantId for current user in the conversation
+        try {
+          const cacheData = client.cache.readFragment({
+            id: client.cache.identify({
+              __typename: 'ExtendConversationDTO',
+              id: newMessageAdded.conversationId,
+            }),
+            fragment: gql`
+              fragment ParticipantsFragment on ExtendConversationDTO {
+                participants {
+                  id
+                  userId
+                }
+              }
+            `,
+          }) as { participants?: { id: string; userId: string }[] } | null
+          const userId = meData?.me?.data?.id
+          const participantId = cacheData?.participants?.find(
+            (p) => p.userId === userId,
+          )?.id
+          if (participantId) {
+            updateLastReceivedMessage({
+              variables: {
+                participantId,
+                messageId: newMessageAdded.id,
+                conversationId: newMessageAdded.conversationId,
+              },
+            })
+          }
+        } catch (error) {
+          return {
+            error,
+          }
+        }
       }
     },
   })
