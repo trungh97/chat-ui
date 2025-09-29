@@ -5,4 +5,7 @@ fragment detailedParticipant on DetailedParticipantDTO {
   type
   name
   avatar
+  lastReceivedMessageId
+  lastSeenMessageId
+  lastSeenAt
 }

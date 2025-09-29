@@ -1,10 +1,12 @@
 mutation UpdateLastReceivedMessage(
   $participantId: String!
   $messageId: String!
+  $conversationId: String!
 ) {
   updateLastReceivedMessage(
     participantId: $participantId
     messageId: $messageId
+    conversationId: $conversationId
   ) {
     ...detailedParticipantResponse
   }
