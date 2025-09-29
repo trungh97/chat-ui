@@ -1,6 +1,10 @@
 import { useAuth } from '@hooks/auth'
 import { useChatScrollManagement } from '@hooks/common'
-import { useConversationMessages, useSubscribeNewMessage } from '@hooks/message'
+import {
+  useConversationMessages,
+  useHandleLastReceivedMessageSubscription,
+  useSubscribeNewMessage,
+} from '@hooks/message'
 import React, { memo } from 'react'
 import { useParams } from 'react-router-dom'
 import { ChatMessage } from 'shared-ui'
@@ -11,6 +15,7 @@ export const ChatMessageSection = memo(() => {
   const currentUserId = data?.me.data?.id
 
   useSubscribeNewMessage()
+  useHandleLastReceivedMessageSubscription()
   const {
     loading,
     data: messages,
