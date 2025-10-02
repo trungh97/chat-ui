@@ -1,0 +1,9 @@
+mutation BatchUpdateLastReceivedMessageRequest(
+  $updates: [BatchUpdateLastReceivedMessageRequest!]!
+) {
+  batchUpdateLastReceivedMessages(updates: $updates) {
+    ...status
+    data
+    error
+  }
+}
