@@ -2,6 +2,7 @@ import { DEFAULT_DEBOUNCE_TIME } from '@constants/common'
 import { DEFAULT_LIMIT } from '@constants/pagination'
 import { ConversationData } from '@data/conversation'
 import { useGetMyLatestConversationsQuery } from '@generated/graphql'
+import { useSyncLastReceivedMessage } from '@hooks/participant'
 import { CursorBasedPagination } from '@interfaces/pagination'
 import _debounce from 'lodash/debounce'
 import { useCallback, useEffect, useState } from 'react'
@@ -24,6 +25,12 @@ export const useMyLatestConversations = (options: CursorBasedPagination) => {
 
   const items = data?.getMyConversations.data?.items || []
   const nextCursor = data?.getMyConversations.data?.nextCursor
+
+  const syncLastReceivedMessage = useSyncLastReceivedMessage()
+
+  useEffect(() => {
+    syncLastReceivedMessage(items)
+  }, [items])
 
   // Auto redirect to the first conversation
   useEffect(() => {
