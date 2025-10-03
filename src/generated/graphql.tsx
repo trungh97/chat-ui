@@ -197,14 +197,12 @@ export type IResponse = {
 
 export type LastReceivedMessageUpdateBodyDto = {
   __typename?: 'LastReceivedMessageUpdateBodyDTO';
-  conversationId: Scalars['String']['output'];
   messageId: Scalars['String']['output'];
   participantId: Scalars['String']['output'];
 };
 
 export type LastSeenMessageUpdateBodyDto = {
   __typename?: 'LastSeenMessageUpdateBodyDTO';
-  conversationId: Scalars['String']['output'];
   lastSeenAt: Scalars['DateTimeISO']['output'];
   messageId: Scalars['String']['output'];
   participantId: Scalars['String']['output'];
@@ -485,7 +483,7 @@ export type QueryGetUserByIdArgs = {
 export type Subscription = {
   __typename?: 'Subscription';
   newMessageAdded: MessageWithConversationDto;
-  updateLastReceivedMessageSubscription: LastReceivedMessageUpdateBodyDto;
+  updateLastReceivedMessageSubscription: Array<LastReceivedMessageUpdateBodyDto>;
   updateLastSeenMessageSubscription: LastSeenMessageUpdateBodyDto;
 };
 
@@ -675,12 +673,12 @@ export type NewMessageAddedSubscription = { __typename?: 'Subscription', newMess
 export type UpdateLastReceivedMessageSubscriptionSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
-export type UpdateLastReceivedMessageSubscriptionSubscription = { __typename?: 'Subscription', updateLastReceivedMessageSubscription: { __typename?: 'LastReceivedMessageUpdateBodyDTO', participantId: string, messageId: string, conversationId: string } };
+export type UpdateLastReceivedMessageSubscriptionSubscription = { __typename?: 'Subscription', updateLastReceivedMessageSubscription: Array<{ __typename?: 'LastReceivedMessageUpdateBodyDTO', participantId: string, messageId: string }> };
 
 export type UpdateLastSeenMessageSubscriptionSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
-export type UpdateLastSeenMessageSubscriptionSubscription = { __typename?: 'Subscription', updateLastSeenMessageSubscription: { __typename?: 'LastSeenMessageUpdateBodyDTO', participantId: string, messageId: string, conversationId: string, lastSeenAt: any } };
+export type UpdateLastSeenMessageSubscriptionSubscription = { __typename?: 'Subscription', updateLastSeenMessageSubscription: { __typename?: 'LastSeenMessageUpdateBodyDTO', participantId: string, messageId: string, lastSeenAt: any } };
 
 export const ConversationFragmentDoc = gql`
     fragment conversation on ConversationDTO {
@@ -1245,7 +1243,6 @@ export const UpdateLastReceivedMessageSubscriptionDocument = gql`
   updateLastReceivedMessageSubscription {
     participantId
     messageId
-    conversationId
   }
 }
     `;
@@ -1276,7 +1273,6 @@ export const UpdateLastSeenMessageSubscriptionDocument = gql`
   updateLastSeenMessageSubscription {
     participantId
     messageId
-    conversationId
     lastSeenAt
   }
 }

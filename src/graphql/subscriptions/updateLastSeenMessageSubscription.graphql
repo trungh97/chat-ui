@@ -2,7 +2,6 @@ subscription UpdateLastSeenMessageSubscription {
   updateLastSeenMessageSubscription {
     participantId
     messageId
-    conversationId
     lastSeenAt
   }
 }
