@@ -1,7 +1,7 @@
-mutation BatchUpdateLastReceivedMessageRequest(
-  $updates: [BatchUpdateLastReceivedMessageRequest!]!
+mutation BatchUpdateLastReceivedMessages(
+  $request: [BatchUpdateLastReceivedMessageRequest!]!
 ) {
-  batchUpdateLastReceivedMessages(updates: $updates) {
+  batchUpdateLastReceivedMessages(request: $request) {
     ...status
     data
     error

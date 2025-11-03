@@ -72,6 +72,7 @@ export type ConversationDto = {
   id: Scalars['ID']['output'];
   isArchived: Scalars['Boolean']['output'];
   lastMessageAt?: Maybe<Scalars['DateTimeISO']['output']>;
+  lastMessageId?: Maybe<Scalars['String']['output']>;
   title?: Maybe<Scalars['String']['output']>;
   type: ConversationType;
 };
@@ -133,6 +134,7 @@ export type ExtendConversationDto = {
   id: Scalars['ID']['output'];
   isArchived: Scalars['Boolean']['output'];
   lastMessageAt?: Maybe<Scalars['DateTimeISO']['output']>;
+  lastMessageId?: Maybe<Scalars['String']['output']>;
   messages: Array<MessageDto>;
   participants: Array<DetailedParticipantDto>;
   title?: Maybe<Scalars['String']['output']>;
@@ -302,6 +304,7 @@ export type MessageWithSenderDto = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  batchUpdateAllBehindConversations: BatchUpdateResponse;
   batchUpdateLastReceivedMessages: BatchUpdateResponse;
   changeFriendRequestStatus: FriendRequestResponse;
   createContact: ContactResponse;
@@ -319,11 +322,12 @@ export type Mutation = {
   updateLastReceivedMessage: DetailedParticipantResponse;
   updateLastSeenMessage: DetailedParticipantResponse;
   updateMessage: MessageResponse;
+  updateUserPresence: UserPresenseGlobalResponse;
 };
 
 
 export type MutationBatchUpdateLastReceivedMessagesArgs = {
-  updates: Array<BatchUpdateLastReceivedMessageRequest>;
+  request: Array<BatchUpdateLastReceivedMessageRequest>;
 };
 
 
@@ -405,6 +409,12 @@ export type MutationUpdateMessageArgs = {
   request: MessageUpdateMutationRequest;
 };
 
+
+export type MutationUpdateUserPresenceArgs = {
+  isOnline: Scalars['Boolean']['input'];
+  userId: Scalars['String']['input'];
+};
+
 export type PaginatedConversationListResponse = {
   __typename?: 'PaginatedConversationListResponse';
   items: Array<ExtendConversationDto>;
@@ -440,6 +450,7 @@ export type Query = {
   getMyConversations: ExtendConversationListGlobalResponse;
   getMyFriendRequests: FriendRequestListResponse;
   getUserById: UserGlobalResponse;
+  getUserPresence: UserPresenseGlobalResponse;
   me: UserGlobalResponse;
 };
 
@@ -480,11 +491,17 @@ export type QueryGetUserByIdArgs = {
   id: Scalars['String']['input'];
 };
 
+
+export type QueryGetUserPresenceArgs = {
+  userId: Scalars['String']['input'];
+};
+
 export type Subscription = {
   __typename?: 'Subscription';
   newMessageAdded: MessageWithConversationDto;
   updateLastReceivedMessageSubscription: Array<LastReceivedMessageUpdateBodyDto>;
   updateLastSeenMessageSubscription: LastSeenMessageUpdateBodyDto;
+  userPresence: UserPresenseGlobalResponse;
 };
 
 export type UserCreateMutationRequest = {
@@ -522,6 +539,21 @@ export type UserGlobalResponse = IResponse & {
 export type UserLoginInput = {
   email: Scalars['String']['input'];
   password: Scalars['String']['input'];
+};
+
+export type UserPresenceDto = {
+  __typename?: 'UserPresenceDTO';
+  isOnline: Scalars['Boolean']['output'];
+  lastSeenAt: Scalars['DateTimeISO']['output'];
+  userId: Scalars['String']['output'];
+};
+
+export type UserPresenseGlobalResponse = IResponse & {
+  __typename?: 'UserPresenseGlobalResponse';
+  data?: Maybe<UserPresenceDto>;
+  error?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  statusCode?: Maybe<Scalars['Float']['output']>;
 };
 
 /** User provider */
@@ -591,16 +623,18 @@ type Status_MessageResponse_Fragment = { __typename?: 'MessageResponse', statusC
 
 type Status_UserGlobalResponse_Fragment = { __typename?: 'UserGlobalResponse', statusCode?: number | null, message?: string | null };
 
-export type StatusFragment = Status_BatchUpdateResponse_Fragment | Status_ContactListResponse_Fragment | Status_ContactResponse_Fragment | Status_ConversationDeleteGlobalResponse_Fragment | Status_ConversationGlobalResponse_Fragment | Status_DetailedParticipantResponse_Fragment | Status_ExtendConversationGlobalResponse_Fragment | Status_ExtendConversationListGlobalResponse_Fragment | Status_FriendRequestListResponse_Fragment | Status_FriendRequestResponse_Fragment | Status_MessageCreationResponse_Fragment | Status_MessageListGlobalResponse_Fragment | Status_MessageResponse_Fragment | Status_UserGlobalResponse_Fragment;
+type Status_UserPresenseGlobalResponse_Fragment = { __typename?: 'UserPresenseGlobalResponse', statusCode?: number | null, message?: string | null };
+
+export type StatusFragment = Status_BatchUpdateResponse_Fragment | Status_ContactListResponse_Fragment | Status_ContactResponse_Fragment | Status_ConversationDeleteGlobalResponse_Fragment | Status_ConversationGlobalResponse_Fragment | Status_DetailedParticipantResponse_Fragment | Status_ExtendConversationGlobalResponse_Fragment | Status_ExtendConversationListGlobalResponse_Fragment | Status_FriendRequestListResponse_Fragment | Status_FriendRequestResponse_Fragment | Status_MessageCreationResponse_Fragment | Status_MessageListGlobalResponse_Fragment | Status_MessageResponse_Fragment | Status_UserGlobalResponse_Fragment | Status_UserPresenseGlobalResponse_Fragment;
 
 export type UserInfoFragment = { __typename?: 'UserDTO', id: string, firstName: string, lastName: string, email: string, phone?: string | null, role: UserRole, avatar: string, isActive: boolean, provider?: UserProvider | null, providerUserId?: string | null, status: UserStatus };
 
-export type BatchUpdateLastReceivedMessageRequestMutationVariables = Exact<{
-  updates: Array<BatchUpdateLastReceivedMessageRequest> | BatchUpdateLastReceivedMessageRequest;
+export type BatchUpdateLastReceivedMessagesMutationVariables = Exact<{
+  request: Array<BatchUpdateLastReceivedMessageRequest> | BatchUpdateLastReceivedMessageRequest;
 }>;
 
 
-export type BatchUpdateLastReceivedMessageRequestMutation = { __typename?: 'Mutation', batchUpdateLastReceivedMessages: { __typename?: 'BatchUpdateResponse', data?: boolean | null, error?: string | null, statusCode?: number | null, message?: string | null } };
+export type BatchUpdateLastReceivedMessagesMutation = { __typename?: 'Mutation', batchUpdateLastReceivedMessages: { __typename?: 'BatchUpdateResponse', data?: boolean | null, error?: string | null, statusCode?: number | null, message?: string | null } };
 
 export type CreateMessageMutationVariables = Exact<{
   request: MessageCreateMutationRequest;
@@ -639,6 +673,14 @@ export type UpdateLastSeenMessageMutationVariables = Exact<{
 
 
 export type UpdateLastSeenMessageMutation = { __typename?: 'Mutation', updateLastSeenMessage: { __typename?: 'DetailedParticipantResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'DetailedParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType, name: string, avatar: string, lastReceivedMessageId?: string | null, lastSeenMessageId?: string | null, lastSeenAt?: any | null } | null } };
+
+export type UpdateUserPresenseMutationVariables = Exact<{
+  isOnline: Scalars['Boolean']['input'];
+  userId: Scalars['String']['input'];
+}>;
+
+
+export type UpdateUserPresenseMutation = { __typename?: 'Mutation', updateUserPresence: { __typename?: 'UserPresenseGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'UserPresenceDTO', userId: string, isOnline: boolean, lastSeenAt: any } | null } };
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -679,6 +721,11 @@ export type UpdateLastSeenMessageSubscriptionSubscriptionVariables = Exact<{ [ke
 
 
 export type UpdateLastSeenMessageSubscriptionSubscription = { __typename?: 'Subscription', updateLastSeenMessageSubscription: { __typename?: 'LastSeenMessageUpdateBodyDTO', participantId: string, messageId: string, lastSeenAt: any } };
+
+export type UserPresenseSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type UserPresenseSubscription = { __typename?: 'Subscription', userPresence: { __typename?: 'UserPresenseGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'UserPresenceDTO', userId: string, isOnline: boolean, lastSeenAt: any } | null } };
 
 export const ConversationFragmentDoc = gql`
     fragment conversation on ConversationDTO {
@@ -833,41 +880,41 @@ export const UserResponseFragmentDoc = gql`
 }
     ${StatusFragmentDoc}
 ${UserInfoFragmentDoc}`;
-export const BatchUpdateLastReceivedMessageRequestDocument = gql`
-    mutation BatchUpdateLastReceivedMessageRequest($updates: [BatchUpdateLastReceivedMessageRequest!]!) {
-  batchUpdateLastReceivedMessages(updates: $updates) {
+export const BatchUpdateLastReceivedMessagesDocument = gql`
+    mutation BatchUpdateLastReceivedMessages($request: [BatchUpdateLastReceivedMessageRequest!]!) {
+  batchUpdateLastReceivedMessages(request: $request) {
     ...status
     data
     error
   }
 }
     ${StatusFragmentDoc}`;
-export type BatchUpdateLastReceivedMessageRequestMutationFn = Apollo.MutationFunction<BatchUpdateLastReceivedMessageRequestMutation, BatchUpdateLastReceivedMessageRequestMutationVariables>;
+export type BatchUpdateLastReceivedMessagesMutationFn = Apollo.MutationFunction<BatchUpdateLastReceivedMessagesMutation, BatchUpdateLastReceivedMessagesMutationVariables>;
 
 /**
- * __useBatchUpdateLastReceivedMessageRequestMutation__
+ * __useBatchUpdateLastReceivedMessagesMutation__
  *
- * To run a mutation, you first call `useBatchUpdateLastReceivedMessageRequestMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useBatchUpdateLastReceivedMessageRequestMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useBatchUpdateLastReceivedMessagesMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useBatchUpdateLastReceivedMessagesMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [batchUpdateLastReceivedMessageRequestMutation, { data, loading, error }] = useBatchUpdateLastReceivedMessageRequestMutation({
+ * const [batchUpdateLastReceivedMessagesMutation, { data, loading, error }] = useBatchUpdateLastReceivedMessagesMutation({
  *   variables: {
- *      updates: // value for 'updates'
+ *      request: // value for 'request'
  *   },
  * });
  */
-export function useBatchUpdateLastReceivedMessageRequestMutation(baseOptions?: Apollo.MutationHookOptions<BatchUpdateLastReceivedMessageRequestMutation, BatchUpdateLastReceivedMessageRequestMutationVariables>) {
+export function useBatchUpdateLastReceivedMessagesMutation(baseOptions?: Apollo.MutationHookOptions<BatchUpdateLastReceivedMessagesMutation, BatchUpdateLastReceivedMessagesMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<BatchUpdateLastReceivedMessageRequestMutation, BatchUpdateLastReceivedMessageRequestMutationVariables>(BatchUpdateLastReceivedMessageRequestDocument, options);
+        return Apollo.useMutation<BatchUpdateLastReceivedMessagesMutation, BatchUpdateLastReceivedMessagesMutationVariables>(BatchUpdateLastReceivedMessagesDocument, options);
       }
-export type BatchUpdateLastReceivedMessageRequestMutationHookResult = ReturnType<typeof useBatchUpdateLastReceivedMessageRequestMutation>;
-export type BatchUpdateLastReceivedMessageRequestMutationResult = Apollo.MutationResult<BatchUpdateLastReceivedMessageRequestMutation>;
-export type BatchUpdateLastReceivedMessageRequestMutationOptions = Apollo.BaseMutationOptions<BatchUpdateLastReceivedMessageRequestMutation, BatchUpdateLastReceivedMessageRequestMutationVariables>;
+export type BatchUpdateLastReceivedMessagesMutationHookResult = ReturnType<typeof useBatchUpdateLastReceivedMessagesMutation>;
+export type BatchUpdateLastReceivedMessagesMutationResult = Apollo.MutationResult<BatchUpdateLastReceivedMessagesMutation>;
+export type BatchUpdateLastReceivedMessagesMutationOptions = Apollo.BaseMutationOptions<BatchUpdateLastReceivedMessagesMutation, BatchUpdateLastReceivedMessagesMutationVariables>;
 export const CreateMessageDocument = gql`
     mutation CreateMessage($request: MessageCreateMutationRequest!) {
   createMessage(request: $request) {
@@ -1042,6 +1089,46 @@ export function useUpdateLastSeenMessageMutation(baseOptions?: Apollo.MutationHo
 export type UpdateLastSeenMessageMutationHookResult = ReturnType<typeof useUpdateLastSeenMessageMutation>;
 export type UpdateLastSeenMessageMutationResult = Apollo.MutationResult<UpdateLastSeenMessageMutation>;
 export type UpdateLastSeenMessageMutationOptions = Apollo.BaseMutationOptions<UpdateLastSeenMessageMutation, UpdateLastSeenMessageMutationVariables>;
+export const UpdateUserPresenseDocument = gql`
+    mutation UpdateUserPresense($isOnline: Boolean!, $userId: String!) {
+  updateUserPresence(isOnline: $isOnline, userId: $userId) {
+    ...status
+    data {
+      userId
+      isOnline
+      lastSeenAt
+    }
+    error
+  }
+}
+    ${StatusFragmentDoc}`;
+export type UpdateUserPresenseMutationFn = Apollo.MutationFunction<UpdateUserPresenseMutation, UpdateUserPresenseMutationVariables>;
+
+/**
+ * __useUpdateUserPresenseMutation__
+ *
+ * To run a mutation, you first call `useUpdateUserPresenseMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateUserPresenseMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateUserPresenseMutation, { data, loading, error }] = useUpdateUserPresenseMutation({
+ *   variables: {
+ *      isOnline: // value for 'isOnline'
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useUpdateUserPresenseMutation(baseOptions?: Apollo.MutationHookOptions<UpdateUserPresenseMutation, UpdateUserPresenseMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateUserPresenseMutation, UpdateUserPresenseMutationVariables>(UpdateUserPresenseDocument, options);
+      }
+export type UpdateUserPresenseMutationHookResult = ReturnType<typeof useUpdateUserPresenseMutation>;
+export type UpdateUserPresenseMutationResult = Apollo.MutationResult<UpdateUserPresenseMutation>;
+export type UpdateUserPresenseMutationOptions = Apollo.BaseMutationOptions<UpdateUserPresenseMutation, UpdateUserPresenseMutationVariables>;
 export const LogoutDocument = gql`
     mutation Logout {
   logout
@@ -1299,3 +1386,38 @@ export function useUpdateLastSeenMessageSubscriptionSubscription(baseOptions?: A
       }
 export type UpdateLastSeenMessageSubscriptionSubscriptionHookResult = ReturnType<typeof useUpdateLastSeenMessageSubscriptionSubscription>;
 export type UpdateLastSeenMessageSubscriptionSubscriptionResult = Apollo.SubscriptionResult<UpdateLastSeenMessageSubscriptionSubscription>;
+export const UserPresenseDocument = gql`
+    subscription UserPresense {
+  userPresence {
+    ...status
+    data {
+      userId
+      isOnline
+      lastSeenAt
+    }
+    error
+  }
+}
+    ${StatusFragmentDoc}`;
+
+/**
+ * __useUserPresenseSubscription__
+ *
+ * To run a query within a React component, call `useUserPresenseSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useUserPresenseSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUserPresenseSubscription({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useUserPresenseSubscription(baseOptions?: Apollo.SubscriptionHookOptions<UserPresenseSubscription, UserPresenseSubscriptionVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useSubscription<UserPresenseSubscription, UserPresenseSubscriptionVariables>(UserPresenseDocument, options);
+      }
+export type UserPresenseSubscriptionHookResult = ReturnType<typeof useUserPresenseSubscription>;
+export type UserPresenseSubscriptionResult = Apollo.SubscriptionResult<UserPresenseSubscription>;
