@@ -1,0 +1,11 @@
+mutation UpdateUserPresense($isOnline: Boolean!, $userId: String!) {
+  updateUserPresence(isOnline: $isOnline, userId: $userId) {
+    ...status
+    data {
+      userId
+      isOnline
+      lastSeenAt
+    }
+    error
+  }
+}

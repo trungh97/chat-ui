@@ -1,0 +1,11 @@
+subscription UserPresense {
+  userPresence {
+    ...status
+    data {
+      userId
+      isOnline
+      lastSeenAt
+    }
+    error
+  }
+}
