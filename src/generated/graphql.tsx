@@ -192,6 +192,14 @@ export enum FriendRequestStatus {
   Pending = 'PENDING'
 }
 
+export type HeartBeatUserPresenseGlobalResponse = IResponse & {
+  __typename?: 'HeartBeatUserPresenseGlobalResponse';
+  data?: Maybe<Scalars['Boolean']['output']>;
+  error?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  statusCode?: Maybe<Scalars['Float']['output']>;
+};
+
 export type IResponse = {
   message?: Maybe<Scalars['String']['output']>;
   statusCode?: Maybe<Scalars['Float']['output']>;
@@ -316,6 +324,7 @@ export type Mutation = {
   deleteFriendRequest: Scalars['Boolean']['output'];
   deleteMessage: MessageResponse;
   googleLogin: UserGlobalResponse;
+  heartbeatUserPresence: HeartBeatUserPresenseGlobalResponse;
   loginCredentialBasedUser: UserGlobalResponse;
   logout: Scalars['Boolean']['output'];
   registerCredentialBasedUser: UserGlobalResponse;
@@ -379,6 +388,11 @@ export type MutationDeleteMessageArgs = {
 
 export type MutationGoogleLoginArgs = {
   code: Scalars['String']['input'];
+};
+
+
+export type MutationHeartbeatUserPresenceArgs = {
+  userId: Scalars['String']['input'];
 };
 
 
@@ -615,6 +629,8 @@ type Status_FriendRequestListResponse_Fragment = { __typename?: 'FriendRequestLi
 
 type Status_FriendRequestResponse_Fragment = { __typename?: 'FriendRequestResponse', statusCode?: number | null, message?: string | null };
 
+type Status_HeartBeatUserPresenseGlobalResponse_Fragment = { __typename?: 'HeartBeatUserPresenseGlobalResponse', statusCode?: number | null, message?: string | null };
+
 type Status_MessageCreationResponse_Fragment = { __typename?: 'MessageCreationResponse', statusCode?: number | null, message?: string | null };
 
 type Status_MessageListGlobalResponse_Fragment = { __typename?: 'MessageListGlobalResponse', statusCode?: number | null, message?: string | null };
@@ -625,7 +641,7 @@ type Status_UserGlobalResponse_Fragment = { __typename?: 'UserGlobalResponse', s
 
 type Status_UserPresenseGlobalResponse_Fragment = { __typename?: 'UserPresenseGlobalResponse', statusCode?: number | null, message?: string | null };
 
-export type StatusFragment = Status_BatchUpdateResponse_Fragment | Status_ContactListResponse_Fragment | Status_ContactResponse_Fragment | Status_ConversationDeleteGlobalResponse_Fragment | Status_ConversationGlobalResponse_Fragment | Status_DetailedParticipantResponse_Fragment | Status_ExtendConversationGlobalResponse_Fragment | Status_ExtendConversationListGlobalResponse_Fragment | Status_FriendRequestListResponse_Fragment | Status_FriendRequestResponse_Fragment | Status_MessageCreationResponse_Fragment | Status_MessageListGlobalResponse_Fragment | Status_MessageResponse_Fragment | Status_UserGlobalResponse_Fragment | Status_UserPresenseGlobalResponse_Fragment;
+export type StatusFragment = Status_BatchUpdateResponse_Fragment | Status_ContactListResponse_Fragment | Status_ContactResponse_Fragment | Status_ConversationDeleteGlobalResponse_Fragment | Status_ConversationGlobalResponse_Fragment | Status_DetailedParticipantResponse_Fragment | Status_ExtendConversationGlobalResponse_Fragment | Status_ExtendConversationListGlobalResponse_Fragment | Status_FriendRequestListResponse_Fragment | Status_FriendRequestResponse_Fragment | Status_HeartBeatUserPresenseGlobalResponse_Fragment | Status_MessageCreationResponse_Fragment | Status_MessageListGlobalResponse_Fragment | Status_MessageResponse_Fragment | Status_UserGlobalResponse_Fragment | Status_UserPresenseGlobalResponse_Fragment;
 
 export type UserInfoFragment = { __typename?: 'UserDTO', id: string, firstName: string, lastName: string, email: string, phone?: string | null, role: UserRole, avatar: string, isActive: boolean, provider?: UserProvider | null, providerUserId?: string | null, status: UserStatus };
 
@@ -656,6 +672,13 @@ export type GoogleLoginMutationVariables = Exact<{
 
 
 export type GoogleLoginMutation = { __typename?: 'Mutation', googleLogin: { __typename?: 'UserGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'UserDTO', id: string, firstName: string, lastName: string, email: string, phone?: string | null, role: UserRole, avatar: string, isActive: boolean, provider?: UserProvider | null, providerUserId?: string | null, status: UserStatus } | null } };
+
+export type HeartbeatUserPresenceMutationVariables = Exact<{
+  heartbeatUserPresenceUserId: Scalars['String']['input'];
+}>;
+
+
+export type HeartbeatUserPresenceMutation = { __typename?: 'Mutation', heartbeatUserPresence: { __typename?: 'HeartBeatUserPresenseGlobalResponse', data?: boolean | null, error?: string | null, statusCode?: number | null, message?: string | null } };
 
 export type UpdateLastReceivedMessageMutationVariables = Exact<{
   participantId: Scalars['String']['input'];
@@ -1016,6 +1039,41 @@ export function useGoogleLoginMutation(baseOptions?: Apollo.MutationHookOptions<
 export type GoogleLoginMutationHookResult = ReturnType<typeof useGoogleLoginMutation>;
 export type GoogleLoginMutationResult = Apollo.MutationResult<GoogleLoginMutation>;
 export type GoogleLoginMutationOptions = Apollo.BaseMutationOptions<GoogleLoginMutation, GoogleLoginMutationVariables>;
+export const HeartbeatUserPresenceDocument = gql`
+    mutation HeartbeatUserPresence($heartbeatUserPresenceUserId: String!) {
+  heartbeatUserPresence(userId: $heartbeatUserPresenceUserId) {
+    ...status
+    data
+    error
+  }
+}
+    ${StatusFragmentDoc}`;
+export type HeartbeatUserPresenceMutationFn = Apollo.MutationFunction<HeartbeatUserPresenceMutation, HeartbeatUserPresenceMutationVariables>;
+
+/**
+ * __useHeartbeatUserPresenceMutation__
+ *
+ * To run a mutation, you first call `useHeartbeatUserPresenceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useHeartbeatUserPresenceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [heartbeatUserPresenceMutation, { data, loading, error }] = useHeartbeatUserPresenceMutation({
+ *   variables: {
+ *      heartbeatUserPresenceUserId: // value for 'heartbeatUserPresenceUserId'
+ *   },
+ * });
+ */
+export function useHeartbeatUserPresenceMutation(baseOptions?: Apollo.MutationHookOptions<HeartbeatUserPresenceMutation, HeartbeatUserPresenceMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<HeartbeatUserPresenceMutation, HeartbeatUserPresenceMutationVariables>(HeartbeatUserPresenceDocument, options);
+      }
+export type HeartbeatUserPresenceMutationHookResult = ReturnType<typeof useHeartbeatUserPresenceMutation>;
+export type HeartbeatUserPresenceMutationResult = Apollo.MutationResult<HeartbeatUserPresenceMutation>;
+export type HeartbeatUserPresenceMutationOptions = Apollo.BaseMutationOptions<HeartbeatUserPresenceMutation, HeartbeatUserPresenceMutationVariables>;
 export const UpdateLastReceivedMessageDocument = gql`
     mutation UpdateLastReceivedMessage($participantId: String!, $messageId: String!, $conversationId: String!) {
   updateLastReceivedMessage(

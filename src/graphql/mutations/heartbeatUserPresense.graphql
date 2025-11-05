@@ -1,0 +1,7 @@
+mutation HeartbeatUserPresence($heartbeatUserPresenceUserId: String!) {
+  heartbeatUserPresence(userId: $heartbeatUserPresenceUserId) {
+    ...status
+    data
+    error
+  }
+}
