@@ -1,6 +1,8 @@
 subscription UpdateLastReceivedMessageSubscription {
   updateLastReceivedMessageSubscription {
+    conversationId
     participantId
     messageId
+    messageCreatedAt
   }
 }

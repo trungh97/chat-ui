@@ -1,12 +1,20 @@
 import { MessageGroupPosition } from '@constants/enums'
 import {
   ConversationType,
+  MessageType,
   MessageWithConversationDto,
   MessageWithSenderDto,
 } from '@generated/graphql'
-import { getGroupPosition } from '@helpers/conversation'
+import { getGroupPosition, getGroupPositions } from '@helpers/conversation'
 import { Message, MessageWithConversation } from '@interfaces/dtos'
 import { MessagePosition } from '@interfaces/types'
+import { PendingMessage } from '@store/pendingMessage'
+
+/** A message in the chat window: a saved message, or one of the user's pending messages. */
+export type DisplayMessage = Message & {
+  /** Set only for messages the server has not saved yet. */
+  pendingStatus?: PendingMessage['status']
+}
 
 export class MessageData {
   // Converts a GraphQL message DTO (e.g., from Apollo codegen) to the local Message type
@@ -32,7 +40,52 @@ export class MessageData {
           ? data.createdAt
           : String(data.createdAt),
       groupPosition: position,
+      clientMessageId: data.clientMessageId ?? null,
     }
+  }
+
+  /**
+   * Appends the user's pending messages (oldest first) after the saved messages and recomputes
+   * group positions. A pending message the saved list already contains is skipped.
+   * @param messages Saved messages, oldest first
+   */
+  static withPendingMessages({
+    messages,
+    pendingMessages,
+    currentUserId,
+  }: {
+    messages: Message[]
+    pendingMessages: PendingMessage[]
+    currentUserId: string
+  }): DisplayMessage[] {
+    const savedClientIds = new Set(
+      messages.map(({ clientMessageId }) => clientMessageId).filter(Boolean),
+    )
+    const pending: DisplayMessage[] = pendingMessages
+      .filter(({ clientMessageId }) => !savedClientIds.has(clientMessageId))
+      .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+      .map((message) => ({
+        id: message.clientMessageId,
+        clientMessageId: message.clientMessageId,
+        content: message.content,
+        messageType: MessageType.Text,
+        senderId: currentUserId,
+        senderName: null,
+        senderAvatar: null,
+        conversationId: message.conversationId,
+        createdAt: message.createdAt,
+        groupPosition: MessageGroupPosition.start,
+        pendingStatus: message.status,
+      }))
+
+    if (pending.length === 0) return messages
+
+    const combined = [...messages, ...pending]
+    const positions = getGroupPositions(combined)
+    return combined.map((message, i) => ({
+      ...message,
+      groupPosition: positions[i],
+    }))
   }
 
   // Converts an array of GraphQL message DTOs to the local Message type with groupPosition

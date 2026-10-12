@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 export const useAuth = () => {
-  const { data, loading } = useMeQuery()
+  const { data, loading } = useMeQuery({ fetchPolicy: 'cache-first' })
   const { pathname } = useLocation()
   const navigate = useNavigate()
 

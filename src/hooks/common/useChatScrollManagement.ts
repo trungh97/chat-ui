@@ -1,5 +1,6 @@
 import { useInfiniteScrollToTop } from './useInfiniteScrollToTop'
 import { useInitialAutoScroll } from './useInitialAutoScroll'
+import { useIsScrolledToBottom } from './useIsScrolledToBottom'
 import { usePreserveScrollOnLoadMore } from './usePreserveScrollOnLoadMore'
 
 type useChatScrollManagementProps = {
@@ -18,7 +19,7 @@ type useChatScrollManagementProps = {
  * @param hasNextPage Whether there are more messages to load
  * @param loading Loading state for messages
  * @param loadMore Function to load more messages
- * @returns { containerRef, sentinelRef }
+ * @returns { containerRef, sentinelRef, isScrolledToBottom }
  */
 export function useChatScrollManagement({
   conversationId,
@@ -44,5 +45,9 @@ export function useChatScrollManagement({
     hasNextPage,
     loading,
   )
-  return { containerRef, sentinelRef }
+
+  // 4. Whether the latest messages are in view
+  const isScrolledToBottom = useIsScrolledToBottom(containerRef, messages)
+
+  return { containerRef, sentinelRef, isScrolledToBottom }
 }

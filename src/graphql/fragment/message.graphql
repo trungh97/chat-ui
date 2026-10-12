@@ -7,6 +7,7 @@ fragment message on MessageDTO {
   conversationId
   replyToMessageId
   createdAt
+  clientMessageId
 }
 
 fragment messageWithSender on MessageWithSenderDTO {
@@ -18,6 +19,7 @@ fragment messageWithSender on MessageWithSenderDTO {
   conversationId
   replyToMessageId
   createdAt
+  clientMessageId
   senderName
   senderAvatar
 }
@@ -31,6 +33,7 @@ fragment messageWithConversation on MessageWithConversationDTO {
   conversationId
   replyToMessageId
   createdAt
+  clientMessageId
   conversation {
     ...conversation
   }

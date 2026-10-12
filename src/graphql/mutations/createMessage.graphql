@@ -1,7 +1,9 @@
 mutation CreateMessage($request: MessageCreateMutationRequest!) {
   createMessage(request: $request) {
     ...status
-    data
+    data {
+      ...messageWithSender
+    }
     error
   }
 }
