@@ -83,6 +83,12 @@ export function useConversationMessages({
 
           const prevMessages =
             prev.getMessagesByConversationId.data?.items || []
+
+          // The sender's createMessage result may have added it already
+          if (prevMessages.some(({ id }) => id === newMessageAdded.id)) {
+            return prev
+          }
+
           const normalizedNewMessage =
             MessageData.fromNewMessageSubscriptionToMessageWithSenderDTO({
               data: newMessageAdded,

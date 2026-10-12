@@ -14,6 +14,7 @@ export interface Message {
   replyToMessageId?: string
   createdAt: string
   groupPosition: MessagePosition
+  clientMessageId?: string | null
 }
 export interface MessageWithSender extends Message {
   senderName: string | null

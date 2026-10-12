@@ -3,7 +3,7 @@ import React from 'react'
 import UserAvatar from '../UserAvatar'
 
 export const MyAvatar = () => {
-  const { data } = useMeQuery()
+  const { data } = useMeQuery({ fetchPolicy: 'cache-first' })
 
   if (!data) {
     return null

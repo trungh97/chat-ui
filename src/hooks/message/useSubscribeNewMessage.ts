@@ -90,40 +90,16 @@ export function useSubscribeNewMessage(options?: {
         const userId = meData?.me?.data?.id
         if (userId === newMessageAdded.senderId) return
 
-        // Find participantId for current user in the conversation
-        try {
-          const cacheData = client.cache.readFragment({
-            id: client.cache.identify({
-              __typename: 'ExtendConversationDTO',
-              id: newMessageAdded.conversationId,
-            }),
-            fragment: gql`
-              fragment ParticipantsFragment on ExtendConversationDTO {
-                participants {
-                  id
-                  userId
-                }
-              }
-            `,
-          }) as { participants?: { id: string; userId: string }[] } | null
-          const userId = meData?.me?.data?.id
-          const participantId = cacheData?.participants?.find(
-            (p) => p.userId === userId,
-          )?.id
-          if (participantId) {
-            updateLastReceivedMessage({
-              variables: {
-                participantId,
-                messageId: newMessageAdded.id,
-                conversationId: newMessageAdded.conversationId,
-              },
-            })
-          }
-        } catch (error) {
-          return {
-            error,
-          }
-        }
+        // Tell the server this user has received the message. It resolves the user's own
+        // participant from the session.
+        updateLastReceivedMessage({
+          variables: {
+            conversationId: newMessageAdded.conversationId,
+            messageId: newMessageAdded.id,
+          },
+        }).catch(() => {
+          // Best effort: the batch sync on reconnect catches up missed updates.
+        })
       }
     },
   })

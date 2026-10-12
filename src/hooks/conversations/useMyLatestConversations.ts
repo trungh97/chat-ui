@@ -7,6 +7,7 @@ import { CursorBasedPagination } from '@interfaces/pagination'
 import _debounce from 'lodash/debounce'
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { onWsReconnected } from '../../apollo/wsLink'
 
 export const useMyLatestConversations = (options: CursorBasedPagination) => {
   const navigate = useNavigate()
@@ -14,14 +15,15 @@ export const useMyLatestConversations = (options: CursorBasedPagination) => {
 
   const [isFetchingMore, setIsFetchingMore] = useState(false)
 
-  const { data, error, loading, fetchMore } = useGetMyLatestConversationsQuery({
-    variables: {
-      options: {
-        cursor: options.cursor,
-        limit: options.limit || DEFAULT_LIMIT,
+  const { data, error, loading, fetchMore, refetch } =
+    useGetMyLatestConversationsQuery({
+      variables: {
+        options: {
+          cursor: options.cursor,
+          limit: options.limit || DEFAULT_LIMIT,
+        },
       },
-    },
-  })
+    })
 
   const items = data?.getMyConversations.data?.items || []
   const nextCursor = data?.getMyConversations.data?.nextCursor
@@ -31,6 +33,16 @@ export const useMyLatestConversations = (options: CursorBasedPagination) => {
   useEffect(() => {
     syncLastReceivedMessage(items)
   }, [items])
+
+  // Events are missed while the WebSocket is down. Refetch so participants' last seen/received
+  // pointers (message statuses) and the latest messages catch up, which also re-syncs received.
+  useEffect(
+    () =>
+      onWsReconnected(() => {
+        refetch()
+      }),
+    [refetch],
+  )
 
   // Auto redirect to the first conversation
   useEffect(() => {

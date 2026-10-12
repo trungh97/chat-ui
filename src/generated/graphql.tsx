@@ -19,8 +19,8 @@ export type Scalars = {
 };
 
 export type BatchUpdateLastReceivedMessageRequest = {
+  conversationId: Scalars['String']['input'];
   messageId: Scalars['String']['input'];
-  participantId: Scalars['String']['input'];
 };
 
 export type BatchUpdateResponse = IResponse & {
@@ -109,8 +109,10 @@ export type DetailedParticipantDto = {
   avatar: Scalars['String']['output'];
   conversationId: Scalars['String']['output'];
   id: Scalars['ID']['output'];
+  lastReceivedMessageAt?: Maybe<Scalars['DateTimeISO']['output']>;
   lastReceivedMessageId?: Maybe<Scalars['String']['output']>;
   lastSeenAt?: Maybe<Scalars['DateTimeISO']['output']>;
+  lastSeenMessageAt?: Maybe<Scalars['DateTimeISO']['output']>;
   lastSeenMessageId?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
   type: ParticipantType;
@@ -207,18 +209,23 @@ export type IResponse = {
 
 export type LastReceivedMessageUpdateBodyDto = {
   __typename?: 'LastReceivedMessageUpdateBodyDTO';
+  conversationId: Scalars['String']['output'];
+  messageCreatedAt: Scalars['DateTimeISO']['output'];
   messageId: Scalars['String']['output'];
   participantId: Scalars['String']['output'];
 };
 
 export type LastSeenMessageUpdateBodyDto = {
   __typename?: 'LastSeenMessageUpdateBodyDTO';
+  conversationId: Scalars['String']['output'];
   lastSeenAt: Scalars['DateTimeISO']['output'];
+  messageCreatedAt: Scalars['DateTimeISO']['output'];
   messageId: Scalars['String']['output'];
   participantId: Scalars['String']['output'];
 };
 
 export type MessageCreateMutationRequest = {
+  clientMessageId: Scalars['String']['input'];
   content: Scalars['String']['input'];
   conversationId?: InputMaybe<Scalars['String']['input']>;
   extra?: InputMaybe<Scalars['String']['input']>;
@@ -227,16 +234,9 @@ export type MessageCreateMutationRequest = {
   replyToMessageId?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type MessageCreationResponse = IResponse & {
-  __typename?: 'MessageCreationResponse';
-  data?: Maybe<Scalars['Boolean']['output']>;
-  error?: Maybe<Scalars['String']['output']>;
-  message?: Maybe<Scalars['String']['output']>;
-  statusCode?: Maybe<Scalars['Float']['output']>;
-};
-
 export type MessageDto = {
   __typename?: 'MessageDTO';
+  clientMessageId?: Maybe<Scalars['String']['output']>;
   content: Scalars['String']['output'];
   conversationId: Scalars['String']['output'];
   createdAt: Scalars['DateTimeISO']['output'];
@@ -283,6 +283,7 @@ export type MessageUpdateMutationRequest = {
 
 export type MessageWithConversationDto = {
   __typename?: 'MessageWithConversationDTO';
+  clientMessageId?: Maybe<Scalars['String']['output']>;
   content: Scalars['String']['output'];
   conversation: ConversationDto;
   conversationId: Scalars['String']['output'];
@@ -298,6 +299,7 @@ export type MessageWithConversationDto = {
 
 export type MessageWithSenderDto = {
   __typename?: 'MessageWithSenderDTO';
+  clientMessageId?: Maybe<Scalars['String']['output']>;
   content: Scalars['String']['output'];
   conversationId: Scalars['String']['output'];
   createdAt: Scalars['DateTimeISO']['output'];
@@ -310,6 +312,14 @@ export type MessageWithSenderDto = {
   senderName?: Maybe<Scalars['String']['output']>;
 };
 
+export type MessageWithSenderResponse = IResponse & {
+  __typename?: 'MessageWithSenderResponse';
+  data?: Maybe<MessageWithSenderDto>;
+  error?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  statusCode?: Maybe<Scalars['Float']['output']>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   batchUpdateAllBehindConversations: BatchUpdateResponse;
@@ -318,7 +328,7 @@ export type Mutation = {
   createContact: ContactResponse;
   createConversation: ConversationGlobalResponse;
   createFriendRequest: FriendRequestResponse;
-  createMessage: MessageCreationResponse;
+  createMessage: MessageWithSenderResponse;
   createParticipant: DetailedParticipantResponse;
   deleteConversation: ConversationDeleteGlobalResponse;
   deleteFriendRequest: Scalars['Boolean']['output'];
@@ -328,8 +338,8 @@ export type Mutation = {
   loginCredentialBasedUser: UserGlobalResponse;
   logout: Scalars['Boolean']['output'];
   registerCredentialBasedUser: UserGlobalResponse;
-  updateLastReceivedMessage: DetailedParticipantResponse;
-  updateLastSeenMessage: DetailedParticipantResponse;
+  updateLastReceivedMessage: PointerUpdateResponse;
+  updateLastSeenMessage: PointerUpdateResponse;
   updateMessage: MessageResponse;
   updateUserPresence: UserPresenseGlobalResponse;
 };
@@ -409,13 +419,12 @@ export type MutationRegisterCredentialBasedUserArgs = {
 export type MutationUpdateLastReceivedMessageArgs = {
   conversationId: Scalars['String']['input'];
   messageId: Scalars['String']['input'];
-  participantId: Scalars['String']['input'];
 };
 
 
 export type MutationUpdateLastSeenMessageArgs = {
+  conversationId: Scalars['String']['input'];
   messageId: Scalars['String']['input'];
-  participantId: Scalars['String']['input'];
 };
 
 
@@ -452,6 +461,14 @@ export enum ParticipantType {
   Admin = 'ADMIN',
   Member = 'MEMBER'
 }
+
+export type PointerUpdateResponse = IResponse & {
+  __typename?: 'PointerUpdateResponse';
+  data?: Maybe<Scalars['Boolean']['output']>;
+  error?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  statusCode?: Maybe<Scalars['Float']['output']>;
+};
 
 export type Query = {
   __typename?: 'Query';
@@ -591,21 +608,21 @@ export enum UserStatus {
 
 export type ConversationFragment = { __typename?: 'ConversationDTO', id: string, title?: string | null, creatorId: string, isArchived: boolean, deletedAt?: any | null, type: ConversationType, groupAvatar?: string | null, lastMessageAt?: any | null };
 
-export type ExtendedConversationFragment = { __typename?: 'ExtendConversationDTO', id: string, title?: string | null, creatorId: string, isArchived: boolean, deletedAt?: any | null, type: ConversationType, lastMessageAt?: any | null, groupAvatar?: string | null, defaultGroupAvatars?: Array<string> | null, participants: Array<{ __typename?: 'DetailedParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType, name: string, avatar: string, lastReceivedMessageId?: string | null, lastSeenMessageId?: string | null, lastSeenAt?: any | null }>, messages: Array<{ __typename?: 'MessageDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any }> };
+export type ExtendedConversationFragment = { __typename?: 'ExtendConversationDTO', id: string, title?: string | null, creatorId: string, isArchived: boolean, deletedAt?: any | null, type: ConversationType, lastMessageAt?: any | null, groupAvatar?: string | null, defaultGroupAvatars?: Array<string> | null, participants: Array<{ __typename?: 'DetailedParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType, name: string, avatar: string, lastReceivedMessageId?: string | null, lastSeenMessageId?: string | null, lastSeenAt?: any | null, lastReceivedMessageAt?: any | null, lastSeenMessageAt?: any | null }>, messages: Array<{ __typename?: 'MessageDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, clientMessageId?: string | null }> };
 
-export type MessageFragment = { __typename?: 'MessageDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any };
+export type MessageFragment = { __typename?: 'MessageDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, clientMessageId?: string | null };
 
-export type MessageWithSenderFragment = { __typename?: 'MessageWithSenderDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, senderName?: string | null, senderAvatar?: string | null };
+export type MessageWithSenderFragment = { __typename?: 'MessageWithSenderDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, clientMessageId?: string | null, senderName?: string | null, senderAvatar?: string | null };
 
-export type MessageWithConversationFragment = { __typename?: 'MessageWithConversationDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, conversation: { __typename?: 'ConversationDTO', id: string, title?: string | null, creatorId: string, isArchived: boolean, deletedAt?: any | null, type: ConversationType, groupAvatar?: string | null, lastMessageAt?: any | null } };
+export type MessageWithConversationFragment = { __typename?: 'MessageWithConversationDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, clientMessageId?: string | null, conversation: { __typename?: 'ConversationDTO', id: string, title?: string | null, creatorId: string, isArchived: boolean, deletedAt?: any | null, type: ConversationType, groupAvatar?: string | null, lastMessageAt?: any | null } };
 
-export type DetailedParticipantFragment = { __typename?: 'DetailedParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType, name: string, avatar: string, lastReceivedMessageId?: string | null, lastSeenMessageId?: string | null, lastSeenAt?: any | null };
+export type DetailedParticipantFragment = { __typename?: 'DetailedParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType, name: string, avatar: string, lastReceivedMessageId?: string | null, lastSeenMessageId?: string | null, lastSeenAt?: any | null, lastReceivedMessageAt?: any | null, lastSeenMessageAt?: any | null };
 
-export type ConversationListResponseFragment = { __typename?: 'ExtendConversationListGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'PaginatedConversationListResponse', nextCursor?: string | null, items: Array<{ __typename?: 'ExtendConversationDTO', id: string, title?: string | null, creatorId: string, isArchived: boolean, deletedAt?: any | null, type: ConversationType, lastMessageAt?: any | null, groupAvatar?: string | null, defaultGroupAvatars?: Array<string> | null, participants: Array<{ __typename?: 'DetailedParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType, name: string, avatar: string, lastReceivedMessageId?: string | null, lastSeenMessageId?: string | null, lastSeenAt?: any | null }>, messages: Array<{ __typename?: 'MessageDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any }> }> } | null };
+export type ConversationListResponseFragment = { __typename?: 'ExtendConversationListGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'PaginatedConversationListResponse', nextCursor?: string | null, items: Array<{ __typename?: 'ExtendConversationDTO', id: string, title?: string | null, creatorId: string, isArchived: boolean, deletedAt?: any | null, type: ConversationType, lastMessageAt?: any | null, groupAvatar?: string | null, defaultGroupAvatars?: Array<string> | null, participants: Array<{ __typename?: 'DetailedParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType, name: string, avatar: string, lastReceivedMessageId?: string | null, lastSeenMessageId?: string | null, lastSeenAt?: any | null, lastReceivedMessageAt?: any | null, lastSeenMessageAt?: any | null }>, messages: Array<{ __typename?: 'MessageDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, clientMessageId?: string | null }> }> } | null };
 
-export type DetailedParticipantResponseFragment = { __typename?: 'DetailedParticipantResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'DetailedParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType, name: string, avatar: string, lastReceivedMessageId?: string | null, lastSeenMessageId?: string | null, lastSeenAt?: any | null } | null };
+export type DetailedParticipantResponseFragment = { __typename?: 'DetailedParticipantResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'DetailedParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType, name: string, avatar: string, lastReceivedMessageId?: string | null, lastSeenMessageId?: string | null, lastSeenAt?: any | null, lastReceivedMessageAt?: any | null, lastSeenMessageAt?: any | null } | null };
 
-export type MessageListResponseFragment = { __typename?: 'MessageListGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'PaginatedMessageListResponse', nextCursor?: string | null, items: Array<{ __typename?: 'MessageWithSenderDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, senderName?: string | null, senderAvatar?: string | null }> } | null };
+export type MessageListResponseFragment = { __typename?: 'MessageListGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'PaginatedMessageListResponse', nextCursor?: string | null, items: Array<{ __typename?: 'MessageWithSenderDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, clientMessageId?: string | null, senderName?: string | null, senderAvatar?: string | null }> } | null };
 
 export type UserResponseFragment = { __typename?: 'UserGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'UserDTO', id: string, firstName: string, lastName: string, email: string, phone?: string | null, role: UserRole, avatar: string, isActive: boolean, provider?: UserProvider | null, providerUserId?: string | null, status: UserStatus } | null };
 
@@ -631,17 +648,19 @@ type Status_FriendRequestResponse_Fragment = { __typename?: 'FriendRequestRespon
 
 type Status_HeartBeatUserPresenseGlobalResponse_Fragment = { __typename?: 'HeartBeatUserPresenseGlobalResponse', statusCode?: number | null, message?: string | null };
 
-type Status_MessageCreationResponse_Fragment = { __typename?: 'MessageCreationResponse', statusCode?: number | null, message?: string | null };
-
 type Status_MessageListGlobalResponse_Fragment = { __typename?: 'MessageListGlobalResponse', statusCode?: number | null, message?: string | null };
 
 type Status_MessageResponse_Fragment = { __typename?: 'MessageResponse', statusCode?: number | null, message?: string | null };
+
+type Status_MessageWithSenderResponse_Fragment = { __typename?: 'MessageWithSenderResponse', statusCode?: number | null, message?: string | null };
+
+type Status_PointerUpdateResponse_Fragment = { __typename?: 'PointerUpdateResponse', statusCode?: number | null, message?: string | null };
 
 type Status_UserGlobalResponse_Fragment = { __typename?: 'UserGlobalResponse', statusCode?: number | null, message?: string | null };
 
 type Status_UserPresenseGlobalResponse_Fragment = { __typename?: 'UserPresenseGlobalResponse', statusCode?: number | null, message?: string | null };
 
-export type StatusFragment = Status_BatchUpdateResponse_Fragment | Status_ContactListResponse_Fragment | Status_ContactResponse_Fragment | Status_ConversationDeleteGlobalResponse_Fragment | Status_ConversationGlobalResponse_Fragment | Status_DetailedParticipantResponse_Fragment | Status_ExtendConversationGlobalResponse_Fragment | Status_ExtendConversationListGlobalResponse_Fragment | Status_FriendRequestListResponse_Fragment | Status_FriendRequestResponse_Fragment | Status_HeartBeatUserPresenseGlobalResponse_Fragment | Status_MessageCreationResponse_Fragment | Status_MessageListGlobalResponse_Fragment | Status_MessageResponse_Fragment | Status_UserGlobalResponse_Fragment | Status_UserPresenseGlobalResponse_Fragment;
+export type StatusFragment = Status_BatchUpdateResponse_Fragment | Status_ContactListResponse_Fragment | Status_ContactResponse_Fragment | Status_ConversationDeleteGlobalResponse_Fragment | Status_ConversationGlobalResponse_Fragment | Status_DetailedParticipantResponse_Fragment | Status_ExtendConversationGlobalResponse_Fragment | Status_ExtendConversationListGlobalResponse_Fragment | Status_FriendRequestListResponse_Fragment | Status_FriendRequestResponse_Fragment | Status_HeartBeatUserPresenseGlobalResponse_Fragment | Status_MessageListGlobalResponse_Fragment | Status_MessageResponse_Fragment | Status_MessageWithSenderResponse_Fragment | Status_PointerUpdateResponse_Fragment | Status_UserGlobalResponse_Fragment | Status_UserPresenseGlobalResponse_Fragment;
 
 export type UserInfoFragment = { __typename?: 'UserDTO', id: string, firstName: string, lastName: string, email: string, phone?: string | null, role: UserRole, avatar: string, isActive: boolean, provider?: UserProvider | null, providerUserId?: string | null, status: UserStatus };
 
@@ -657,7 +676,7 @@ export type CreateMessageMutationVariables = Exact<{
 }>;
 
 
-export type CreateMessageMutation = { __typename?: 'Mutation', createMessage: { __typename?: 'MessageCreationResponse', data?: boolean | null, error?: string | null, statusCode?: number | null, message?: string | null } };
+export type CreateMessageMutation = { __typename?: 'Mutation', createMessage: { __typename?: 'MessageWithSenderResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'MessageWithSenderDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, clientMessageId?: string | null, senderName?: string | null, senderAvatar?: string | null } | null } };
 
 export type CredentialBasedLoginMutationVariables = Exact<{
   request: UserLoginInput;
@@ -681,21 +700,20 @@ export type HeartbeatUserPresenceMutationVariables = Exact<{
 export type HeartbeatUserPresenceMutation = { __typename?: 'Mutation', heartbeatUserPresence: { __typename?: 'HeartBeatUserPresenseGlobalResponse', data?: boolean | null, error?: string | null, statusCode?: number | null, message?: string | null } };
 
 export type UpdateLastReceivedMessageMutationVariables = Exact<{
-  participantId: Scalars['String']['input'];
-  messageId: Scalars['String']['input'];
   conversationId: Scalars['String']['input'];
+  messageId: Scalars['String']['input'];
 }>;
 
 
-export type UpdateLastReceivedMessageMutation = { __typename?: 'Mutation', updateLastReceivedMessage: { __typename?: 'DetailedParticipantResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'DetailedParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType, name: string, avatar: string, lastReceivedMessageId?: string | null, lastSeenMessageId?: string | null, lastSeenAt?: any | null } | null } };
+export type UpdateLastReceivedMessageMutation = { __typename?: 'Mutation', updateLastReceivedMessage: { __typename?: 'PointerUpdateResponse', data?: boolean | null, error?: string | null, statusCode?: number | null, message?: string | null } };
 
 export type UpdateLastSeenMessageMutationVariables = Exact<{
-  participantId: Scalars['String']['input'];
+  conversationId: Scalars['String']['input'];
   messageId: Scalars['String']['input'];
 }>;
 
 
-export type UpdateLastSeenMessageMutation = { __typename?: 'Mutation', updateLastSeenMessage: { __typename?: 'DetailedParticipantResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'DetailedParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType, name: string, avatar: string, lastReceivedMessageId?: string | null, lastSeenMessageId?: string | null, lastSeenAt?: any | null } | null } };
+export type UpdateLastSeenMessageMutation = { __typename?: 'Mutation', updateLastSeenMessage: { __typename?: 'PointerUpdateResponse', data?: boolean | null, error?: string | null, statusCode?: number | null, message?: string | null } };
 
 export type UpdateUserPresenseMutationVariables = Exact<{
   isOnline: Scalars['Boolean']['input'];
@@ -716,14 +734,14 @@ export type GetMessagesByConversationIdQueryVariables = Exact<{
 }>;
 
 
-export type GetMessagesByConversationIdQuery = { __typename?: 'Query', getMessagesByConversationId: { __typename?: 'MessageListGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'PaginatedMessageListResponse', nextCursor?: string | null, items: Array<{ __typename?: 'MessageWithSenderDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, senderName?: string | null, senderAvatar?: string | null }> } | null } };
+export type GetMessagesByConversationIdQuery = { __typename?: 'Query', getMessagesByConversationId: { __typename?: 'MessageListGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'PaginatedMessageListResponse', nextCursor?: string | null, items: Array<{ __typename?: 'MessageWithSenderDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, clientMessageId?: string | null, senderName?: string | null, senderAvatar?: string | null }> } | null } };
 
 export type GetMyLatestConversationsQueryVariables = Exact<{
   options: CursorBasedPaginationParams;
 }>;
 
 
-export type GetMyLatestConversationsQuery = { __typename?: 'Query', getMyConversations: { __typename?: 'ExtendConversationListGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'PaginatedConversationListResponse', nextCursor?: string | null, items: Array<{ __typename?: 'ExtendConversationDTO', id: string, title?: string | null, creatorId: string, isArchived: boolean, deletedAt?: any | null, type: ConversationType, lastMessageAt?: any | null, groupAvatar?: string | null, defaultGroupAvatars?: Array<string> | null, participants: Array<{ __typename?: 'DetailedParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType, name: string, avatar: string, lastReceivedMessageId?: string | null, lastSeenMessageId?: string | null, lastSeenAt?: any | null }>, messages: Array<{ __typename?: 'MessageDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any }> }> } | null } };
+export type GetMyLatestConversationsQuery = { __typename?: 'Query', getMyConversations: { __typename?: 'ExtendConversationListGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'PaginatedConversationListResponse', nextCursor?: string | null, items: Array<{ __typename?: 'ExtendConversationDTO', id: string, title?: string | null, creatorId: string, isArchived: boolean, deletedAt?: any | null, type: ConversationType, lastMessageAt?: any | null, groupAvatar?: string | null, defaultGroupAvatars?: Array<string> | null, participants: Array<{ __typename?: 'DetailedParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType, name: string, avatar: string, lastReceivedMessageId?: string | null, lastSeenMessageId?: string | null, lastSeenAt?: any | null, lastReceivedMessageAt?: any | null, lastSeenMessageAt?: any | null }>, messages: Array<{ __typename?: 'MessageDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, clientMessageId?: string | null }> }> } | null } };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -733,17 +751,17 @@ export type MeQuery = { __typename?: 'Query', me: { __typename?: 'UserGlobalResp
 export type NewMessageAddedSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
-export type NewMessageAddedSubscription = { __typename?: 'Subscription', newMessageAdded: { __typename?: 'MessageWithConversationDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, senderName?: string | null, senderAvatar?: string | null, conversation: { __typename?: 'ConversationDTO', id: string, title?: string | null, creatorId: string, isArchived: boolean, deletedAt?: any | null, type: ConversationType, groupAvatar?: string | null, lastMessageAt?: any | null } } };
+export type NewMessageAddedSubscription = { __typename?: 'Subscription', newMessageAdded: { __typename?: 'MessageWithConversationDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, clientMessageId?: string | null, senderName?: string | null, senderAvatar?: string | null, conversation: { __typename?: 'ConversationDTO', id: string, title?: string | null, creatorId: string, isArchived: boolean, deletedAt?: any | null, type: ConversationType, groupAvatar?: string | null, lastMessageAt?: any | null } } };
 
 export type UpdateLastReceivedMessageSubscriptionSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
-export type UpdateLastReceivedMessageSubscriptionSubscription = { __typename?: 'Subscription', updateLastReceivedMessageSubscription: Array<{ __typename?: 'LastReceivedMessageUpdateBodyDTO', participantId: string, messageId: string }> };
+export type UpdateLastReceivedMessageSubscriptionSubscription = { __typename?: 'Subscription', updateLastReceivedMessageSubscription: Array<{ __typename?: 'LastReceivedMessageUpdateBodyDTO', conversationId: string, participantId: string, messageId: string, messageCreatedAt: any }> };
 
 export type UpdateLastSeenMessageSubscriptionSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
-export type UpdateLastSeenMessageSubscriptionSubscription = { __typename?: 'Subscription', updateLastSeenMessageSubscription: { __typename?: 'LastSeenMessageUpdateBodyDTO', participantId: string, messageId: string, lastSeenAt: any } };
+export type UpdateLastSeenMessageSubscriptionSubscription = { __typename?: 'Subscription', updateLastSeenMessageSubscription: { __typename?: 'LastSeenMessageUpdateBodyDTO', conversationId: string, participantId: string, messageId: string, messageCreatedAt: any, lastSeenAt: any } };
 
 export type UserPresenseSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
@@ -772,6 +790,7 @@ export const MessageWithConversationFragmentDoc = gql`
   conversationId
   replyToMessageId
   createdAt
+  clientMessageId
   conversation {
     ...conversation
   }
@@ -794,6 +813,8 @@ export const DetailedParticipantFragmentDoc = gql`
   lastReceivedMessageId
   lastSeenMessageId
   lastSeenAt
+  lastReceivedMessageAt
+  lastSeenMessageAt
 }
     `;
 export const MessageFragmentDoc = gql`
@@ -806,6 +827,7 @@ export const MessageFragmentDoc = gql`
   conversationId
   replyToMessageId
   createdAt
+  clientMessageId
 }
     `;
 export const ExtendedConversationFragmentDoc = gql`
@@ -861,6 +883,7 @@ export const MessageWithSenderFragmentDoc = gql`
   conversationId
   replyToMessageId
   createdAt
+  clientMessageId
   senderName
   senderAvatar
 }
@@ -942,11 +965,14 @@ export const CreateMessageDocument = gql`
     mutation CreateMessage($request: MessageCreateMutationRequest!) {
   createMessage(request: $request) {
     ...status
-    data
+    data {
+      ...messageWithSender
+    }
     error
   }
 }
-    ${StatusFragmentDoc}`;
+    ${StatusFragmentDoc}
+${MessageWithSenderFragmentDoc}`;
 export type CreateMessageMutationFn = Apollo.MutationFunction<CreateMessageMutation, CreateMessageMutationVariables>;
 
 /**
@@ -1075,16 +1101,17 @@ export type HeartbeatUserPresenceMutationHookResult = ReturnType<typeof useHeart
 export type HeartbeatUserPresenceMutationResult = Apollo.MutationResult<HeartbeatUserPresenceMutation>;
 export type HeartbeatUserPresenceMutationOptions = Apollo.BaseMutationOptions<HeartbeatUserPresenceMutation, HeartbeatUserPresenceMutationVariables>;
 export const UpdateLastReceivedMessageDocument = gql`
-    mutation UpdateLastReceivedMessage($participantId: String!, $messageId: String!, $conversationId: String!) {
+    mutation UpdateLastReceivedMessage($conversationId: String!, $messageId: String!) {
   updateLastReceivedMessage(
-    participantId: $participantId
-    messageId: $messageId
     conversationId: $conversationId
+    messageId: $messageId
   ) {
-    ...detailedParticipantResponse
+    ...status
+    data
+    error
   }
 }
-    ${DetailedParticipantResponseFragmentDoc}`;
+    ${StatusFragmentDoc}`;
 export type UpdateLastReceivedMessageMutationFn = Apollo.MutationFunction<UpdateLastReceivedMessageMutation, UpdateLastReceivedMessageMutationVariables>;
 
 /**
@@ -1100,9 +1127,8 @@ export type UpdateLastReceivedMessageMutationFn = Apollo.MutationFunction<Update
  * @example
  * const [updateLastReceivedMessageMutation, { data, loading, error }] = useUpdateLastReceivedMessageMutation({
  *   variables: {
- *      participantId: // value for 'participantId'
- *      messageId: // value for 'messageId'
  *      conversationId: // value for 'conversationId'
+ *      messageId: // value for 'messageId'
  *   },
  * });
  */
@@ -1114,12 +1140,14 @@ export type UpdateLastReceivedMessageMutationHookResult = ReturnType<typeof useU
 export type UpdateLastReceivedMessageMutationResult = Apollo.MutationResult<UpdateLastReceivedMessageMutation>;
 export type UpdateLastReceivedMessageMutationOptions = Apollo.BaseMutationOptions<UpdateLastReceivedMessageMutation, UpdateLastReceivedMessageMutationVariables>;
 export const UpdateLastSeenMessageDocument = gql`
-    mutation UpdateLastSeenMessage($participantId: String!, $messageId: String!) {
-  updateLastSeenMessage(participantId: $participantId, messageId: $messageId) {
-    ...detailedParticipantResponse
+    mutation UpdateLastSeenMessage($conversationId: String!, $messageId: String!) {
+  updateLastSeenMessage(conversationId: $conversationId, messageId: $messageId) {
+    ...status
+    data
+    error
   }
 }
-    ${DetailedParticipantResponseFragmentDoc}`;
+    ${StatusFragmentDoc}`;
 export type UpdateLastSeenMessageMutationFn = Apollo.MutationFunction<UpdateLastSeenMessageMutation, UpdateLastSeenMessageMutationVariables>;
 
 /**
@@ -1135,7 +1163,7 @@ export type UpdateLastSeenMessageMutationFn = Apollo.MutationFunction<UpdateLast
  * @example
  * const [updateLastSeenMessageMutation, { data, loading, error }] = useUpdateLastSeenMessageMutation({
  *   variables: {
- *      participantId: // value for 'participantId'
+ *      conversationId: // value for 'conversationId'
  *      messageId: // value for 'messageId'
  *   },
  * });
@@ -1353,6 +1381,7 @@ export const NewMessageAddedDocument = gql`
     conversationId
     replyToMessageId
     createdAt
+    clientMessageId
     senderName
     senderAvatar
     conversation {
@@ -1386,8 +1415,10 @@ export type NewMessageAddedSubscriptionResult = Apollo.SubscriptionResult<NewMes
 export const UpdateLastReceivedMessageSubscriptionDocument = gql`
     subscription UpdateLastReceivedMessageSubscription {
   updateLastReceivedMessageSubscription {
+    conversationId
     participantId
     messageId
+    messageCreatedAt
   }
 }
     `;
@@ -1416,8 +1447,10 @@ export type UpdateLastReceivedMessageSubscriptionSubscriptionResult = Apollo.Sub
 export const UpdateLastSeenMessageSubscriptionDocument = gql`
     subscription UpdateLastSeenMessageSubscription {
   updateLastSeenMessageSubscription {
+    conversationId
     participantId
     messageId
+    messageCreatedAt
     lastSeenAt
   }
 }

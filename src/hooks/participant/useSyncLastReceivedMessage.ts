@@ -1,33 +1,34 @@
 import {
   ExtendConversationDto,
-  useBatchUpdateLastReceivedMessageRequestMutation,
+  useBatchUpdateLastReceivedMessagesMutation,
 } from '@generated/graphql'
 import { useAuth } from '@hooks/auth'
 
 export function useSyncLastReceivedMessage() {
   const meData = useAuth()
   const [batchUpdateLastReceivedMessageRequest] =
-    useBatchUpdateLastReceivedMessageRequestMutation()
+    useBatchUpdateLastReceivedMessagesMutation()
 
   const sync = (items: ExtendConversationDto[]) => {
     if (!meData.data?.me) return
     const userId = meData.data.me.data?.id
-    const updates = items
-      .map((conversation) => {
-        const participant = conversation.participants.find(
-          (participant) => participant.userId === userId,
-        )
-        if (!participant) return null
-        return {
-          participantId: participant.id,
-          messageId: conversation.messages[0].id,
-        }
-      })
-      .filter(Boolean) as { participantId: string; messageId: string }[]
-    if (updates.length > 0) {
+    // The server resolves the user's own participant in each conversation from the session.
+    const request = items
+      .filter(
+        (conversation) =>
+          conversation.messages.length > 0 &&
+          conversation.participants.some(
+            (participant) => participant.userId === userId,
+          ),
+      )
+      .map((conversation) => ({
+        conversationId: conversation.id,
+        messageId: conversation.messages[0].id,
+      }))
+    if (request.length > 0) {
       batchUpdateLastReceivedMessageRequest({
         variables: {
-          updates,
+          request,
         },
       })
     }

@@ -8,4 +8,6 @@ fragment detailedParticipant on DetailedParticipantDTO {
   lastReceivedMessageId
   lastSeenMessageId
   lastSeenAt
+  lastReceivedMessageAt
+  lastSeenMessageAt
 }

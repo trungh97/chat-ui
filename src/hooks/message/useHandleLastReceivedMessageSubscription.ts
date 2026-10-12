@@ -10,7 +10,7 @@ export function useHandleLastReceivedMessageSubscription() {
       const payload = data?.data?.updateLastReceivedMessageSubscription
       if (!payload) return
 
-      payload.forEach(({ participantId, messageId }) => {
+      payload.forEach(({ participantId, messageId, messageCreatedAt }) => {
         client.cache.writeFragment({
           id: client.cache.identify({
             __typename: 'DetailedParticipantDTO',
@@ -19,10 +19,12 @@ export function useHandleLastReceivedMessageSubscription() {
           fragment: gql`
             fragment UpdateLastReceivedMessageToParticipant on DetailedParticipantDTO {
               lastReceivedMessageId
+              lastReceivedMessageAt
             }
           `,
           data: {
             lastReceivedMessageId: messageId,
+            lastReceivedMessageAt: messageCreatedAt,
           },
         })
       })

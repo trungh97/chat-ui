@@ -4,7 +4,7 @@ import { Navigate, Outlet } from 'react-router-dom'
 import { useMeQuery } from '@generated/graphql'
 
 export const PrivateRoutes = () => {
-  const { data, loading } = useMeQuery()
+  const { data, loading } = useMeQuery({ fetchPolicy: 'cache-first' })
 
   if (loading) {
     return <span>Loading</span>

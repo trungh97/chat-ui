@@ -8,6 +8,7 @@ subscription NewMessageAdded {
     conversationId
     replyToMessageId
     createdAt
+    clientMessageId
     senderName
     senderAvatar
     conversation {

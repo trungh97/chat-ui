@@ -1,5 +1,7 @@
-mutation UpdateLastSeenMessage($participantId: String!, $messageId: String!) {
-  updateLastSeenMessage(participantId: $participantId, messageId: $messageId) {
-    ...detailedParticipantResponse
+mutation UpdateLastSeenMessage($conversationId: String!, $messageId: String!) {
+  updateLastSeenMessage(conversationId: $conversationId, messageId: $messageId) {
+    ...status
+    data
+    error
   }
 }

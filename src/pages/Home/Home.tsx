@@ -8,7 +8,7 @@ import { Divider } from 'shared-ui'
 import ChatWindow from './ChatMessageSection/ChatWindow'
 
 const Home = memo(() => {
-  const { loading, data } = useMeQuery()
+  const { loading, data } = useMeQuery({ fetchPolicy: 'cache-first' })
   const navigate = useNavigate()
 
   if (!loading && !data) {
