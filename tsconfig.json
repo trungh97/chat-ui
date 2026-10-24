@@ -30,12 +30,15 @@
       "@store/*": ["./src/store/*"],
       "@data/*": ["./src/data/*"],
       "@helpers/*": ["./src/helpers/*"],
+      "@i18n": ["./src/i18n"],
+      "@i18n/*": ["./src/i18n/*"],
       "ui/*": ["./@mf-types/ui/*"]
     },
     "declaration": true,
     "declarationMap": true,
     "emitDeclarationOnly": false,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "resolveJsonModule": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]
