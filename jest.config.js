@@ -12,6 +12,8 @@ module.exports = {
     '^@generated/(.*)$': '<rootDir>/src/generated/$1',
     '^@store/(.*)$': '<rootDir>/src/store/$1',
     '^@data/(.*)$': '<rootDir>/src/data/$1',
+    '^@i18n$': '<rootDir>/src/i18n',
+    '^@i18n/(.*)$': '<rootDir>/src/i18n/$1',
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
   },
   testEnvironment: 'jest-environment-jsdom',
@@ -27,7 +29,10 @@ module.exports = {
     'json',
     'node',
   ],
-  setupFilesAfterEnv: ['@testing-library/jest-dom'],
+  setupFilesAfterEnv: [
+    '@testing-library/jest-dom',
+    '<rootDir>/src/i18n/testSetup.ts',
+  ],
   transform: {
     '^.+\\.(ts|tsx)$': ['ts-jest', { tsconfig: 'tsconfig.json' }],
   },

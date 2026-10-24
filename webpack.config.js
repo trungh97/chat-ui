@@ -54,6 +54,7 @@ module.exports = {
       '@store': path.resolve(__dirname, 'src/store'),
       '@data': path.resolve(__dirname, 'src/data'),
       '@helpers': path.resolve(__dirname, 'src/helpers'),
+      '@i18n': path.resolve(__dirname, 'src/i18n'),
       ui: path.resolve(__dirname, '@mf-types/ui'),
     },
     extensions: ['.ts', '.js', '.tsx', '.jsx'],
