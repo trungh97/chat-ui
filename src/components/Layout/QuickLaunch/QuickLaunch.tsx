@@ -1,5 +1,4 @@
-import { LanguageSwitcher } from '@components/LanguageSwitcher'
-import { Logout } from '@components/Logout'
+import { UserMenuPopover } from '@components/UserMenu'
 import React from 'react'
 import { NameAvatar } from 'shared-ui'
 
@@ -11,10 +10,7 @@ export const QuickLaunch = () => {
         <NameAvatar size="xl" firstName="John" lastName="Doe" />
         <NameAvatar size="xl" firstName="John" lastName="Doe" />
       </div>
-      <div className="flex flex-col items-center gap-y-4">
-        <LanguageSwitcher />
-        <Logout />
-      </div>
+      <UserMenuPopover />
     </div>
   )
 }

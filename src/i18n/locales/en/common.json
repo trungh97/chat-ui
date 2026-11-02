@@ -4,6 +4,7 @@
   },
   "language": {
     "switcherLabel": "Language",
+    "change": "Change language",
     "en": "English",
     "vi": "Tiếng Việt"
   },
