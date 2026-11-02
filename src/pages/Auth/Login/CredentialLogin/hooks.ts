@@ -4,6 +4,7 @@ import {
   MeQuery,
   useCredentialBasedLoginMutation,
 } from '@generated/graphql'
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { message } from 'shared-ui'
 import { useUserStore } from '@store/user'
@@ -13,6 +14,7 @@ export const useCredentialLogin = () => {
   const client = useApolloClient()
   const navigate = useNavigate()
   const setCurrentUser = useUserStore.use.setCurrentUser()
+  const { t } = useTranslation()
 
   const handleLogin = async (values: Record<string, any>) => {
     if (!values.email || !values.password) {
@@ -47,11 +49,11 @@ export const useCredentialLogin = () => {
           },
         })
         setCurrentUser(data)
-        message.success('Logged in successfully')
+        message.success(t('auth.login.success'))
         navigate('/')
       }
     } catch (error) {
-      message.error('Something went wrong')
+      message.error(t('auth.login.genericError'))
       return
     }
   }

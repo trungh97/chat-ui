@@ -1,4 +1,4 @@
-import { Logout } from '@components/Logout'
+import { UserMenuPopover } from '@components/UserMenu'
 import React from 'react'
 import { NameAvatar } from 'shared-ui'
 
@@ -10,7 +10,7 @@ export const QuickLaunch = () => {
         <NameAvatar size="xl" firstName="John" lastName="Doe" />
         <NameAvatar size="xl" firstName="John" lastName="Doe" />
       </div>
-      <Logout />
+      <UserMenuPopover />
     </div>
   )
 }

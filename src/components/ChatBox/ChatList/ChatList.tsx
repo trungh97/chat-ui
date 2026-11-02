@@ -1,6 +1,7 @@
 import { useInfiniteScroll } from '@hooks/common'
 import { useMyLatestConversations } from '@hooks/conversations'
 import React, { memo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Skeleton } from 'shared-ui'
 import { ChatListLoading } from './ChatListLoading'
 import { ChatListWrapper } from './ChatListWrapper'
@@ -12,6 +13,7 @@ export type ChatListProps = {
 }
 
 export const ChatList = memo(() => {
+  const { t } = useTranslation()
   const { conversations, loadMore, hasNextPage, loading, isFetchingMore } =
     useMyLatestConversations({
       cursor: null,
@@ -25,7 +27,7 @@ export const ChatList = memo(() => {
   })
 
   if ((!conversations || conversations.length === 0) && !loading) {
-    return <div>No chats available</div>
+    return <div>{t('chat.list.empty')}</div>
   }
 
   if (loading && conversations.length === 0) {

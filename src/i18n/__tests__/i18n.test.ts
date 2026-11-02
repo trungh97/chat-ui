@@ -17,6 +17,16 @@ const flattenKeys = (translations: Translations, prefix = ''): string[] =>
     return typeof value === 'string' ? [path] : flattenKeys(value, path)
   })
 
+// Plural forms differ per language (Vietnamese has only `_other`), so compare base keys
+const PLURAL_SUFFIX = /_(zero|one|two|few|many|other)$/
+
+const baseKeys = (translations: Translations) =>
+  Array.from(
+    new Set(
+      flattenKeys(translations).map((key) => key.replace(PLURAL_SUFFIX, '')),
+    ),
+  ).sort()
+
 // Lets a test look up a key that is not in the typed resources
 const translate = (key: string) => (i18n.t as (key: string) => string)(key)
 
@@ -25,7 +35,21 @@ const mockNavigatorLanguage = (language: string) =>
 
 describe('translation resources', () => {
   it('has the same keys in Vietnamese as in English', () => {
-    expect(flattenKeys(vi).sort()).toEqual(flattenKeys(en).sort())
+    expect(baseKeys(vi)).toEqual(baseKeys(en))
+  })
+
+  it('has the `_other` plural form for every plural key', () => {
+    const pluralBases = (translations: Translations) =>
+      flattenKeys(translations)
+        .filter((key) => PLURAL_SUFFIX.test(key))
+        .map((key) => key.replace(PLURAL_SUFFIX, ''))
+
+    for (const translations of [en, vi]) {
+      const keys = flattenKeys(translations)
+      for (const base of pluralBases(translations)) {
+        expect(keys).toContain(`${base}_other`)
+      }
+    }
   })
 
   it('has no empty Vietnamese translations', () => {

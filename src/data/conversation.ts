@@ -12,7 +12,7 @@ export class ConversationData {
       id: data.id,
       title: data.title!,
       avatar: data.groupAvatar || data.defaultGroupAvatars?.[0] || '',
-      lastMessage: messages?.[0]?.content || 'No messages yet',
+      lastMessage: messages?.[0]?.content || '',
       lastMessageTime:
         data.messages?.[0]?.createdAt || new Date().toISOString(),
       isRead: false,

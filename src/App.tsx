@@ -3,10 +3,13 @@ import { PresenseTrackerProvider } from '@components/PresenseTracker'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import AppRoutes from '@routes/AppRoutes'
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { BrowserRouter } from 'react-router-dom'
 import apolloClient from './apollo'
 
 const App = () => {
+  const { t } = useTranslation()
+
   return (
     <ApolloProvider client={apolloClient}>
       <PresenseTrackerProvider>
@@ -14,7 +17,7 @@ const App = () => {
           clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID as string}
         >
           <BrowserRouter>
-            <React.Suspense fallback={<div>Loading...</div>}>
+            <React.Suspense fallback={<div>{t('common.loading')}</div>}>
               <AppRoutes />
             </React.Suspense>
           </BrowserRouter>

@@ -1,4 +1,5 @@
 import { MessageDeliveryStatus } from '@constants/enums'
+import i18n from '@i18n'
 import {
   getMessageStatus,
   isPointerAtOrAfter,
@@ -52,6 +53,7 @@ describe('getMessageStatus', () => {
         participants: [me, other],
         currentUserId: 'me',
         isGroup: false,
+        t: i18n.t,
       })
 
     it('is Sent when the other participant has not received it', () => {
@@ -82,6 +84,7 @@ describe('getMessageStatus', () => {
           participants: [me],
           currentUserId: 'me',
           isGroup: false,
+          t: i18n.t,
         }),
       ).toEqual({ status: MessageDeliveryStatus.SENT, text: 'Sent' })
     })
@@ -94,6 +97,7 @@ describe('getMessageStatus', () => {
         participants: [me, ...others],
         currentUserId: 'me',
         isGroup: true,
+        t: i18n.t,
       })
 
     it('is Sent and never Delivered while nobody has seen it', () => {
@@ -140,6 +144,7 @@ describe('getMessageStatus', () => {
           ],
           currentUserId: 'me',
           isGroup: true,
+          t: i18n.t,
         }),
       ).toEqual({ status: MessageDeliveryStatus.SEEN, text: 'Seen by all' })
     })
@@ -170,5 +175,65 @@ describe('getMessageStatus', () => {
         ]).text,
       ).toBe('Seen by Ann, Ben, Cat and 1 other')
     })
+  })
+})
+
+describe('getMessageStatus in Vietnamese', () => {
+  beforeEach(async () => {
+    await i18n.changeLanguage('vi')
+  })
+
+  const groupStatus = (participants: StatusParticipant[]) =>
+    getMessageStatus({
+      message,
+      participants: [me, ...participants],
+      currentUserId: 'me',
+      isGroup: true,
+      t: i18n.t,
+    })
+
+  it('translates the 1-1 statuses', () => {
+    const oneToOne = (other: StatusParticipant) =>
+      getMessageStatus({
+        message,
+        participants: [me, other],
+        currentUserId: 'me',
+        isGroup: false,
+        t: i18n.t,
+      }).text
+
+    expect(oneToOne(participant('bob', 'Bob Stone'))).toBe('Đã gửi')
+    expect(oneToOne(participant('bob', 'Bob Stone', { received: after }))).toBe(
+      'Đã nhận',
+    )
+    expect(oneToOne(participant('bob', 'Bob Stone', { seen: after }))).toBe(
+      'Đã xem',
+    )
+  })
+
+  it('translates who has seen it in a group', () => {
+    expect(
+      groupStatus([
+        participant('bob', 'Bob Stone', { seen: after }),
+        participant('alice', 'Alice Wu', { seen: after }),
+        participant('carol', 'Carol King'),
+      ]).text,
+    ).toBe('Bob, Alice đã xem')
+
+    expect(
+      groupStatus([participant('bob', 'Bob Stone', { seen: after })]).text,
+    ).toBe('Mọi người đã xem')
+  })
+
+  it('uses the single Vietnamese plural form for the remaining names', () => {
+    const seen = { seen: after }
+    const names = ['Ann A', 'Ben B', 'Cat C', 'Dan D']
+
+    expect(
+      groupStatus([
+        ...names.map((name, i) => participant(`p${i}`, name, seen)),
+        participant('f', 'Fay F'),
+      ]).text,
+    ).toBe('Ann, Ben, Cat và 1 người khác đã xem')
   })
 })

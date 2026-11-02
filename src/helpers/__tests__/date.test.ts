@@ -1,3 +1,4 @@
+import { vi } from 'date-fns/locale/vi'
 import { formatChatDate, formatRelativeToNow, getTimeDifference } from '../date'
 
 describe('formatChatDate', () => {
@@ -36,6 +37,15 @@ describe('formatRelativeToNow', () => {
     const iso = monthAgo.toISOString()
     const result = formatRelativeToNow(iso, { addSuffix: true })
     expect(result).toMatch(/month ago/)
+  })
+
+  it('formats in Vietnamese with the vi locale', () => {
+    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000)
+    const result = formatRelativeToNow(yesterday.toISOString(), {
+      addSuffix: true,
+      locale: vi,
+    })
+    expect(result).toBe('1 ngày trước')
   })
 })
 
