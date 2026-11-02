@@ -1,5 +1,54 @@
 {
   "common": {
     "loading": "Loading..."
+  },
+  "language": {
+    "switcherLabel": "Language",
+    "en": "English",
+    "vi": "Tiếng Việt"
+  },
+  "auth": {
+    "login": {
+      "title": "Log in to your account",
+      "subtitle": "Welcome back! Please enter your details.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Email",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Invalid email",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Password",
+      "passwordRequired": "Password is required",
+      "submit": "Sign in",
+      "success": "Logged in successfully",
+      "genericError": "Something went wrong"
+    },
+    "logout": "Logout"
+  },
+  "chat": {
+    "list": {
+      "title": "Chats",
+      "searchPlaceholder": "Search chat",
+      "empty": "No chats available",
+      "noMessagesYet": "No messages yet"
+    },
+    "window": {
+      "selectConversation": "Please select a conversation to view messages.",
+      "empty": "No messages available for this conversation."
+    }
+  },
+  "message": {
+    "you": "You",
+    "retry": "Retry",
+    "status": {
+      "sending": "Sending",
+      "sent": "Sent",
+      "delivered": "Delivered",
+      "seen": "Seen",
+      "error": "Error",
+      "seenByAll": "Seen by all",
+      "seenBy": "Seen by {{names}}",
+      "seenByOthers_one": "Seen by {{names}} and {{count}} other",
+      "seenByOthers_other": "Seen by {{names}} and {{count}} others"
+    }
   }
 }

@@ -1,5 +1,53 @@
 {
   "common": {
     "loading": "Đang tải..."
+  },
+  "language": {
+    "switcherLabel": "Ngôn ngữ",
+    "en": "English",
+    "vi": "Tiếng Việt"
+  },
+  "auth": {
+    "login": {
+      "title": "Đăng nhập vào tài khoản",
+      "subtitle": "Chào mừng bạn quay lại! Vui lòng nhập thông tin của bạn.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Email",
+      "emailRequired": "Vui lòng nhập email",
+      "emailInvalid": "Email không hợp lệ",
+      "passwordLabel": "Mật khẩu",
+      "passwordPlaceholder": "Mật khẩu",
+      "passwordRequired": "Vui lòng nhập mật khẩu",
+      "submit": "Đăng nhập",
+      "success": "Đăng nhập thành công",
+      "genericError": "Đã xảy ra lỗi"
+    },
+    "logout": "Đăng xuất"
+  },
+  "chat": {
+    "list": {
+      "title": "Đoạn chat",
+      "searchPlaceholder": "Tìm kiếm đoạn chat",
+      "empty": "Chưa có đoạn chat nào",
+      "noMessagesYet": "Chưa có tin nhắn"
+    },
+    "window": {
+      "selectConversation": "Hãy chọn một đoạn chat để xem tin nhắn.",
+      "empty": "Đoạn chat này chưa có tin nhắn."
+    }
+  },
+  "message": {
+    "you": "Bạn",
+    "retry": "Thử lại",
+    "status": {
+      "sending": "Đang gửi",
+      "sent": "Đã gửi",
+      "delivered": "Đã nhận",
+      "seen": "Đã xem",
+      "error": "Lỗi",
+      "seenByAll": "Mọi người đã xem",
+      "seenBy": "{{names}} đã xem",
+      "seenByOthers_other": "{{names}} và {{count}} người khác đã xem"
+    }
   }
 }

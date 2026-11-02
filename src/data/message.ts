@@ -135,7 +135,7 @@ export class MessageData {
         id: data.conversation.id,
         title: data.conversation.title!,
         avatar: data.conversation.groupAvatar!,
-        lastMessage: data.content || 'No messages yet',
+        lastMessage: data.content || '',
         lastMessageTime:
           typeof data.createdAt === 'string'
             ? data.createdAt

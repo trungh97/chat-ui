@@ -1,4 +1,5 @@
 import { MessageDeliveryStatus } from '@constants/enums'
+import type { TFunction } from 'i18next'
 
 /** How many names "Seen by …" lists before switching to "and N others". */
 const MAX_SEEN_BY_NAMES = 3
@@ -45,13 +46,15 @@ export const isPointerAtOrAfter = (
 
 const firstName = (name: string) => name.trim().split(/\s+/)[0] || name
 
-const formatSeenBy = (names: string[]): string => {
-  if (names.length <= MAX_SEEN_BY_NAMES) return `Seen by ${names.join(', ')}`
+const formatSeenBy = (names: string[], t: TFunction): string => {
+  if (names.length <= MAX_SEEN_BY_NAMES) {
+    return t('message.status.seenBy', { names: names.join(', ') })
+  }
 
-  const others = names.length - MAX_SEEN_BY_NAMES
-  return `Seen by ${names.slice(0, MAX_SEEN_BY_NAMES).join(', ')} and ${others} ${
-    others === 1 ? 'other' : 'others'
-  }`
+  return t('message.status.seenByOthers', {
+    names: names.slice(0, MAX_SEEN_BY_NAMES).join(', '),
+    count: names.length - MAX_SEEN_BY_NAMES,
+  })
 }
 
 /**
@@ -60,17 +63,21 @@ const formatSeenBy = (names: string[]): string => {
  *
  * - 1-1: Sent → Delivered → Seen.
  * - Group: Sent → "Seen by Bob, Alice" → "Seen by all". Groups never show Delivered.
+ *
+ * `t` translates the status text, so the result follows the current UI language.
  */
 export const getMessageStatus = ({
   message,
   participants,
   currentUserId,
   isGroup,
+  t,
 }: {
   message: MessagePointer
   participants: StatusParticipant[]
   currentUserId: string
   isGroup: boolean
+  t: TFunction
 }): ConfirmedMessageStatus => {
   const others = participants.filter(
     (participant) => participant.userId !== currentUserId,
@@ -86,9 +93,16 @@ export const getMessageStatus = ({
   if (!isGroup) {
     const [other] = others
 
-    if (!other) return { status: MessageDeliveryStatus.SENT, text: 'Sent' }
+    if (!other)
+      return {
+        status: MessageDeliveryStatus.SENT,
+        text: t('message.status.sent'),
+      }
     if (seenBy.length > 0) {
-      return { status: MessageDeliveryStatus.SEEN, text: 'Seen' }
+      return {
+        status: MessageDeliveryStatus.SEEN,
+        text: t('message.status.seen'),
+      }
     }
     if (
       isPointerAtOrAfter(
@@ -97,21 +111,34 @@ export const getMessageStatus = ({
         message,
       )
     ) {
-      return { status: MessageDeliveryStatus.DELIVERED, text: 'Delivered' }
+      return {
+        status: MessageDeliveryStatus.DELIVERED,
+        text: t('message.status.delivered'),
+      }
     }
-    return { status: MessageDeliveryStatus.SENT, text: 'Sent' }
+    return {
+      status: MessageDeliveryStatus.SENT,
+      text: t('message.status.sent'),
+    }
   }
 
   if (seenBy.length === 0) {
-    return { status: MessageDeliveryStatus.SENT, text: 'Sent' }
+    return {
+      status: MessageDeliveryStatus.SENT,
+      text: t('message.status.sent'),
+    }
   }
   if (seenBy.length === others.length) {
-    return { status: MessageDeliveryStatus.SEEN, text: 'Seen by all' }
+    return {
+      status: MessageDeliveryStatus.SEEN,
+      text: t('message.status.seenByAll'),
+    }
   }
   return {
     status: MessageDeliveryStatus.SEEN,
     text: formatSeenBy(
       seenBy.map((participant) => firstName(participant.name)),
+      t,
     ),
   }
 }
