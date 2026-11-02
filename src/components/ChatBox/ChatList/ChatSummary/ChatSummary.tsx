@@ -1,5 +1,7 @@
 import { formatRelativeToNow } from '@helpers/date'
+import { useLanguage } from '@hooks/common'
 import React, { memo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Avatar } from 'shared-ui'
 import { ChatSummaryProps } from '../types'
@@ -9,6 +11,8 @@ export const ChatSummary = memo(({ data }: { data: ChatSummaryProps }) => {
   const navigate = useNavigate()
   const { conversationId } = useParams()
   const isActive = conversationId === id
+  const { t } = useTranslation()
+  const { dateLocale } = useLanguage()
 
   const handleClick = () => {
     if (!isActive) {
@@ -31,11 +35,11 @@ export const ChatSummary = memo(({ data }: { data: ChatSummaryProps }) => {
           <h3 className={`truncate font-medium text-gray-900`}>{title}</h3>
           <div className="flex items-center justify-between">
             <p className={`max-w-[65%] truncate text-sm text-gray-500`}>
-              {lastMessage}
+              {lastMessage || t('chat.list.noMessagesYet')}
             </p>
             <span className="whitespace-nowrap text-xs text-gray-500">
               {'\u2022 '}
-              {formatRelativeToNow(lastMessageTime)}
+              {formatRelativeToNow(lastMessageTime, { locale: dateLocale })}
             </span>
           </div>
         </div>

@@ -7,7 +7,7 @@ import {
 } from '@generated/graphql'
 import { getMessageStatus, StatusParticipant } from '@helpers/messageStatus'
 import { useAuth } from '@hooks/auth'
-import { useChatScrollManagement } from '@hooks/common'
+import { useChatScrollManagement, useLanguage } from '@hooks/common'
 import { useConversationInCache } from '@hooks/conversations'
 import {
   useConversationMessages,
@@ -21,6 +21,7 @@ import {
 } from '@hooks/participant'
 import { usePendingMessageStore } from '@store/pendingMessage'
 import React, { memo, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useParams } from 'react-router-dom'
 import { ChatMessage, MessageStatus } from 'shared-ui'
 
@@ -46,6 +47,8 @@ export const ChatMessageSection = memo(() => {
   const { conversationId } = useParams()
   const { data } = useAuth()
   const currentUserId = data?.me.data?.id
+  const { t } = useTranslation()
+  const { dateLocale } = useLanguage()
 
   useSubscribeNewMessage()
   useHandleLastReceivedMessageSubscription()
@@ -124,6 +127,7 @@ export const ChatMessageSection = memo(() => {
           participants,
           currentUserId,
           isGroup,
+          t,
         })
       : undefined
 
@@ -137,32 +141,32 @@ export const ChatMessageSection = memo(() => {
   })
 
   if (!conversationId) {
-    return <span>Please select a conversation to view messages.</span>
+    return <span>{t('chat.window.selectConversation')}</span>
   }
 
   const isEmptyConversation = !messages || messages.length === 0
 
   if (isEmptyConversation) {
     return loading ? (
-      <div>Loading...</div>
+      <div>{t('common.loading')}</div>
     ) : (
-      <div>No messages available for this conversation.</div>
+      <div>{t('chat.window.empty')}</div>
     )
   }
 
   const getStatusProps = (message: DisplayMessage) => {
     if (message.pendingStatus) {
-      const status =
-        message.pendingStatus === 'ERROR'
-          ? MessageDeliveryStatus.ERROR
-          : MessageDeliveryStatus.SENDING
+      const isError = message.pendingStatus === 'ERROR'
+      const status = isError
+        ? MessageDeliveryStatus.ERROR
+        : MessageDeliveryStatus.SENDING
       return {
         showStatus: true,
         status: MessageStatus[status],
-        onRetry:
-          message.pendingStatus === 'ERROR'
-            ? () => retry(message.id)
-            : undefined,
+        statusText: t(
+          isError ? 'message.status.error' : 'message.status.sending',
+        ),
+        onRetry: isError ? () => retry(message.id) : undefined,
       }
     }
 
@@ -194,6 +198,9 @@ export const ChatMessageSection = memo(() => {
           isOnline
           type={message.senderId === currentUserId ? 'sent' : 'received'}
           groupPosition={message.groupPosition}
+          selfLabel={t('message.you')}
+          retryLabel={t('message.retry')}
+          locale={dateLocale}
           {...getStatusProps(message)}
         />
       ))}
