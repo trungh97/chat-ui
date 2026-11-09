@@ -1,19 +1,137 @@
+// TypeScript settings for the frontend.
+//
+// TypeScript here only TYPE-CHECKS. It never produces the JavaScript that runs:
+//   - the app is compiled by Babel (babel-loader in webpack.config.js, presets in babel.config.json);
+//   - tests are compiled by ts-jest (jest.config.js), which reads this file.
+// The same file is also read by your editor, which may run a newer TypeScript than the
+// project's `typescript` package (5.0). The settings below are chosen to work on both 5.x and 6.x.
+//
+// Checks: `npx tsc --noEmit` (see frontend/CLAUDE.md).
 {
   "compilerOptions": {
+    // Left over from before `paths` could work without it (TypeScript 4.1+). `paths` below is
+    // resolved relative to this file instead, so it isn't needed.
     // "baseUrl": "./src",
-    "target": "ES5",
-    "lib": ["dom", "ES2016"],
+
+    // ---------------------------------------------------------------------------------------
+    // Language level
+    // ---------------------------------------------------------------------------------------
+
+    // The JavaScript version TypeScript assumes it would compile to. Because nothing is emitted
+    // (see `noEmit`), it doesn't change the bundle; Babel decides how far the code is
+    // down-levelled. ES2020 matches `lib` below. It was ES5, which TypeScript 6 deprecates (and
+    // TypeScript 7 removes), and which made the editor report an error on this line.
+    "target": "ES2020",
+
+    // How `import`/`export` are treated. ESNext keeps them as ES modules, which is what the
+    // source uses and what webpack expects. It has to be set explicitly: with the old ES5 target,
+    // TypeScript defaulted to CommonJS. (ts-jest converts to CommonJS on its own for Jest.)
+    "module": "ESNext",
+
+    // How import paths are resolved to files. "bundler" mimics webpack: extensionless relative
+    // imports, `index` files, and the `exports` field of package.json. Without it,
+    // TypeScript 5 falls back to the old "classic" resolution, which breaks `resolveJsonModule`
+    // and package lookups. ("node"/"node10", the other option, is deprecated in TypeScript 6.)
+    "moduleResolution": "bundler",
+
+    // Global type packages (from node_modules/@types) to load:
+    //   - "node": the code reads `process.env.REACT_APP_*` (injected by webpack's DefinePlugin);
+    //   - "jest": globals in tests (`describe`, `it`, `expect`, `jest`).
+    // TypeScript 5 loaded every @types package automatically; TypeScript 6 loads none unless
+    // listed here, so naming them keeps both versions in agreement. Other packages
+    // (React, testing-library) ship types that are picked up through normal imports.
+    "types": ["node", "jest"],
+
+    // The built-in APIs TypeScript knows about.
+    //   - "dom": browser APIs (window, document, fetch, ...);
+    //   - "ES2020": modern JS APIs the code uses, such as Object.values/entries, String.padStart,
+    //     Promise.finally and Array.flatMap.
+    // It was ES2016, which doesn't include those APIs; the CLI only passed because @types/node
+    // quietly added ES2020, so editors that didn't load @types/node showed errors.
+    "lib": ["dom", "ES2020"],
+
+    // Where compiled files would go. Unused while `noEmit` is true (webpack writes the build to
+    // its own output folder); kept so that if `noEmit` is ever turned off, output stays out of src/.
     "outDir": "dist",
+
+    // How JSX is understood. "react" is the classic transform (React.createElement), which is
+    // why each component file has `import React from 'react'`. It matches the Babel preset,
+    // which also uses the classic runtime by default.
     "jsx": "react",
+
+    // ---------------------------------------------------------------------------------------
+    // Interop with other packages
+    // ---------------------------------------------------------------------------------------
+
+    // Allows a default import from a CommonJS package (`import React from 'react'`), which is
+    // how webpack and Babel treat such packages. Without it these imports are type errors.
     "esModuleInterop": true,
+
+    // Don't type-check the .d.ts files inside node_modules. Third-party typings sometimes clash
+    // with each other or with our TypeScript version, and those errors aren't ours to fix.
+    // It also makes the check much faster. Our own .d.ts files are still checked.
     "skipLibCheck": true,
+
+    // Lets `import en from './locales/en/common.json'` work and gives the JSON a type. The i18n
+    // setup (src/i18n) imports the translation files this way and types `t()` keys from them.
+    "resolveJsonModule": true,
+
+    // Allows .js files under src/ to be imported. There are none today; it's harmless and lets
+    // a plain JS file be added without changing the config.
+    "allowJs": true,
+
+    // ---------------------------------------------------------------------------------------
+    // Strictness (see "Conventions" in frontend/CLAUDE.md: no new `any`)
+    // ---------------------------------------------------------------------------------------
+
+    // Turns on the whole strict family: strictNullChecks, noImplicitAny, strictFunctionTypes,
+    // and others. Catches null/undefined bugs before they reach the browser.
     "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
+
+    // Already included by `strict`; listed explicitly to make the "no implicit any" rule visible.
     "noImplicitAny": true,
+
+    // Unused variables and parameters are errors, so dead code doesn't pile up. Prefix a
+    // parameter with `_` when a callback signature forces you to accept one you don't use.
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "allowJs": true,
+
+    // Errors when an import's letter case differs from the file name (`./chatList` vs
+    // `./ChatList`). Windows and macOS don't care, but Linux (CI, Docker) does, so a mismatch
+    // would only break there.
+    "forceConsistentCasingInFileNames": true,
+
+    // Requires each file to be compilable on its own, because Babel and ts-jest compile one
+    // file at a time without seeing the others. TypeScript then flags what they can't handle,
+    // such as re-exporting a type without `export type`, or `const enum`.
+    "isolatedModules": true,
+
+    // ---------------------------------------------------------------------------------------
+    // Output (none)
+    // ---------------------------------------------------------------------------------------
+
+    // Type-check only; never write .js files. Babel produces the real output.
+    "noEmit": true,
+
+    // Would generate .d.ts type files (and maps back to the source) for publishing a library.
+    // This app isn't published, and with `noEmit` they have no effect. They are probably left over from
+    // the module-federation setup (see the `ui/*` alias below).
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": false,
+
+    // ---------------------------------------------------------------------------------------
+    // Import aliases
+    // ---------------------------------------------------------------------------------------
+
+    // Short import paths, e.g. `import { useAuth } from '@hooks/auth'` instead of
+    // `../../../hooks/auth`. This only teaches TypeScript (and the editor) about them; the same
+    // aliases must also exist in webpack.config.js (`resolve.alias`) for the build and
+    // jest.config.js (`moduleNameMapper`) for tests. Add or rename an alias in all three.
+    //
+    // Stale entries, kept to avoid unrelated churn. Don't use them, since their folders don't
+    // exist: @providers, @redux, @api, @utils, and ui/* (from the disabled module-federation
+    // config).
     "paths": {
       "@components/*": ["./src/components/*"],
       "@assets/*": ["./src/assets/*"],
@@ -33,13 +151,13 @@
       "@i18n": ["./src/i18n"],
       "@i18n/*": ["./src/i18n/*"],
       "ui/*": ["./@mf-types/ui/*"]
-    },
-    "declaration": true,
-    "declarationMap": true,
-    "emitDeclarationOnly": false,
-    "isolatedModules": true,
-    "resolveJsonModule": true
+    }
   },
+
+  // Check everything under src/, including tests and src/global.d.ts (which tells TypeScript
+  // that `import './index.css'` is fine; webpack handles stylesheets).
   "include": ["src/**/*"],
+
+  // Third-party code is never checked as our source.
   "exclude": ["node_modules"]
 }
