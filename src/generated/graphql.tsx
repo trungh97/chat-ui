@@ -401,11 +401,6 @@ export type MutationGoogleLoginArgs = {
 };
 
 
-export type MutationHeartbeatUserPresenceArgs = {
-  userId: Scalars['String']['input'];
-};
-
-
 export type MutationLoginCredentialBasedUserArgs = {
   request: UserLoginInput;
 };
@@ -435,7 +430,6 @@ export type MutationUpdateMessageArgs = {
 
 export type MutationUpdateUserPresenceArgs = {
   isOnline: Scalars['Boolean']['input'];
-  userId: Scalars['String']['input'];
 };
 
 export type PaginatedConversationListResponse = {
@@ -474,6 +468,7 @@ export type Query = {
   __typename?: 'Query';
   getContactsByUserId: ContactListResponse;
   getConversationById: ExtendConversationGlobalResponse;
+  getDirectConversation: ExtendConversationGlobalResponse;
   getFriendRequestById: FriendRequestResponse;
   getFriendRequestByUsers: FriendRequestResponse;
   getMessageById: MessageResponse;
@@ -483,11 +478,17 @@ export type Query = {
   getUserById: UserGlobalResponse;
   getUserPresence: UserPresenseGlobalResponse;
   me: UserGlobalResponse;
+  searchUsers: UserContactListGlobalResponse;
 };
 
 
 export type QueryGetConversationByIdArgs = {
   conversationId: Scalars['String']['input'];
+};
+
+
+export type QueryGetDirectConversationArgs = {
+  userId: Scalars['String']['input'];
 };
 
 
@@ -527,12 +528,42 @@ export type QueryGetUserPresenceArgs = {
   userId: Scalars['String']['input'];
 };
 
+
+export type QuerySearchUsersArgs = {
+  options: CursorBasedPaginationParams;
+  search?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type Subscription = {
   __typename?: 'Subscription';
   newMessageAdded: MessageWithConversationDto;
   updateLastReceivedMessageSubscription: Array<LastReceivedMessageUpdateBodyDto>;
   updateLastSeenMessageSubscription: LastSeenMessageUpdateBodyDto;
   userPresence: UserPresenseGlobalResponse;
+};
+
+export type UserContactDto = {
+  __typename?: 'UserContactDTO';
+  avatar?: Maybe<Scalars['String']['output']>;
+  email: Scalars['String']['output'];
+  firstName: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  isOnline: Scalars['Boolean']['output'];
+  lastName: Scalars['String']['output'];
+};
+
+export type UserContactListGlobalResponse = IResponse & {
+  __typename?: 'UserContactListGlobalResponse';
+  data?: Maybe<UserContactListResponse>;
+  error?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  statusCode?: Maybe<Scalars['Float']['output']>;
+};
+
+export type UserContactListResponse = {
+  __typename?: 'UserContactListResponse';
+  items: Array<UserContactDto>;
+  nextCursor?: Maybe<Scalars['String']['output']>;
 };
 
 export type UserCreateMutationRequest = {
@@ -656,11 +687,13 @@ type Status_MessageWithSenderResponse_Fragment = { __typename?: 'MessageWithSend
 
 type Status_PointerUpdateResponse_Fragment = { __typename?: 'PointerUpdateResponse', statusCode?: number | null, message?: string | null };
 
+type Status_UserContactListGlobalResponse_Fragment = { __typename?: 'UserContactListGlobalResponse', statusCode?: number | null, message?: string | null };
+
 type Status_UserGlobalResponse_Fragment = { __typename?: 'UserGlobalResponse', statusCode?: number | null, message?: string | null };
 
 type Status_UserPresenseGlobalResponse_Fragment = { __typename?: 'UserPresenseGlobalResponse', statusCode?: number | null, message?: string | null };
 
-export type StatusFragment = Status_BatchUpdateResponse_Fragment | Status_ContactListResponse_Fragment | Status_ContactResponse_Fragment | Status_ConversationDeleteGlobalResponse_Fragment | Status_ConversationGlobalResponse_Fragment | Status_DetailedParticipantResponse_Fragment | Status_ExtendConversationGlobalResponse_Fragment | Status_ExtendConversationListGlobalResponse_Fragment | Status_FriendRequestListResponse_Fragment | Status_FriendRequestResponse_Fragment | Status_HeartBeatUserPresenseGlobalResponse_Fragment | Status_MessageListGlobalResponse_Fragment | Status_MessageResponse_Fragment | Status_MessageWithSenderResponse_Fragment | Status_PointerUpdateResponse_Fragment | Status_UserGlobalResponse_Fragment | Status_UserPresenseGlobalResponse_Fragment;
+export type StatusFragment = Status_BatchUpdateResponse_Fragment | Status_ContactListResponse_Fragment | Status_ContactResponse_Fragment | Status_ConversationDeleteGlobalResponse_Fragment | Status_ConversationGlobalResponse_Fragment | Status_DetailedParticipantResponse_Fragment | Status_ExtendConversationGlobalResponse_Fragment | Status_ExtendConversationListGlobalResponse_Fragment | Status_FriendRequestListResponse_Fragment | Status_FriendRequestResponse_Fragment | Status_HeartBeatUserPresenseGlobalResponse_Fragment | Status_MessageListGlobalResponse_Fragment | Status_MessageResponse_Fragment | Status_MessageWithSenderResponse_Fragment | Status_PointerUpdateResponse_Fragment | Status_UserContactListGlobalResponse_Fragment | Status_UserGlobalResponse_Fragment | Status_UserPresenseGlobalResponse_Fragment;
 
 export type UserInfoFragment = { __typename?: 'UserDTO', id: string, firstName: string, lastName: string, email: string, phone?: string | null, role: UserRole, avatar: string, isActive: boolean, provider?: UserProvider | null, providerUserId?: string | null, status: UserStatus };
 
@@ -692,9 +725,7 @@ export type GoogleLoginMutationVariables = Exact<{
 
 export type GoogleLoginMutation = { __typename?: 'Mutation', googleLogin: { __typename?: 'UserGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'UserDTO', id: string, firstName: string, lastName: string, email: string, phone?: string | null, role: UserRole, avatar: string, isActive: boolean, provider?: UserProvider | null, providerUserId?: string | null, status: UserStatus } | null } };
 
-export type HeartbeatUserPresenceMutationVariables = Exact<{
-  heartbeatUserPresenceUserId: Scalars['String']['input'];
-}>;
+export type HeartbeatUserPresenceMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type HeartbeatUserPresenceMutation = { __typename?: 'Mutation', heartbeatUserPresence: { __typename?: 'HeartBeatUserPresenseGlobalResponse', data?: boolean | null, error?: string | null, statusCode?: number | null, message?: string | null } };
@@ -717,7 +748,6 @@ export type UpdateLastSeenMessageMutation = { __typename?: 'Mutation', updateLas
 
 export type UpdateUserPresenseMutationVariables = Exact<{
   isOnline: Scalars['Boolean']['input'];
-  userId: Scalars['String']['input'];
 }>;
 
 
@@ -727,6 +757,20 @@ export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
+
+export type GetConversationByIdQueryVariables = Exact<{
+  conversationId: Scalars['String']['input'];
+}>;
+
+
+export type GetConversationByIdQuery = { __typename?: 'Query', getConversationById: { __typename?: 'ExtendConversationGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'ExtendConversationDTO', id: string, title?: string | null, creatorId: string, isArchived: boolean, deletedAt?: any | null, type: ConversationType, lastMessageAt?: any | null, groupAvatar?: string | null, defaultGroupAvatars?: Array<string> | null, participants: Array<{ __typename?: 'DetailedParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType, name: string, avatar: string, lastReceivedMessageId?: string | null, lastSeenMessageId?: string | null, lastSeenAt?: any | null, lastReceivedMessageAt?: any | null, lastSeenMessageAt?: any | null }>, messages: Array<{ __typename?: 'MessageDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, clientMessageId?: string | null }> } | null } };
+
+export type GetDirectConversationQueryVariables = Exact<{
+  userId: Scalars['String']['input'];
+}>;
+
+
+export type GetDirectConversationQuery = { __typename?: 'Query', getDirectConversation: { __typename?: 'ExtendConversationGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'ExtendConversationDTO', id: string, title?: string | null, creatorId: string, isArchived: boolean, deletedAt?: any | null, type: ConversationType, lastMessageAt?: any | null, groupAvatar?: string | null, defaultGroupAvatars?: Array<string> | null, participants: Array<{ __typename?: 'DetailedParticipantDTO', id: string, conversationId: string, userId: string, type: ParticipantType, name: string, avatar: string, lastReceivedMessageId?: string | null, lastSeenMessageId?: string | null, lastSeenAt?: any | null, lastReceivedMessageAt?: any | null, lastSeenMessageAt?: any | null }>, messages: Array<{ __typename?: 'MessageDTO', id: string, content: string, messageType: MessageType, senderId?: string | null, extra?: string | null, conversationId: string, replyToMessageId?: string | null, createdAt: any, clientMessageId?: string | null }> } | null } };
 
 export type GetMessagesByConversationIdQueryVariables = Exact<{
   conversationId: Scalars['String']['input'];
@@ -747,6 +791,14 @@ export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type MeQuery = { __typename?: 'Query', me: { __typename?: 'UserGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'UserDTO', id: string, firstName: string, lastName: string, email: string, phone?: string | null, role: UserRole, avatar: string, isActive: boolean, provider?: UserProvider | null, providerUserId?: string | null, status: UserStatus } | null } };
+
+export type SearchUsersQueryVariables = Exact<{
+  search?: InputMaybe<Scalars['String']['input']>;
+  options: CursorBasedPaginationParams;
+}>;
+
+
+export type SearchUsersQuery = { __typename?: 'Query', searchUsers: { __typename?: 'UserContactListGlobalResponse', error?: string | null, statusCode?: number | null, message?: string | null, data?: { __typename?: 'UserContactListResponse', nextCursor?: string | null, items: Array<{ __typename?: 'UserContactDTO', id: string, email: string, firstName: string, lastName: string, avatar?: string | null, isOnline: boolean }> } | null } };
 
 export type NewMessageAddedSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
@@ -1066,8 +1118,8 @@ export type GoogleLoginMutationHookResult = ReturnType<typeof useGoogleLoginMuta
 export type GoogleLoginMutationResult = Apollo.MutationResult<GoogleLoginMutation>;
 export type GoogleLoginMutationOptions = Apollo.BaseMutationOptions<GoogleLoginMutation, GoogleLoginMutationVariables>;
 export const HeartbeatUserPresenceDocument = gql`
-    mutation HeartbeatUserPresence($heartbeatUserPresenceUserId: String!) {
-  heartbeatUserPresence(userId: $heartbeatUserPresenceUserId) {
+    mutation HeartbeatUserPresence {
+  heartbeatUserPresence {
     ...status
     data
     error
@@ -1089,7 +1141,6 @@ export type HeartbeatUserPresenceMutationFn = Apollo.MutationFunction<HeartbeatU
  * @example
  * const [heartbeatUserPresenceMutation, { data, loading, error }] = useHeartbeatUserPresenceMutation({
  *   variables: {
- *      heartbeatUserPresenceUserId: // value for 'heartbeatUserPresenceUserId'
  *   },
  * });
  */
@@ -1176,8 +1227,8 @@ export type UpdateLastSeenMessageMutationHookResult = ReturnType<typeof useUpdat
 export type UpdateLastSeenMessageMutationResult = Apollo.MutationResult<UpdateLastSeenMessageMutation>;
 export type UpdateLastSeenMessageMutationOptions = Apollo.BaseMutationOptions<UpdateLastSeenMessageMutation, UpdateLastSeenMessageMutationVariables>;
 export const UpdateUserPresenseDocument = gql`
-    mutation UpdateUserPresense($isOnline: Boolean!, $userId: String!) {
-  updateUserPresence(isOnline: $isOnline, userId: $userId) {
+    mutation UpdateUserPresense($isOnline: Boolean!) {
+  updateUserPresence(isOnline: $isOnline) {
     ...status
     data {
       userId
@@ -1204,7 +1255,6 @@ export type UpdateUserPresenseMutationFn = Apollo.MutationFunction<UpdateUserPre
  * const [updateUserPresenseMutation, { data, loading, error }] = useUpdateUserPresenseMutation({
  *   variables: {
  *      isOnline: // value for 'isOnline'
- *      userId: // value for 'userId'
  *   },
  * });
  */
@@ -1245,6 +1295,96 @@ export function useLogoutMutation(baseOptions?: Apollo.MutationHookOptions<Logou
 export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
 export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
 export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>;
+export const GetConversationByIdDocument = gql`
+    query GetConversationById($conversationId: String!) {
+  getConversationById(conversationId: $conversationId) {
+    ...status
+    data {
+      ...extendedConversation
+    }
+    error
+  }
+}
+    ${StatusFragmentDoc}
+${ExtendedConversationFragmentDoc}`;
+
+/**
+ * __useGetConversationByIdQuery__
+ *
+ * To run a query within a React component, call `useGetConversationByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetConversationByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetConversationByIdQuery({
+ *   variables: {
+ *      conversationId: // value for 'conversationId'
+ *   },
+ * });
+ */
+export function useGetConversationByIdQuery(baseOptions: Apollo.QueryHookOptions<GetConversationByIdQuery, GetConversationByIdQueryVariables> & ({ variables: GetConversationByIdQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetConversationByIdQuery, GetConversationByIdQueryVariables>(GetConversationByIdDocument, options);
+      }
+export function useGetConversationByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetConversationByIdQuery, GetConversationByIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetConversationByIdQuery, GetConversationByIdQueryVariables>(GetConversationByIdDocument, options);
+        }
+export function useGetConversationByIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetConversationByIdQuery, GetConversationByIdQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetConversationByIdQuery, GetConversationByIdQueryVariables>(GetConversationByIdDocument, options);
+        }
+export type GetConversationByIdQueryHookResult = ReturnType<typeof useGetConversationByIdQuery>;
+export type GetConversationByIdLazyQueryHookResult = ReturnType<typeof useGetConversationByIdLazyQuery>;
+export type GetConversationByIdSuspenseQueryHookResult = ReturnType<typeof useGetConversationByIdSuspenseQuery>;
+export type GetConversationByIdQueryResult = Apollo.QueryResult<GetConversationByIdQuery, GetConversationByIdQueryVariables>;
+export const GetDirectConversationDocument = gql`
+    query GetDirectConversation($userId: String!) {
+  getDirectConversation(userId: $userId) {
+    ...status
+    data {
+      ...extendedConversation
+    }
+    error
+  }
+}
+    ${StatusFragmentDoc}
+${ExtendedConversationFragmentDoc}`;
+
+/**
+ * __useGetDirectConversationQuery__
+ *
+ * To run a query within a React component, call `useGetDirectConversationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDirectConversationQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDirectConversationQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useGetDirectConversationQuery(baseOptions: Apollo.QueryHookOptions<GetDirectConversationQuery, GetDirectConversationQueryVariables> & ({ variables: GetDirectConversationQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetDirectConversationQuery, GetDirectConversationQueryVariables>(GetDirectConversationDocument, options);
+      }
+export function useGetDirectConversationLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDirectConversationQuery, GetDirectConversationQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetDirectConversationQuery, GetDirectConversationQueryVariables>(GetDirectConversationDocument, options);
+        }
+export function useGetDirectConversationSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetDirectConversationQuery, GetDirectConversationQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetDirectConversationQuery, GetDirectConversationQueryVariables>(GetDirectConversationDocument, options);
+        }
+export type GetDirectConversationQueryHookResult = ReturnType<typeof useGetDirectConversationQuery>;
+export type GetDirectConversationLazyQueryHookResult = ReturnType<typeof useGetDirectConversationLazyQuery>;
+export type GetDirectConversationSuspenseQueryHookResult = ReturnType<typeof useGetDirectConversationSuspenseQuery>;
+export type GetDirectConversationQueryResult = Apollo.QueryResult<GetDirectConversationQuery, GetDirectConversationQueryVariables>;
 export const GetMessagesByConversationIdDocument = gql`
     query GetMessagesByConversationId($conversationId: String!, $options: CursorBasedPaginationParams!) {
   getMessagesByConversationId(conversationId: $conversationId, options: $options) {
@@ -1370,6 +1510,59 @@ export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeSuspenseQueryHookResult = ReturnType<typeof useMeSuspenseQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
+export const SearchUsersDocument = gql`
+    query SearchUsers($search: String, $options: CursorBasedPaginationParams!) {
+  searchUsers(search: $search, options: $options) {
+    ...status
+    data {
+      items {
+        id
+        email
+        firstName
+        lastName
+        avatar
+        isOnline
+      }
+      nextCursor
+    }
+    error
+  }
+}
+    ${StatusFragmentDoc}`;
+
+/**
+ * __useSearchUsersQuery__
+ *
+ * To run a query within a React component, call `useSearchUsersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSearchUsersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSearchUsersQuery({
+ *   variables: {
+ *      search: // value for 'search'
+ *      options: // value for 'options'
+ *   },
+ * });
+ */
+export function useSearchUsersQuery(baseOptions: Apollo.QueryHookOptions<SearchUsersQuery, SearchUsersQueryVariables> & ({ variables: SearchUsersQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<SearchUsersQuery, SearchUsersQueryVariables>(SearchUsersDocument, options);
+      }
+export function useSearchUsersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SearchUsersQuery, SearchUsersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<SearchUsersQuery, SearchUsersQueryVariables>(SearchUsersDocument, options);
+        }
+export function useSearchUsersSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<SearchUsersQuery, SearchUsersQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<SearchUsersQuery, SearchUsersQueryVariables>(SearchUsersDocument, options);
+        }
+export type SearchUsersQueryHookResult = ReturnType<typeof useSearchUsersQuery>;
+export type SearchUsersLazyQueryHookResult = ReturnType<typeof useSearchUsersLazyQuery>;
+export type SearchUsersSuspenseQueryHookResult = ReturnType<typeof useSearchUsersSuspenseQuery>;
+export type SearchUsersQueryResult = Apollo.QueryResult<SearchUsersQuery, SearchUsersQueryVariables>;
 export const NewMessageAddedDocument = gql`
     subscription NewMessageAdded {
   newMessageAdded {

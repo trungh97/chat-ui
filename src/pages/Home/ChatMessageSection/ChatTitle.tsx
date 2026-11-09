@@ -4,12 +4,14 @@ import {
   DetailedParticipantFragmentDoc,
 } from '@generated/graphql'
 import { useConversationInCache } from '@hooks/conversations'
+import { useDraftConversationStore } from '@store/draftConversation'
 import React, { memo } from 'react'
 import { useParams } from 'react-router-dom'
 import { Divider, StarIcon, UserIcon } from 'shared-ui'
 
 export const ChatTitle = memo(() => {
-  const { conversationId } = useParams()
+  const { conversationId, userId: draftUserId } = useParams()
+  const draft = useDraftConversationStore.use.drafts()[draftUserId ?? '']
   const fragment = gql`
     fragment ConversationTitle on ExtendConversationDTO {
       id
@@ -22,10 +24,18 @@ export const ChatTitle = memo(() => {
     ${DetailedParticipantFragmentDoc}
   `
   const { data } = useConversationInCache({
-    conversationId: conversationId!,
+    conversationId: conversationId ?? '',
     fragment,
     fragmentName: 'ConversationTitle',
   })
+
+  if (draft) {
+    return (
+      <div className="block text-ellipsis text-lg font-semibold">
+        {draft.name}
+      </div>
+    )
+  }
 
   if (!conversationId || !data) {
     return null

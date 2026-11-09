@@ -11,12 +11,15 @@ interface UseMessageListOptions {
   conversationId: string
   initialCursor?: string
   limit?: number
+  /** Skip loading, e.g. for a draft, which has no messages on the server yet. */
+  skip?: boolean
 }
 
 export function useConversationMessages({
   conversationId,
   initialCursor,
   limit = DEFAULT_LIMIT,
+  skip = false,
 }: UseMessageListOptions) {
   const { loading, fetchMore, data, error, subscribeToMore } =
     useGetMessagesByConversationIdQuery({
@@ -25,6 +28,7 @@ export function useConversationMessages({
         options: { cursor: initialCursor, limit },
       },
       fetchPolicy: 'network-only',
+      skip,
     })
 
   const nextCursor = data?.getMessagesByConversationId?.data?.nextCursor
