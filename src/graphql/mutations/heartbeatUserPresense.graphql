@@ -1,5 +1,5 @@
-mutation HeartbeatUserPresence($heartbeatUserPresenceUserId: String!) {
-  heartbeatUserPresence(userId: $heartbeatUserPresenceUserId) {
+mutation HeartbeatUserPresence {
+  heartbeatUserPresence {
     ...status
     data
     error

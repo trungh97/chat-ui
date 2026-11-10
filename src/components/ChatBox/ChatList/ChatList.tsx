@@ -1,6 +1,8 @@
+import { ConversationData } from '@data/conversation'
 import { useInfiniteScroll } from '@hooks/common'
 import { useMyLatestConversations } from '@hooks/conversations'
-import React, { memo } from 'react'
+import { useDraftConversationStore } from '@store/draftConversation'
+import React, { memo, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Skeleton } from 'shared-ui'
 import { ChatListLoading } from './ChatListLoading'
@@ -20,17 +22,29 @@ export const ChatList = memo(() => {
       limit: 15,
     })
 
+  const drafts = useDraftConversationStore.use.drafts()
+  // Drafts come first, newest first.
+  const draftItems = useMemo(
+    () =>
+      Object.values(drafts)
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+        .map(ConversationData.fromDraft),
+    [drafts],
+  )
+
   const { sentinelRef } = useInfiniteScroll({
     onLoadMore: loadMore,
     hasNextPage,
     loading,
   })
 
-  if ((!conversations || conversations.length === 0) && !loading) {
+  const isEmpty = conversations.length === 0 && draftItems.length === 0
+
+  if (isEmpty && !loading) {
     return <div>{t('chat.list.empty')}</div>
   }
 
-  if (loading && conversations.length === 0) {
+  if (loading && isEmpty) {
     return (
       <ChatListWrapper>
         <ChatListLoading />
@@ -40,6 +54,11 @@ export const ChatList = memo(() => {
 
   return (
     <ChatListWrapper>
+      {draftItems.map((draft) => (
+        <ChatSummaryWrapper key={draft.id}>
+          <ChatSummary data={draft} />
+        </ChatSummaryWrapper>
+      ))}
       {conversations.map((chat) => (
         <ChatSummaryWrapper key={chat.id}>
           <Skeleton title={false} avatar loading={loading} key={chat.id}>

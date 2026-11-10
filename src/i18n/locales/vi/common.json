@@ -34,7 +34,8 @@
     },
     "window": {
       "selectConversation": "Hãy chọn một đoạn chat để xem tin nhắn.",
-      "empty": "Đoạn chat này chưa có tin nhắn."
+      "empty": "Đoạn chat này chưa có tin nhắn.",
+      "draftEmpty": "Gửi lời chào đến {{name}}. Tin nhắn đầu tiên sẽ bắt đầu đoạn chat."
     }
   },
   "message": {
@@ -50,5 +51,17 @@
       "seenBy": "{{names}} đã xem",
       "seenByOthers_other": "{{names}} và {{count}} người khác đã xem"
     }
+  },
+  "contacts": {
+    "open": "Tin nhắn mới",
+    "title": "Danh bạ",
+    "searchPlaceholder": "Tìm kiếm mọi người",
+    "empty": "Không tìm thấy ai",
+    "loadError": "Không tải được danh bạ. Hãy thử lại.",
+    "openError": "Không mở được đoạn chat. Hãy thử lại.",
+    "message": "Nhắn tin",
+    "messageUser": "Nhắn tin cho {{name}}",
+    "online": "Trực tuyến",
+    "offline": "Ngoại tuyến"
   }
 }

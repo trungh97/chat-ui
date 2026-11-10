@@ -1,0 +1,17 @@
+query SearchUsers($search: String, $options: CursorBasedPaginationParams!) {
+  searchUsers(search: $search, options: $options) {
+    ...status
+    data {
+      items {
+        id
+        email
+        firstName
+        lastName
+        avatar
+        isOnline
+      }
+      nextCursor
+    }
+    error
+  }
+}

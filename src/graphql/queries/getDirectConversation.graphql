@@ -1,0 +1,9 @@
+query GetDirectConversation($userId: String!) {
+  getDirectConversation(userId: $userId) {
+    ...status
+    data {
+      ...extendedConversation
+    }
+    error
+  }
+}

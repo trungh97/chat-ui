@@ -2,21 +2,22 @@ import { formatRelativeToNow } from '@helpers/date'
 import { useLanguage } from '@hooks/common'
 import React, { memo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { Avatar } from 'shared-ui'
 import { ChatSummaryProps } from '../types'
 
 export const ChatSummary = memo(({ data }: { data: ChatSummaryProps }) => {
-  const { id, avatar, title, lastMessage, lastMessageTime } = data
+  const { id, path, avatar, title, lastMessage, lastMessageTime } = data
   const navigate = useNavigate()
-  const { conversationId } = useParams()
-  const isActive = conversationId === id
+  const { pathname } = useLocation()
+  const target = path ?? `/${id}`
+  const isActive = pathname === target
   const { t } = useTranslation()
   const { dateLocale } = useLanguage()
 
   const handleClick = () => {
     if (!isActive) {
-      navigate(`/${id}`)
+      navigate(target)
     }
   }
 

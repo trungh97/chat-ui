@@ -1,5 +1,6 @@
+import { useDraftRoute } from '@hooks/conversations/useDraftRoute'
 import React, { memo } from 'react'
-import { useParams } from 'react-router-dom'
+import { Navigate, useParams } from 'react-router-dom'
 import { Divider } from 'shared-ui'
 import ChatHead from './ChatHead'
 import ChatInput from './ChatInput'
@@ -10,8 +11,19 @@ import Wrapper from './Wrapper'
 
 const ChatWindow = memo(() => {
   const { conversationId } = useParams()
+  const { draftUserId, draft, isMissing } = useDraftRoute()
 
-  if (!conversationId) {
+  if (isMissing) {
+    // Drafts live in memory only, so after a reload there is nothing to show.
+    return <Navigate to="/" replace />
+  }
+
+  // A draft that was just replaced by its conversation: the route is about to change.
+  if (draftUserId && !draft) {
+    return null
+  }
+
+  if (!conversationId && !draftUserId) {
     return null
   }
 

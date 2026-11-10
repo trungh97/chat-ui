@@ -11,7 +11,7 @@ import { onWsReconnected } from '../../apollo/wsLink'
 
 export const useMyLatestConversations = (options: CursorBasedPagination) => {
   const navigate = useNavigate()
-  const { conversationId } = useParams()
+  const { conversationId, userId: draftUserId } = useParams()
 
   const [isFetchingMore, setIsFetchingMore] = useState(false)
 
@@ -44,9 +44,9 @@ export const useMyLatestConversations = (options: CursorBasedPagination) => {
     [refetch],
   )
 
-  // Auto redirect to the first conversation
+  // Auto redirect to the first conversation, unless a draft is open
   useEffect(() => {
-    if (items.length > 0 && !conversationId) {
+    if (items.length > 0 && !conversationId && !draftUserId) {
       const firstConversationId = data?.getMyConversations?.data?.items[0].id
       navigate(`/${firstConversationId}`)
     }

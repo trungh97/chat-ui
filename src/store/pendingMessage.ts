@@ -23,6 +23,11 @@ export interface PendingMessageState {
     clientMessageId: string,
     status: PendingMessage['status'],
   ) => void
+  /**
+   * Moves a pending message to another conversation, e.g. from a draft key to the
+   * conversation the server created for it.
+   */
+  movePendingMessage: (clientMessageId: string, conversationId: string) => void
   removePendingMessage: (clientMessageId: string) => void
 }
 
@@ -44,6 +49,18 @@ const usePendingMessageStoreBase = create<PendingMessageState>((set) => ({
         pendingMessages: {
           ...state.pendingMessages,
           [clientMessageId]: { ...message, status },
+        },
+      }
+    }),
+  movePendingMessage: (clientMessageId, conversationId) =>
+    set((state) => {
+      const message = state.pendingMessages[clientMessageId]
+      if (!message) return {}
+
+      return {
+        pendingMessages: {
+          ...state.pendingMessages,
+          [clientMessageId]: { ...message, conversationId },
         },
       }
     }),

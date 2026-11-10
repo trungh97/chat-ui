@@ -1,6 +1,10 @@
 import { useHeartbeatUserPresenceMutation } from '@generated/graphql'
 import { useEffect, useRef } from 'react'
 
+/**
+ * Keeps the current user marked online. The server takes the user from the session, so
+ * `userId` only says whether someone is logged in yet.
+ */
 export const useUserPresenceHeartbeat = ({ userId }: { userId: string }) => {
   const [heartbeat] = useHeartbeatUserPresenceMutation()
   const initialized = useRef(false)
@@ -13,20 +17,12 @@ export const useUserPresenceHeartbeat = ({ userId }: { userId: string }) => {
     // delay 10s before first heartbeat
     const startTimeout = setTimeout(() => {
       console.log('💗 first heartbeat')
-      heartbeat({
-        variables: {
-          heartbeatUserPresenceUserId: userId,
-        },
-      })
+      heartbeat()
 
       // send heartbeat every 15s
       const interval = setInterval(() => {
         console.log('💗 beat')
-        heartbeat({
-          variables: {
-            heartbeatUserPresenceUserId: userId,
-          },
-        })
+        heartbeat()
       }, 180000)
 
       // cleanup on unmount
