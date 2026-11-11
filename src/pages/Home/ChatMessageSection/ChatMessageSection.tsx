@@ -19,8 +19,12 @@ import {
   useHandleLastSeenMessageSubscription,
   useMarkConversationSeen,
 } from '@hooks/participant'
+import {
+  draftConversationKey,
+  useDraftConversationStore,
+} from '@store/draftConversation'
 import { usePendingMessageStore } from '@store/pendingMessage'
-import React, { memo, useMemo } from 'react'
+import React, { memo, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams } from 'react-router-dom'
 import { ChatMessage, MessageStatus } from 'shared-ui'
@@ -44,7 +48,11 @@ const findLast = <T,>(items: T[], predicate: (item: T) => boolean) => {
 }
 
 export const ChatMessageSection = memo(() => {
-  const { conversationId } = useParams()
+  const { conversationId, userId: draftUserId } = useParams()
+  const draft = useDraftConversationStore.use.drafts()[draftUserId ?? '']
+  // Pending messages of a draft are keyed by the draft until the server creates it.
+  const viewKey =
+    conversationId ?? (draft ? draftConversationKey(draft.userId) : undefined)
   const { data } = useAuth()
   const currentUserId = data?.me.data?.id
   const { t } = useTranslation()
@@ -60,12 +68,13 @@ export const ChatMessageSection = memo(() => {
     hasNextPage,
     loadMore,
   } = useConversationMessages({
-    conversationId: conversationId!,
+    conversationId: conversationId ?? '',
     limit: 20,
+    skip: !conversationId,
   })
 
   const { data: conversation } = useConversationInCache({
-    conversationId: conversationId!,
+    conversationId: conversationId ?? '',
     fragment: conversationParticipantsFragment,
     fragmentName: 'ConversationParticipants',
   })
@@ -91,21 +100,35 @@ export const ChatMessageSection = memo(() => {
   const isGroup = conversation?.type === ConversationType.Group
 
   const pendingMessages = usePendingMessageStore.use.pendingMessages()
+  const removePendingMessage = usePendingMessageStore.use.removePendingMessage()
   const messages: DisplayMessage[] = useMemo(
     () =>
       MessageData.withPendingMessages({
         messages: savedMessages,
         pendingMessages: Object.values(pendingMessages).filter(
-          (message) => message.conversationId === conversationId,
+          (message) => message.conversationId === viewKey,
         ),
         currentUserId: currentUserId ?? '',
       }),
-    [savedMessages, pendingMessages, conversationId, currentUserId],
+    [savedMessages, pendingMessages, viewKey, currentUserId],
   )
+
+  // A draft's first message stays pending after it's saved, so it shows while the new
+  // conversation's messages load. Drop it once the loaded list has it.
+  useEffect(() => {
+    const savedClientIds = new Set(
+      savedMessages.map(({ clientMessageId }) => clientMessageId),
+    )
+    Object.values(pendingMessages).forEach(({ clientMessageId }) => {
+      if (savedClientIds.has(clientMessageId)) {
+        removePendingMessage(clientMessageId)
+      }
+    })
+  }, [savedMessages, pendingMessages, removePendingMessage])
 
   const { containerRef, sentinelRef, isScrolledToBottom } =
     useChatScrollManagement({
-      conversationId: conversationId!,
+      conversationId: viewKey ?? '',
       messages,
       hasNextPage,
       loading,
@@ -140,13 +163,17 @@ export const ChatMessageSection = memo(() => {
     isScrolledToBottom,
   })
 
-  if (!conversationId) {
+  if (!viewKey) {
     return <span>{t('chat.window.selectConversation')}</span>
   }
 
   const isEmptyConversation = !messages || messages.length === 0
 
   if (isEmptyConversation) {
+    if (draft) {
+      return <div>{t('chat.window.draftEmpty', { name: draft.name })}</div>
+    }
+
     return loading ? (
       <div>{t('common.loading')}</div>
     ) : (

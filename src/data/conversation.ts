@@ -1,9 +1,9 @@
-import {
-  ConversationType,
-  ExtendConversationDto,
-  MessageWithConversationDto,
-} from '@generated/graphql'
+import { ConversationType, ExtendConversationDto } from '@generated/graphql'
 import { Conversation } from '@interfaces/dtos'
+import {
+  DraftConversation,
+  draftConversationKey,
+} from '@store/draftConversation'
 
 export class ConversationData {
   static toBaseConversation(data: ExtendConversationDto): Conversation {
@@ -31,42 +31,18 @@ export class ConversationData {
     return data.map(this.toBaseConversation)
   }
 
-  /**
-   * Maps a MessageWithConversation DTO to an ExtendConversation DTO.
-   *
-   * @param {{ data: MessageWithConversationDto }} - The MessageWithConversation DTO to be mapped.
-   * @return {ExtendConversationDto} The mapped ExtendConversation DTO.
-   */
-  static fromMessageWithConversationDTOToExtendedConversationDTO({
-    data,
-  }: {
-    data: MessageWithConversationDto
-  }): ExtendConversationDto {
-    const conversation = data.conversation
+  /** A draft as a chat list item. It opens the draft route instead of `/<id>`. */
+  static fromDraft(draft: DraftConversation): Conversation {
     return {
-      __typename: 'ExtendConversationDTO',
-      id: conversation.id,
-      creatorId: conversation.creatorId,
-      isArchived: conversation.isArchived,
-      deletedAt: conversation.deletedAt,
-      type: conversation.type,
-      groupAvatar: conversation.groupAvatar,
-      lastMessageAt: conversation.lastMessageAt,
-      messages: [
-        {
-          __typename: 'MessageDTO',
-          id: data.id,
-          content: data.content,
-          createdAt: data.createdAt,
-          messageType: data.messageType,
-          senderId: data.senderId,
-          extra: data.extra,
-          conversationId: data.conversationId,
-          replyToMessageId: data.replyToMessageId,
-        },
-      ],
-      participants: [],
-      title: conversation.title,
+      id: draftConversationKey(draft.userId),
+      path: `/new/${draft.userId}`,
+      title: draft.name,
+      avatar: draft.avatar ?? '',
+      lastMessage: '',
+      lastMessageTime: draft.createdAt,
+      isRead: true,
+      numberOfPaticipants: 2,
+      isGroup: false,
     }
   }
 }

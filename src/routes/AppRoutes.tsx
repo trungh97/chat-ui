@@ -23,6 +23,7 @@ const AppRoutes = () => {
       <Route element={<PrivateRoutes />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/:conversationId" element={<HomePage />} />
+        <Route path="/new/:userId" element={<HomePage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Route>

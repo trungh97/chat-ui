@@ -42,3 +42,26 @@ describe('ConversationData.toBaseConversation', () => {
     ).toBe('')
   })
 })
+
+describe('ConversationData.fromDraft', () => {
+  it('maps a draft to a chat list item that opens the draft route', () => {
+    expect(
+      ConversationData.fromDraft({
+        userId: 'u-2',
+        name: 'Ann Lee',
+        avatar: null,
+        createdAt: '2026-11-08T10:00:00.000Z',
+      }),
+    ).toEqual({
+      id: 'draft:u-2',
+      path: '/new/u-2',
+      title: 'Ann Lee',
+      avatar: '',
+      lastMessage: '',
+      lastMessageTime: '2026-11-08T10:00:00.000Z',
+      isRead: true,
+      numberOfPaticipants: 2,
+      isGroup: false,
+    })
+  })
+})

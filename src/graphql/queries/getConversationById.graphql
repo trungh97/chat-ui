@@ -1,0 +1,9 @@
+query GetConversationById($conversationId: String!) {
+  getConversationById(conversationId: $conversationId) {
+    ...status
+    data {
+      ...extendedConversation
+    }
+    error
+  }
+}
