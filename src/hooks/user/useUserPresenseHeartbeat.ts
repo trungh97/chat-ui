@@ -1,34 +1,36 @@
+import {
+  PRESENCE_FIRST_HEARTBEAT_DELAY_MS,
+  PRESENCE_HEARTBEAT_INTERVAL_MS,
+} from '@constants/common'
 import { useHeartbeatUserPresenceMutation } from '@generated/graphql'
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 
 /**
  * Keeps the current user marked online. The server takes the user from the session, so
- * `userId` only says whether someone is logged in yet.
+ * `userId` only says whether someone is logged in. Heartbeats stop when it is empty or the
+ * component unmounts, and start again when a user logs in.
  */
 export const useUserPresenceHeartbeat = ({ userId }: { userId: string }) => {
-  const [heartbeat] = useHeartbeatUserPresenceMutation()
-  const initialized = useRef(false)
+  // Nothing reads the mutation's result, so don't re-render the caller on every beat.
+  const [heartbeat] = useHeartbeatUserPresenceMutation({ ignoreResults: true })
 
   useEffect(() => {
-    if (!userId) return
-    if (initialized.current) return
-    initialized.current = true
+    if (!userId) return undefined
 
-    // delay 10s before first heartbeat
+    // A failed heartbeat needs no handling: the next one tries again.
+    const beat = () => {
+      heartbeat().catch(() => undefined)
+    }
+
+    let interval: ReturnType<typeof setInterval> | undefined
     const startTimeout = setTimeout(() => {
-      console.log('💗 first heartbeat')
-      heartbeat()
+      beat()
+      interval = setInterval(beat, PRESENCE_HEARTBEAT_INTERVAL_MS)
+    }, PRESENCE_FIRST_HEARTBEAT_DELAY_MS)
 
-      // send heartbeat every 15s
-      const interval = setInterval(() => {
-        console.log('💗 beat')
-        heartbeat()
-      }, 180000)
-
-      // cleanup on unmount
-      return () => clearInterval(interval)
-    }, 10000)
-
-    return () => clearTimeout(startTimeout)
+    return () => {
+      clearTimeout(startTimeout)
+      clearInterval(interval)
+    }
   }, [heartbeat, userId])
 }
